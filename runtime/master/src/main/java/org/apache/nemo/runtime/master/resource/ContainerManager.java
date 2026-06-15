@@ -206,6 +206,8 @@ public final class ContainerManager {
     pendingContextIdToResourceSpec.put(executorId, resourceSpecification);
 
     final JVMProcess jvmProcess = jvmProcessFactory.newEvaluatorProcess()
+      .addOption("--add-opens=java.base/java.lang=ALL-UNNAMED")
+      .addOption("--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED")
       .addOption("-XX:-OmitStackTraceInFastThrow")
       .addOption("-XX:+PrintGCDetails")
       .addOption("-XX:+PrintGCTimeStamps")

@@ -11,6 +11,7 @@
 
   <modules>
     <module>vm</module>
+    <module>lambda</module>
   </modules>
   <artifactId>offloading-workers</artifactId>
   <packaging>pom</packaging>

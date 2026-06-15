@@ -108,6 +108,14 @@ public final class JobLauncher {
   private static final List<?> COLLECTED_DATA = new ArrayList<>();
   private static final String[] EMPTY_USER_ARGS = new String[0];
 
+  private static String getNemoWorkingFile(final String fileName) {
+    final String configuredDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    if (configuredDir != null && !configuredDir.isEmpty()) {
+      return Paths.get(configuredDir, fileName).toString();
+    }
+    return Paths.get(System.getProperty("user.dir"), fileName).toString();
+  }
+
   /**
    * private constructor.
    */
@@ -361,10 +369,11 @@ public final class JobLauncher {
             .build())
         .build());
 
-    final String home = System.getenv("HOME");
+    final String scalingFile = getNemoWorkingFile("scaling.txt");
+    final String sourceLogFile = getNemoWorkingFile("source.log");
 
     try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(home + "/incubator-nemo/scaling.txt"));
+      BufferedWriter writer = new BufferedWriter(new FileWriter(scalingFile));
       writer.close();
     } catch (final Exception e) {
       e.printStackTrace();
@@ -375,7 +384,7 @@ public final class JobLauncher {
       LOG.info("Scaling service invoked...");
         try {
           final BufferedReader br =
-            new BufferedReader(new FileReader(home + "/incubator-nemo/scaling.txt"));
+            new BufferedReader(new FileReader(scalingFile));
 
           String s;
           String lastLine = null;
@@ -494,7 +503,7 @@ public final class JobLauncher {
     // input rate 보내기
     try {
       final BufferedReader br =
-        new BufferedReader(new FileReader(home + "/incubator-nemo/source.log"));
+        new BufferedReader(new FileReader(sourceLogFile));
 
       Pattern pattern = Pattern.compile("\\d+ events");
 

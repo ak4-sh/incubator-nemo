@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,14 @@ public final class StaticSyncOffloadingPolicy implements TaskOffloadingPolicy {
 
   private final Map<TaskExecutor, DescriptiveStatistics> taskExecutionTimeMap = new HashMap<>();
 
+  private static String getScalingFilePath() {
+    final String configuredDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    if (configuredDir != null && !configuredDir.isEmpty()) {
+      return Paths.get(configuredDir, "scaling.txt").toString();
+    }
+    return Paths.get(System.getProperty("user.dir"), "scaling.txt").toString();
+  }
+
   @Inject
   private StaticSyncOffloadingPolicy(
     final SystemLoadProfiler profiler,
@@ -63,11 +72,12 @@ public final class StaticSyncOffloadingPolicy implements TaskOffloadingPolicy {
     LOG.info("Start StaticOffloadingPolicy");
 
     try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter("/home/ubuntu/incubator-nemo/scaling.txt"));
+      final String scalingFilePath = getScalingFilePath();
+      BufferedWriter writer = new BufferedWriter(new FileWriter(scalingFilePath));
       writer.close();
 
       final BufferedReader br =
-        new BufferedReader(new FileReader("/home/ubuntu/incubator-nemo/scaling.txt"));
+        new BufferedReader(new FileReader(scalingFilePath));
 
       String s;
       String lastLine = null;
@@ -128,7 +138,7 @@ public final class StaticSyncOffloadingPolicy implements TaskOffloadingPolicy {
   public void triggerPolicy() {
     try {
       final BufferedReader br =
-        new BufferedReader(new FileReader("/home/ubuntu/incubator-nemo/scaling.txt"));
+        new BufferedReader(new FileReader(getScalingFilePath()));
 
       String s;
       String lastLine = null;

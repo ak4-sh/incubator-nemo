@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
@@ -40,6 +41,14 @@ public final class StaticOffloadingPolicy implements TaskOffloadingPolicy {
   private final StageOffloadingWorkerManager stageOffloadingWorkerManager;
 
   private final Map<TaskExecutor, DescriptiveStatistics> taskExecutionTimeMap = new HashMap<>();
+
+  private static String getScalingFilePath() {
+    final String configuredDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    if (configuredDir != null && !configuredDir.isEmpty()) {
+      return Paths.get(configuredDir, "scaling.txt").toString();
+    }
+    return Paths.get(System.getProperty("user.dir"), "scaling.txt").toString();
+  }
 
   @Inject
   private StaticOffloadingPolicy(
@@ -64,7 +73,7 @@ public final class StaticOffloadingPolicy implements TaskOffloadingPolicy {
 
     try {
       final BufferedReader br =
-        new BufferedReader(new FileReader("/home/ubuntu/incubator-nemo/scaling.txt"));
+        new BufferedReader(new FileReader(getScalingFilePath()));
 
       String s;
       String lastLine = null;
@@ -125,7 +134,7 @@ public final class StaticOffloadingPolicy implements TaskOffloadingPolicy {
   public void triggerPolicy() {
     try {
       final BufferedReader br =
-        new BufferedReader(new FileReader("/home/ubuntu/incubator-nemo/scaling.txt"));
+        new BufferedReader(new FileReader(getScalingFilePath()));
 
       String s;
       String lastLine = null;
