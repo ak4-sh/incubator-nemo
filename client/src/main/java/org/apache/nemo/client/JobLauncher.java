@@ -342,7 +342,10 @@ public final class JobLauncher {
     // launch driver if it hasn't been already
     if (driverReadyLatch == null) {
       try {
-        setup(new String[]{"-job_id", jobId});
+        setup(new String[]{
+            "-job_id", jobId,
+            "-user_main", "org.apache.beam.sdk.nexmark.Main"
+        });
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

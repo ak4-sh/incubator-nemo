@@ -209,9 +209,6 @@ public final class ContainerManager {
       .addOption("--add-opens=java.base/java.lang=ALL-UNNAMED")
       .addOption("--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED")
       .addOption("-XX:-OmitStackTraceInFastThrow")
-      .addOption("-XX:+PrintGCDetails")
-      .addOption("-XX:+PrintGCTimeStamps")
-      .addOption("-XX:+PrintGCDateStamps")
       .addOption("-XX:NewRatio=1")
       .addOption("-XX:InitialHeapSize=" + (resourceSpecification.getMemory() - 100) + "m")
       .addOption("-XX:MaxHeapSize=" + (resourceSpecification.getMemory() - 100) + "m");

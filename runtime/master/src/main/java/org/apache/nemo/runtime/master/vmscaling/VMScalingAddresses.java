@@ -16,12 +16,26 @@ public class VMScalingAddresses {
 
   @Inject
   private VMScalingAddresses(@Parameter(EvalConf.VMAddresses.class) final String text) {
+    if (text == null || text.trim().isEmpty()) {
+      this.vmAddresses = new ArrayList<>(0);
+      this.vmIds = new ArrayList<>(0);
+      LOG.info("vm addresses: {}", vmAddresses);
+      LOG.info("vm ids: {}", vmIds);
+      return;
+    }
+
     final String[] lines = text.split("\n");
     this.vmAddresses = new ArrayList<>(lines.length);
     this.vmIds = new ArrayList<>(lines.length);
 
     for (int i = 0; i < lines.length; i++) {
+      if (lines[i].trim().isEmpty()) {
+        continue;
+      }
       final String[] addressAndId = lines[i].split(",");
+      if (addressAndId.length < 2) {
+        continue;
+      }
       vmAddresses.add(addressAndId[0]);
       vmIds.add(addressAndId[1]);
     }

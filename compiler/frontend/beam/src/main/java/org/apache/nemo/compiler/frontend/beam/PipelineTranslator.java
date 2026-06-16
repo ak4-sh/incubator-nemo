@@ -218,7 +218,7 @@ final class PipelineTranslator {
   private static void parDoSingleOutputTranslator(final PipelineTranslationContext ctx,
                                                   final TransformHierarchy.Node beamNode,
                                                   final ParDo.SingleOutput<?, ?> transform) {
-    final Map<Integer, PCollectionView<?>> sideInputMap = getSideInputMap(transform.getSideInputs().values());
+    final Map<Integer, PCollectionView<?>> sideInputMap = getSideInputMap(getSideInputs(transform));
     final AbstractDoFnTransform doFnTransform = createDoFnTransform(ctx, beamNode, sideInputMap);
     final IRVertex vertex = new OperatorVertex(doFnTransform);
 
@@ -244,7 +244,7 @@ final class PipelineTranslator {
   private static void parDoMultiOutputTranslator(final PipelineTranslationContext ctx,
                                                  final TransformHierarchy.Node beamNode,
                                                  final ParDo.MultiOutput<?, ?> transform) {
-    final Map<Integer, PCollectionView<?>> sideInputMap = getSideInputMap(transform.getSideInputs().values());
+    final Map<Integer, PCollectionView<?>> sideInputMap = getSideInputMap(getSideInputs(transform));
     final AbstractDoFnTransform doFnTransform = createDoFnTransform(ctx, beamNode, sideInputMap);
     final IRVertex vertex = new OperatorVertex(doFnTransform);
     ctx.addVertex(vertex);
@@ -673,6 +673,27 @@ final class PipelineTranslator {
    * @param viewList list of {@link PCollectionView}s.
    * @return map of side inputs.
    */
+  /**
+   * Beam changed ParDo#getSideInputs across versions.
+   * Newer Beam returns a Map; older Beam returns a List.
+   * Use reflection so Nemo can compile against Beam 2.18 while running the Beam 2.6 Nexmark fork.
+   */
+  @SuppressWarnings("unchecked")
+  private static Collection<PCollectionView<?>> getSideInputs(final Object transform) {
+    try {
+      final Object sideInputs = transform.getClass().getMethod("getSideInputs").invoke(transform);
+      if (sideInputs instanceof Map) {
+        return ((Map<?, PCollectionView<?>>) sideInputs).values();
+      } else if (sideInputs instanceof Collection) {
+        return (Collection<PCollectionView<?>>) sideInputs;
+      } else {
+        throw new RuntimeException("Unsupported side input container: " + sideInputs);
+      }
+    } catch (final ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private static Map<Integer, PCollectionView<?>> getSideInputMap(final Collection<PCollectionView<?>> viewList) {
     final PrimitiveIterator.OfInt iterator = IntStream.range(0, viewList.size()).iterator();
     return viewList.stream().collect(Collectors.toMap(i -> iterator.next(), Function.identity()));
@@ -700,7 +721,7 @@ final class PipelineTranslator {
         builder.add(DisplayData.item("name", beamNode.getFullName()));
       };
       final DoFnSchemaInformation doFnSchemaInformation =
-        ParDoTranslation.getSchemaInformation(beamNode.toAppliedPTransform(ctx.getPipeline()));
+      DoFnSchemaInformation.create();
 
       if (sideInputMap.isEmpty()) {
         return new DoFnTransform(

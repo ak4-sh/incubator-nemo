@@ -127,7 +127,7 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
 
       readableService = ReadableService.getInstance();
       reader = unboundedSource.createReader(pipelineOptions, checkpointMark);
-      kafkaReader = (KafkaUnboundedReader) reader;
+      kafkaReader = reader instanceof KafkaUnboundedReader ? (KafkaUnboundedReader) reader : null;
 
       final long et2 = System.currentTimeMillis();
 
@@ -179,7 +179,7 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
 
       readableService = ReadableService.getInstance();
       reader = unboundedSource.createReader(pipelineOptions, checkpointMark);
-      kafkaReader = (KafkaUnboundedReader) reader;
+      kafkaReader = reader instanceof KafkaUnboundedReader ? (KafkaUnboundedReader) reader : null;
 
       final long et2 = System.currentTimeMillis();
 
@@ -204,8 +204,10 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
       return true;
     } else {
       try {
-        // poll kafka
-        kafkaReader.pollRecord(5);
+        // poll kafka only when this source is Kafka-backed
+        if (kafkaReader != null) {
+          kafkaReader.pollRecord(5);
+        }
         isCurrentAvailable =  reader.advance();
       } catch (IOException e) {
         e.printStackTrace();
@@ -222,7 +224,10 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
 
     if (isCurrentAvailable) {
       final O elem = reader.getCurrent();
-      final Instant currTs = reader.getCurrentTimestamp();
+      Instant currTs = reader.getCurrentTimestamp();
+      if (currTs == null) {
+        currTs = Instant.now();
+      }
       //LOG.info("Curr timestamp: {}", currTs);
 
       try {
@@ -233,10 +238,12 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
       }
 
       return new TimestampAndValue<>(currTs.getMillis(),
-        WindowedValue.timestampedValueInGlobalWindow(elem, reader.getCurrentTimestamp()));
+        WindowedValue.timestampedValueInGlobalWindow(elem, currTs));
     } else {
       // poll kafka
-      kafkaReader.pollRecord(5);
+      if (kafkaReader != null) {
+        kafkaReader.pollRecord(5);
+      }
       // set current available
       try{
         isCurrentAvailable = reader.advance();
@@ -265,7 +272,10 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
 
     if (isCurrentAvailable) {
       final O elem = reader.getCurrent();
-      final Instant currTs = reader.getCurrentTimestamp();
+      Instant currTs = reader.getCurrentTimestamp();
+      if (currTs == null) {
+        currTs = Instant.now();
+      }
       //LOG.info("Curr timestamp: {}", currTs);
 
       isCurrentAvailable = false;
@@ -280,7 +290,7 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
       });
 
       return new TimestampAndValue<>(currTs.getMillis(),
-        WindowedValue.timestampedValueInGlobalWindow(elem, reader.getCurrentTimestamp()));
+        WindowedValue.timestampedValueInGlobalWindow(elem, currTs));
     }
 
     return EmptyElement.getInstance();
