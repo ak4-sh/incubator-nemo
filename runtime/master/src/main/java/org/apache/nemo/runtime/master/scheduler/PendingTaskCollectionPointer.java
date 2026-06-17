@@ -85,10 +85,14 @@ public final class PendingTaskCollectionPointer {
   }
 
   public synchronized List<Task> getTasks() {
-    if (queue.isEmpty()) {
-      return null;
-    } else {
+    if (!queue.isEmpty()) {
       return queue.remove(0);
+    } else if (curTaskCollection != null) {
+      final List<Task> result = new ArrayList<>(curTaskCollection);
+      curTaskCollection = null;
+      return result;
+    } else {
+      return null;
     }
   }
 

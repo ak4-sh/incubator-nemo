@@ -178,7 +178,8 @@ under the License.
                     <version>${maven.compiler.version}</version>
                     <!--          Uncomment when dropping support for Java 8 -->
                     <configuration>
-                        <release>${java.version}</release>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
                     </configuration>
                 </plugin>
                 <plugin>

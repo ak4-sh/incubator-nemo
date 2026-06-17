@@ -29,11 +29,13 @@ import org.apache.nemo.common.ir.edge.executionproperty.MessageIdEdgeProperty;
 import org.apache.nemo.common.ir.vertex.executionproperty.ClonedSchedulingProperty;
 import org.apache.nemo.common.ir.vertex.executionproperty.IgnoreSchedulingTempDataReceiverProperty;
 import org.apache.nemo.common.ir.vertex.executionproperty.MessageIdVertexProperty;
+import org.apache.nemo.common.ir.vertex.executionproperty.ParallelismProperty;
 import org.apache.nemo.common.RuntimeIdManager;
 import org.apache.nemo.runtime.common.plan.*;
 import org.apache.nemo.runtime.common.state.BlockState;
 import org.apache.nemo.common.TaskState;
 import org.apache.nemo.runtime.master.*;
+import org.apache.nemo.runtime.master.PipeIndexMaster;
 import org.apache.nemo.common.exception.*;
 import org.apache.nemo.runtime.common.state.StageState;
 import org.apache.commons.lang.mutable.MutableBoolean;
@@ -77,6 +79,7 @@ public final class BatchScheduler implements Scheduler {
    * Other necessary components of this {@link org.apache.nemo.runtime.master.RuntimeMaster}.
    */
   private final BlockManagerMaster blockManagerMaster;
+  private final PipeIndexMaster pipeIndexMaster;
 
   /**
    * The below variables depend on the submitted plan to execute.
@@ -89,13 +92,15 @@ public final class BatchScheduler implements Scheduler {
                          final PendingTaskCollectionPointer pendingTaskCollectionPointer,
                          final BlockManagerMaster blockManagerMaster,
                          final ExecutorRegistry executorRegistry,
-                         final PlanStateManager planStateManager) {
+                         final PlanStateManager planStateManager,
+                         final PipeIndexMaster pipeIndexMaster) {
     this.planRewriter = planRewriter;
     this.taskDispatcher = taskDispatcher;
     this.pendingTaskCollectionPointer = pendingTaskCollectionPointer;
     this.blockManagerMaster = blockManagerMaster;
     this.executorRegistry = executorRegistry;
     this.planStateManager = planStateManager;
+    this.pipeIndexMaster = pipeIndexMaster;
   }
 
   ////////////////////////////////////////////////////////////////////// Methods for plan rewriting.
@@ -434,6 +439,24 @@ public final class BatchScheduler implements Scheduler {
       final Set<String> blockIds = getOutputBlockIds(taskId);
       blockManagerMaster.onProducerTaskScheduled(taskId, blockIds);
       final int taskIdx = RuntimeIdManager.getIndexFromTaskId(taskId);
+
+      // Register pipe routing for outgoing edges (same pattern as StreamingScheduler)
+      stageOutgoingEdges.forEach(outEdge -> {
+        final int dstParallelism = outEdge.getDst().getPropertyValue(ParallelismProperty.class).get();
+        for (int i = 0; i < dstParallelism; i++) {
+          final String dstTask = RuntimeIdManager.generateTaskId(outEdge.getDst().getId(), i, 0);
+          pipeIndexMaster.onTaskScheduled(taskId, outEdge.getId(), dstTask);
+        }
+      });
+      // Register pipe routing for incoming edges
+      stageIncomingEdges.forEach(inEdge -> {
+        final int srcParallelism = inEdge.getSrc().getPropertyValue(ParallelismProperty.class).get();
+        for (int i = 0; i < srcParallelism; i++) {
+          final String srcTask = RuntimeIdManager.generateTaskId(inEdge.getSrc().getId(), i, 0);
+          pipeIndexMaster.onTaskScheduled(srcTask, inEdge.getId(), taskId);
+        }
+      });
+
       tasks.add(new Task(
         taskId,
         stageToSchedule.getExecutionProperties(),

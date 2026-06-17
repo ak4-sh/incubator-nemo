@@ -333,7 +333,7 @@ public final class Task implements Serializable {
         }
       }
 
-      dos.writeByte(taskType.ordinal());
+      dos.writeByte(taskType == null ? TaskType.DefaultTask.ordinal() : taskType.ordinal());
 
       dos.writeInt(o2oStages.size());
       for (final String edgeId : o2oStages) {
@@ -347,25 +347,25 @@ public final class Task implements Serializable {
   }
 
   public boolean isStreamTask() {
-    return taskType.equals(TaskType.StreamTask);
+    return TaskType.StreamTask.equals(taskType);
   }
 
   public boolean isCrTask() {
-    return taskType.equals(TaskType.CRTask);
+    return TaskType.CRTask.equals(taskType);
   }
 
   public boolean isTransientTask() {
-    return taskType.equals(TaskType.TransientTask);
+    return TaskType.TransientTask.equals(taskType);
   }
 
   public boolean isVMTask() {
-    return taskType.equals(TaskType.VMTask);
+    return TaskType.VMTask.equals(taskType);
   }
 
-  public boolean isMerger() { return taskType.equals(TaskType.MergerTask); }
+  public boolean isMerger() { return TaskType.MergerTask.equals(taskType); }
 
   public boolean isDefaultTask() {
-    return taskType.equals(TaskType.DefaultTask);
+    return TaskType.DefaultTask.equals(taskType);
   }
 
   public boolean isSourceTask() {
