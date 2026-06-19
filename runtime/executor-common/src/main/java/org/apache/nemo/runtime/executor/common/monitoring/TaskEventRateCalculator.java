@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
@@ -37,6 +40,17 @@ public final class TaskEventRateCalculator {
 
     final StringBuilder sb = new StringBuilder("---- Start of task processed event (# tasks: "
       + tasks.size() + " in executor " + executorId + ")----\n");
+
+    // CSV writer
+    final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    final String outDir = workDir != null ? workDir : "/tmp";
+    PrintWriter csvWriter = null;
+    try {
+      csvWriter = new PrintWriter(new FileWriter(outDir + "/task_metrics.csv", true));
+    } catch (IOException e) {
+      LOG.warn("Failed to create task metrics CSV", e);
+    }
+    final long now = System.currentTimeMillis();
 
     for (final TaskExecutor taskExecutor : tasks) {
       // final AtomicInteger count = taskExecutor.getProcessedCnt();
@@ -71,11 +85,23 @@ public final class TaskEventRateCalculator {
       sb.append("\towc:");
       sb.append(taskMetrics.outWatermarkCount);
       sb.append("\n");
+
+      if (csvWriter != null) {
+        csvWriter.printf("%d,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d%n",
+          now, executorId, taskExecutor.getId(),
+          taskMetrics.inputReceiveElement, taskMetrics.inputElement,
+          taskMetrics.outputElement, taskMetrics.computation,
+          taskMetrics.deserTime, taskMetrics.inbytes,
+          taskMetrics.serializedTime, taskMetrics.outbytes);
+      }
     }
 
     sb.append("----- End of taks processed event ----\n");
 
     LOG.info(sb.toString());
+    if (csvWriter != null) {
+      csvWriter.close();
+    }
 
     return Pair.of(sum, sum2);
   }

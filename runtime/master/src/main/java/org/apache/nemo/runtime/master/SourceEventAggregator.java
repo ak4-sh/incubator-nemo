@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -45,6 +48,18 @@ public final class SourceEventAggregator {
           LOG.info("Set source count {} / {}", count, sourceEventMap);
           backpressure.addSourceEvent(count);
           scaler.addSourceEvent(count);
+
+          // Write source metrics to CSV
+          final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+          final String outDir = workDir != null ? workDir : "/tmp";
+          try (PrintWriter writer = new PrintWriter(new FileWriter(outDir + "/source_metrics.csv", true))) {
+            final long now = System.currentTimeMillis();
+            for (final Map.Entry<String, Long> entry : sourceEventMap.entrySet()) {
+              writer.printf("%d,%d,%s,%d%n", now, count, entry.getKey(), entry.getValue());
+            }
+          } catch (IOException e) {
+            LOG.warn("Failed to write source metrics", e);
+          }
         }
       }
 
