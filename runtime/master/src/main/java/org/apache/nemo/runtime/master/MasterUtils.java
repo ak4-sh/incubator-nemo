@@ -30,8 +30,17 @@ public final class MasterUtils {
     for (final String key : stageIdCounterMap.keySet()) {
       final int index = stages.indexOf(key);
       final double ratio = ratios.get(index);
-      stageIdCounterMap.put(key, Math.min(stageIdCounterMap.get(key),
-        (int) (stageIdCounterMap.get(key) * ratio)));
+      final int count = stageIdCounterMap.get(key);
+      final int scaledCount;
+      if (ratio >= 1.0) {
+        scaledCount = count;
+      } else if (ratio <= 0.0) {
+        scaledCount = 0;
+      } else {
+        // Ensure at least 1 task is moved for any positive ratio
+        scaledCount = Math.max(1, (int) Math.ceil(count * ratio));
+      }
+      stageIdCounterMap.put(key, Math.min(count, scaledCount));
     }
 
     return Pair.of(stageIdCounterMap, tasksToBeMoved);

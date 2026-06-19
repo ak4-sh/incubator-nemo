@@ -162,7 +162,10 @@ public final class TaskScheduledMapMaster {
   public Future<String> stopTask(final String parent, final String resourcePriorityProperty) {
 
     final String executorId = taskExecutorIdMap.get(parent);
-
+    if (executorId == null) {
+      LOG.warn("Task {} is not in taskExecutorIdMap (already stopped or removed); returning completed future", parent);
+      return CompletableFuture.completedFuture(parent);
+    }
 
     final List<String> descendants = new LinkedList<>();
     descendants.add(parent);
@@ -213,11 +216,13 @@ public final class TaskScheduledMapMaster {
 
   public boolean isAllTasksScheduledAtStartTime() {
     return taskIdTaskMap.keySet().stream()
-      .allMatch(t -> taskExecutorIdMap.containsKey(t));
+      .allMatch(t -> taskExecutorIdMap.containsKey(t) || taskToBeStopped.contains(t));
   }
 
   public Task removeTask(final String taskId) {
-    taskExecutorIdMap.remove(taskId);
+    // Do NOT remove from taskExecutorIdMap here: the task may have been
+    // re-scheduled to a new executor and removing it would break
+    // isAllTasksScheduledAtStartTime().
     final Task t = taskIdTaskMap.get(taskId);
     // lambdaTaskMap.remove(taskId);
     taskToBeStopped.remove(taskId);
@@ -281,6 +286,8 @@ public final class TaskScheduledMapMaster {
 
     taskOriginalExecutorIdMap.putIfAbsent(taskId, representer.getExecutorId());
     taskExecutorIdMap.put(taskId, representer.getExecutorId());
+    // Clear the stopped flag if the task was being migrated
+    taskToBeStopped.remove(taskId);
 
     final Map<String, List<String>> stageTaskMap = scheduledStageTasks.get(representer);
 

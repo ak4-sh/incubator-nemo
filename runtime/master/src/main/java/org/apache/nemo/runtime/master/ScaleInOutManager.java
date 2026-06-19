@@ -65,6 +65,11 @@ public final class ScaleInOutManager {
 
     final List<Future<String>> futures = new LinkedList<>();
 
+    // Clear Lambda cached selections when scaling back to Compute
+    if (resourceTyp.equals(ResourcePriorityProperty.COMPUTE)) {
+      prevSelectedTasksToMoveLambda.clear();
+    }
+
     // Caching
     if (!prevSelectedTasksToMoveLambda.isEmpty() && resourceTyp.equals(ResourcePriorityProperty.LAMBDA)) {
       // stop prev stopped tasks
@@ -156,7 +161,7 @@ public final class ScaleInOutManager {
   private void checkTaskMoveValidation(final Task task, final ExecutorRepresenter ep) {
     if (task.isParitalCombine() && task.isVMTask())  {
       throw new RuntimeException("Cannot move task " + task.getTaskId() + " from " + ep.getExecutorId());
-    } else if (task.isCrTask() || task.isStreamTask()) {
+    } else if (task.isCrTask()) {
       throw new RuntimeException("Cannot move task " + task.getTaskId() + " from " + ep.getExecutorId());
     }
 //
@@ -179,6 +184,10 @@ public final class ScaleInOutManager {
     });
   }
 
+  public void clearPrevSelectedTasksToMoveLambda() {
+    prevSelectedTasksToMoveLambda.clear();
+  }
+
   public synchronized List<Future<String>> sendMigrationAllStages(
     final double ratio,
     final Collection<ExecutorRepresenter> executors,
@@ -196,7 +205,6 @@ public final class ScaleInOutManager {
       .map(vmExecutor -> vmExecutor.getRunningTasks())
       .flatMap(l -> l.stream()
         .filter(task -> !task.isCrTask())
-        .filter(task -> !task.isStreamTask())
         .filter(task -> !(task.isParitalCombine() && task.isVMTask()))
         .filter(task -> {
           // Filter out stateless task in merger->stateless task
@@ -210,7 +218,11 @@ public final class ScaleInOutManager {
 
     final List<String> slist = new ArrayList<>(stages);
 
-    return sendMigration(slist.stream().map(s -> 1.0)
-      .collect(Collectors.toList()), executors, slist, resourceType);
+    // Use the computed ratio for each selected stage, capped at 1.0
+    final List<Double> ratios = slist.stream()
+      .map(s -> Math.min(1.0, ratio))
+      .collect(Collectors.toList());
+
+    return sendMigration(ratios, executors, slist, resourceType);
   }
 }

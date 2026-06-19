@@ -228,9 +228,11 @@ public final class JobScaler {
 
         LOG.info(sb.toString());
 
-        final double cpuAvg = executorCpuUseMap.values().stream()
-          .map(pair -> pair.left())
-          .reduce(0.0, (x, y) -> x + y) / executorCpuUseMap.size();
+        final double cpuAvg = executorCpuUseMap.isEmpty()
+          ? 0.0
+          : executorCpuUseMap.values().stream()
+            .map(pair -> pair.left())
+            .reduce(0.0, (x, y) -> x + y) / executorCpuUseMap.size();
 
         // 60초 이후에 scaling
         // LOG.info("skpCnt: {}, inputRates {}, basethp {}", skipCnt, inputRates.size(), baseThp);
@@ -240,9 +242,11 @@ public final class JobScaler {
 
         final int throughput = stage0InputRate;
 
-        final double cpuSfPlusAvg = executorCpuUseMap.values().stream()
-          .map(pair -> pair.left() + pair.right())
-          .reduce(0.0, (x, y) -> x + y) / executorCpuUseMap.size();
+        final double cpuSfPlusAvg = executorCpuUseMap.isEmpty()
+          ? 0.0
+          : executorCpuUseMap.values().stream()
+            .map(pair -> pair.left() + pair.right())
+            .reduce(0.0, (x, y) -> x + y) / executorCpuUseMap.size();
 
         // LOG.info("Recent input rate: {}, throughput: {}, cpuAvg: {}, cpuSfAvg: {} executorCpuUseMap: {}",
         //  recentInputRate, throughput, cpuAvg, cpuSfPlusAvg, executorCpuUseMap);
@@ -695,15 +699,21 @@ public final class JobScaler {
     // Task to VM worker mapping
     taskScheduledMap.keepOnceCurrentTaskExecutorIdMap();
 
-    int cnt = 0;
-    final int tasksPerWorker = mvTasks.size() / workers.size();
-    for (final String key : taskLocationMap.locationMap.keySet()) {
-      if (taskLocationMap.locationMap.get(key) == VM_SCALING) {
-        final int vmWorkerIndex = Math.min(cnt / tasksPerWorker, workers.size() - 1);
-        final String executorId = workers.get(vmWorkerIndex).getExecutorId();
-        taskScheduledMap.getTaskExecutorIdMap().put(key, executorId);
-        LOG.info("Moving Task {} to {}", key, executorId);
-        cnt += 1;
+    if (workers.isEmpty() || mvTasks.isEmpty()) {
+      LOG.warn("No VM scaling workers ({}) or no SF tasks to move ({}). Skipping VM scaling worker task mapping.",
+        workers.size(), mvTasks.size());
+    } else {
+      int cnt = 0;
+      final int tasksPerWorker = mvTasks.size() / workers.size();
+      final int effectiveTasksPerWorker = Math.max(tasksPerWorker, 1);
+      for (final String key : taskLocationMap.locationMap.keySet()) {
+        if (taskLocationMap.locationMap.get(key) == VM_SCALING) {
+          final int vmWorkerIndex = Math.min(cnt / effectiveTasksPerWorker, workers.size() - 1);
+          final String executorId = workers.get(vmWorkerIndex).getExecutorId();
+          taskScheduledMap.getTaskExecutorIdMap().put(key, executorId);
+          LOG.info("Moving Task {} to {}", key, executorId);
+          cnt += 1;
+        }
       }
     }
 
@@ -757,10 +767,14 @@ public final class JobScaler {
 
     int offloadingCnt = 0;
 
-    final double ratio = (1 - ((double)thp * evalConf.scalingAlpha / input_rate));
+    final double ratio = (input_rate == 0)
+      ? 0.0
+      : (1 - ((double)thp * evalConf.scalingAlpha / input_rate));
 
     // # of vm scaling workers for each vm
-    final int numWorkers = (int) Math.ceil((1 / ratio));
+    final int numWorkers = (ratio <= 0)
+      ? 1
+      : (int) Math.ceil((1 / ratio));
     final Map<String, String> taskExecutorIdMap = taskScheduledMap.getTaskExecutorIdMap();
 
     LOG.info("ratio {}, # of vm scaling workers: {}", ratio, numWorkers);
@@ -773,6 +787,11 @@ public final class JobScaler {
       final Map<String, List<String>> offloadTaskMap = workerOffloadTaskMap.get(representer);
 
       final List<ControlMessage.TaskStatInfo> taskStatInfos = executorTaskStatMap.get(representer);
+      if (taskStatInfos == null || taskStatInfos.isEmpty()) {
+        LOG.warn("No task stat info for executor {}. Skipping scaling out.", representer.getExecutorId());
+        continue;
+      }
+
       final long totalComputation = taskStatInfos.stream().map(info -> info.getComputation())
         .reduce(0L, (x,y) -> x + y);
 
@@ -789,11 +808,14 @@ public final class JobScaler {
 
       int i = 0;
       long offloadComputation = 0;
-      final long compForEachVmScalingWorker = totalOffloadComputation / numWorkers;
+      final long compForEachVmScalingWorker = (numWorkers == 0)
+        ? totalOffloadComputation
+        : totalOffloadComputation / numWorkers;
       while (offloadComputation < totalOffloadComputation && i < copyInfos.size()) {
 
-        final int executorIndex = Math.min((int) (offloadComputation / compForEachVmScalingWorker),
-          numWorkers - 1);
+        final int executorIndex = (compForEachVmScalingWorker == 0)
+          ? 0
+          : Math.min((int) (offloadComputation / compForEachVmScalingWorker), numWorkers - 1);
 
         final String newExecutorId = representer.getExecutorId() + "-" + executorIndex;
 
@@ -868,9 +890,13 @@ public final class JobScaler {
 
   private void scalingOutConsideringKeyAndComm(final long thp, final long input_rate) {
 
-    final double ratio = (1 - (thp * evalConf.scalingAlpha) / input_rate);
+    final double ratio = (input_rate == 0)
+      ? 0.0
+      : (1 - (thp * evalConf.scalingAlpha) / input_rate);
     // # of vm scaling workers for each vm
-    final int numWorkers = (int) Math.ceil((1 / ratio));
+    final int numWorkers = (ratio <= 0)
+      ? 1
+      : (int) Math.ceil((1 / ratio));
 
     // create vm workers
     if (evalConf.sfToVm) {
@@ -890,6 +916,11 @@ public final class JobScaler {
       final Map<String, List<String>> offloadTaskMap = workerOffloadTaskMap.get(representer);
 
       final List<ControlMessage.TaskStatInfo> taskStatInfos = executorTaskStatMap.get(representer);
+      if (taskStatInfos == null || taskStatInfos.isEmpty()) {
+        LOG.warn("No task stat info for executor {}. Skipping scaling out.", representer.getExecutorId());
+        continue;
+      }
+
       final long totalComputation = taskStatInfos.stream().map(info -> info.getComputation())
         .reduce(0L, (x,y) -> x + y);
 
@@ -994,11 +1025,17 @@ public final class JobScaler {
       final Map<String, List<String>> offloadTaskMap = workerOffloadTaskMap.get(representer);
 
       final List<ControlMessage.TaskStatInfo> taskStatInfos = executorTaskStatMap.get(representer);
+      if (taskStatInfos == null || taskStatInfos.isEmpty()) {
+        LOG.warn("No task stat info for executor {}. Skipping scaling out based on keys.", representer.getExecutorId());
+        continue;
+      }
 
       // sort by keys
       final List<ControlMessage.TaskStatInfo> copyInfos = sortByKeys(taskStatInfos);
 
-      final int countToOffload = (taskStatInfos.size() - (int) (taskStatInfos.size() / divide));
+      final int countToOffload = (divide == 0)
+        ? taskStatInfos.size()
+        : (taskStatInfos.size() - (int) (taskStatInfos.size() / divide));
 
       int offloadedCnt = 0;
 
@@ -1068,7 +1105,9 @@ public final class JobScaler {
 
         for (final Map.Entry<String, List<String>> entry : tasks.entrySet()) {
 
-          final int countToOffload = (int) (entry.getValue().size() - (entry.getValue().size() / divide));
+          final int countToOffload = (divide == 0)
+            ? entry.getValue().size()
+            : (int) (entry.getValue().size() - (entry.getValue().size() / divide));
           final List<String> offloadTask = new ArrayList<>();
           offloadTaskMap.put(entry.getKey(), offloadTask);
 
@@ -1088,7 +1127,9 @@ public final class JobScaler {
       } else {
         // stage-offloading
         // we set the number for each stage
-        final int totalCountToOffload = (int) (totalTasks - totalTasks / divide);
+        final int totalCountToOffload = (divide == 0)
+          ? totalTasks
+          : (int) (totalTasks - totalTasks / divide);
         final Map<String, Integer> stageOffloadCnt = new HashMap<>();
         for (int i = 0; i < offloadingRatio.size(); i++) {
           final String stageId = "Stage" + i;

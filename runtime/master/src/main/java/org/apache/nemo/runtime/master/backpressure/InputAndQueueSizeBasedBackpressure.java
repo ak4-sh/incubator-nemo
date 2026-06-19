@@ -162,9 +162,6 @@ public final class InputAndQueueSizeBasedBackpressure implements Backpressure {
   }
 
   private void sendBackpressureWrapper() {
-
-
-    /*
     if (!started) {
       clientRPC.send(ControlMessage.DriverToClientMessage.newBuilder()
         .setType(ControlMessage.DriverToClientMessageType.PrintLog)
@@ -185,7 +182,6 @@ public final class InputAndQueueSizeBasedBackpressure implements Backpressure {
     } else {
       LOG.info("Skip setting backpressure due to the scaling hint set time");
     }
-    */
   }
 
   private void queueBasedBackpressure(final long queue) {
@@ -235,9 +231,13 @@ public final class InputAndQueueSizeBasedBackpressure implements Backpressure {
 
   @Override
   public void addCurrentInput(final long rate) {
-    // Observed that the actual event is the half
-    avgInputRate.addValue(rate);
-    aggInput.getAndAdd(rate);
+    if (rate <= 0) {
+      return;
+    }
+    final long delta = rate - currEmitInput;
+    currEmitInput = rate;
+    avgInputRate.addValue(delta);
+    aggInput.getAndAdd(delta);
   }
 
   @Override
