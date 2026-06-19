@@ -161,6 +161,19 @@ Current Nexmark Status
   - Sustained Q0 `nexmark-auto-123054`, app `application_1781890212133_0001`: source consumed all 8M records, scale-out fired once, scale-in fired once, no repeat scale-in loop.
   - Earlier Q0 `nexmark-auto-193044`: 500k events consumed with zero loss, scale-out/scale-in fired once each, metrics pipeline worked end-to-end.
 
+### Full Sponge Q0 Benchmark (Latest)
+- New wrapper `scripts/cloudlab/run_sponge_q0_benchmark.sh` created with full Sponge defaults: `TOTAL_EVENTS=23850000`, `RATE_PERIOD_SEC=450`, `FIRST_RATE=50000`, `NEXT_RATE=200000`.
+- Run `sponge-q0-20260619-164645`, app `application_1781901266080_0002`, AM host `node9`.
+  - Producer sent `23,849,900` live records plus 100 prefill = `23,850,000` total at ~58.3K ev/s average.
+  - Kafka offsets confirmed `23,850,000` across 8 partitions.
+  - Source metrics confirmed `23,850,000` consumed.
+  - Result topic `nexmark-sponge-q0-20260619-164645-results` confirmed `23,850,000`.
+  - Scale-out triggered once: `1781906080547,SCALE_OUT,0.0965,46426.0000,21618.4000,27808.0000,27808,0.6658,179`.
+  - VM task migration succeeded: 132 VM task metric rows in `task_metrics.csv`.
+  - Scale-in triggered once after backlog drained: `1781906116551,SCALE_IN,0.0200,0.0000,0.0000,-100.0000,-100,1.0000,179`.
+  - No phantom scale-in loop observed (exactly 1 scale-in row).
+  - Artifacts saved to `results/cloudlab/sponge-q0-20260619-164645/`.
+
 ### Scale-In Loop Fix
 - **Root cause:** `scaleInIfIdle()` used `executorRegistry.getLambdaExecutors().size() > 0` as its only guard. After scale-in moved all tasks back, lambda executors remained registered forever, so every 1s idle tick re-triggered scale-in. `writeScalingDecision("SCALE_IN")` was called before checking whether lambda executors actually had eligible tasks, so no-op attempts were recorded as real scale-in rows.
 - **Fix (3 changes in `InputAndCpuBasedScaler.java`):**
@@ -310,7 +323,7 @@ Next Steps
 2. Rerun Q8 sustained benchmark with the cap4 config after rebuilding the shaded client jar with the scale-in backlog guard; verify scale-out → VM task migration → no scale-in until `queue <= 0`.
 3. Investigate why Q8 source metrics plateaued at `7,684,016` of `8,000,000` in `nexmark-auto-134204` after VM migration.
 4. For the Pado scheduler deadlock, investigate `StreamingScheduler`/`TaskDispatcher` to prefer upstream tasks over downstream tasks.
-5. Consider a cleaner benchmark harness: add external timeout/watchdog, collect YARN logs, aggregate METRICLOG counters, auto-kill stale processes.
+5. Consider additional benchmark harness improvements: collect YARN logs, aggregate METRICLOG counters, auto-kill stale processes (timeout/watchdog already present in `run_sponge_q0_benchmark.sh`).
 
 Critical Context Reminders
 -------------------------
@@ -331,3 +344,4 @@ Critical Context Reminders
 - `metrics_collector.py` needs `am_host` as 4th argument to read driver-side CSVs via SSH; `run_autoscaler_smoke.sh` now captures `AM_HOST` from `yarn application -status` after the app reaches RUNNING.
 - VM executor task metrics are written to offload nodes' local `/tmp/task_metrics.csv`, not the AM host. Check `node4,node6,node7,node8,node13` for current-run `VM-*` rows.
 - Before the next benchmark, the workspace is clean for YARN runtime state: latest app was killed, local subscriber/producer/collector are stopped, warm VMWorker pools were killed, and YARN showed exactly five RUNNING baseline NMs with zero containers. The harness now removes AM-side fallback metric files automatically after it discovers the AM host.
+- Full Sponge Q0 benchmark completed successfully: `sponge-q0-20260619-164645`, app `application_1781901266080_0002`, AM host `node9`. Input/source/result all reached `23,850,000`. Scale-out and scale-in fired exactly once each with no phantom loop. VM task metrics confirmed 132 rows. Artifacts saved to `results/cloudlab/sponge-q0-20260619-164645/`.
