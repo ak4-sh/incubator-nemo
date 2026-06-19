@@ -174,6 +174,20 @@ Current Nexmark Status
   - No phantom scale-in loop observed (exactly 1 scale-in row).
   - Artifacts saved to `results/cloudlab/sponge-q0-20260619-164645/`.
 
+### Custom Burst Mode (Latest)
+- **Problem:** Legacy `BURSTY` mode produced only 1-second micro-bursts at 200K ev/s, which was barely distinguishable from the 50K ev/s steady rate due to the producer's ~66K ev/s max. The scaler only triggered at ~380s of a 408s run.
+- **Solution:** Implemented `CUSTOM_BURST` mode in `StandaloneNexmarkKafkaProducer.java` with sustained multi-second bursts.
+- **Pattern:** Ramp-up (60s at 50K) + N cycles of (steady 60s at 50K + burst 45s at 200K).
+- **Implementation:** Time-based per-second batch loops with `RateShape.SQUARE` and `isRateLimited=false`. Events generated per second = `ratePerGen`, then sleep remainder of second. Respects `maxEvents` cap for prefill/controlled runs.
+- **Default config:** `STEADY_DURATION_SEC=60`, `BURST_DURATION_SEC=45`, `NUM_BURSTS=3`, `RAMP_UP_SEC=60`, `FIRST_RATE=50000`, `NEXT_RATE=200000`.
+- **Run `sponge-q0-20260619-174241`, app `application_1781901266080_0007`, AM host `node11`:**
+  - Producer correctly generated full burst pattern: 60s ramp-up + 3 cycles of (60s steady + 45s burst) = 375s total, 39M events per phase (78M total).
+  - Scale-out triggered early: `1781909586802,SCALE_OUT,0.3355,200000.0000,142812.8000,228542.0000,228542,0.3033,179`.
+  - Queue built up to 228K during first burst (not 27K at 380s like legacy mode).
+  - **Issue:** Prefill generated 39M instead of 100 because custom burst ignored `events` parameter.
+  - **Fix:** Added optional `maxEvents` parameter (11th arg). When `maxEvents > 0`, caps total events. `run_autoscaler_smoke.sh` passes `events` as `maxEvents`.
+  - **Recompiled:** `StandaloneNexmarkKafkaProducer.class` in `build/cloudlab-producer/` (was stale from old compilation).
+
 ### Scale-In Loop Fix
 - **Root cause:** `scaleInIfIdle()` used `executorRegistry.getLambdaExecutors().size() > 0` as its only guard. After scale-in moved all tasks back, lambda executors remained registered forever, so every 1s idle tick re-triggered scale-in. `writeScalingDecision("SCALE_IN")` was called before checking whether lambda executors actually had eligible tasks, so no-op attempts were recorded as real scale-in rows.
 - **Fix (3 changes in `InputAndCpuBasedScaler.java`):**

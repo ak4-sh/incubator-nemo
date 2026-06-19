@@ -6,11 +6,20 @@ source "$SCRIPT_DIR/cloudlab_env.sh"
 
 # Configuration
 TOPIC=${TOPIC:-nexmark-auto-$(date +%H%M%S)}
+
+# Burst mode (default: custom burst with ramp-up + multiple bursts)
+BURST_MODE=${BURST_MODE:-custom}
+FIRST_RATE=${FIRST_RATE:-50000}
+NEXT_RATE=${NEXT_RATE:-200000}
+STEADY_DURATION_SEC=${STEADY_DURATION_SEC:-60}
+BURST_DURATION_SEC=${BURST_DURATION_SEC:-45}
+NUM_BURSTS=${NUM_BURSTS:-3}
+RAMP_UP_SEC=${RAMP_UP_SEC:-60}
+
+# Legacy mode support (when BURST_MODE=legacy)
 TOTAL_EVENTS=${TOTAL_EVENTS:-500}
 PREFILL_EVENTS=${PREFILL_EVENTS:-100}
 LIVE_EVENTS=$((TOTAL_EVENTS - PREFILL_EVENTS))
-FIRST_RATE=${FIRST_RATE:-50000}
-NEXT_RATE=${NEXT_RATE:-200000}
 RATE_PERIOD_SEC=${RATE_PERIOD_SEC:-50}
 SUBSCRIBER_WAIT=${SUBSCRIBER_WAIT:-10}
 
@@ -110,8 +119,20 @@ run_producer_with_source_log() {
   local parallelism=${3:-$PRODUCER_PARALLELISM}
   local producer_pid status
 
-  java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
-    "$KAFKA_BOOTSTRAP" "$TOPIC" "$events" "$FIRST_RATE" "$NEXT_RATE" "$RATE_PERIOD_SEC" "$live" "$parallelism" &
+  if [[ "$BURST_MODE" == "custom" ]]; then
+    # Custom burst mode: steadyRate burstRate steadySec burstSec numBursts isRateLimited numGenerators rampUpSec maxEvents
+    # maxEvents=0 means use the full burst pattern
+    local maxEvents=0
+    if [[ "$events" -gt 0 ]]; then
+      maxEvents="$events"
+    fi
+    java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
+      "$KAFKA_BOOTSTRAP" "$TOPIC" "$FIRST_RATE" "$NEXT_RATE" "$STEADY_DURATION_SEC" "$BURST_DURATION_SEC" "$NUM_BURSTS" "$live" "$parallelism" "$RAMP_UP_SEC" "$maxEvents" &
+  else
+    # Legacy BURSTY mode
+    java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
+      "$KAFKA_BOOTSTRAP" "$TOPIC" "$events" "$FIRST_RATE" "$NEXT_RATE" "$RATE_PERIOD_SEC" "$live" "$parallelism" &
+  fi
   producer_pid=$!
 
   status=0
