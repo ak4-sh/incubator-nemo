@@ -38,6 +38,7 @@ BENCHMARK_TIMEOUT_SEC=${BENCHMARK_TIMEOUT_SEC:-1800}
 KEEP_WARM_POOL=${KEEP_WARM_POOL:-1}
 ALLOW_ACTIVE_APPS=${ALLOW_ACTIVE_APPS:-0}
 PLOT=${PLOT:-0}
+PROGRESS_STALL_LIMIT=${PROGRESS_STALL_LIMIT:-12}
 
 TOPIC=${TOPIC:-nexmark-${RUN_ID}}
 KAFKA_RESULTS_TOPIC=${KAFKA_RESULTS_TOPIC:-${TOPIC}-results}
@@ -82,6 +83,28 @@ get_source_count() {
 get_active_app_count() {
   "$HADOOP_HOME/bin/yarn" application -list 2>/dev/null \
     | awk 'NR > 2 && $1 ~ /^application_/ {count++} END {print count + 0}'
+}
+
+get_running_nm_count() {
+  "$HADOOP_HOME/bin/yarn" node -list 2>/dev/null | grep -c RUNNING || true
+}
+
+get_app_state() {
+  if [[ -z "$APP_ID" ]]; then
+    echo "UNKNOWN"
+    return
+  fi
+  { "$HADOOP_HOME/bin/yarn" application -status "$APP_ID" 2>/dev/null || true; } \
+    | awk -F: '/^[[:space:]]*State[[:space:]]*:/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}'
+}
+
+get_app_am_host() {
+  if [[ -z "$APP_ID" ]]; then
+    echo "N/A"
+    return
+  fi
+  { "$HADOOP_HOME/bin/yarn" application -status "$APP_ID" 2>/dev/null || true; } \
+    | awk -F: '/^[[:space:]]*AM Host[[:space:]]*:/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}'
 }
 
 preflight() {
@@ -169,11 +192,26 @@ monitor_completion() {
   local input_total=0
   local result_total=0
   local source_count=0
+  local last_valid_source_count=0
+  local last_source_count=-1
+  local last_result_total=-1
+  local stalled_checks=0
+  local app_state
+  local app_am_host
+  local running_nm
 
   while [[ "$SECONDS" -lt "$deadline" ]]; do
     input_total=$(sum_topic_offsets "$TOPIC")
     result_total=$(sum_topic_offsets "$KAFKA_RESULTS_TOPIC")
     source_count=$(get_source_count)
+
+    if [[ "$source_count" -gt "$TOTAL_EVENTS" ]]; then
+      log "warning ignoring impossible source_count=$source_count greater than TOTAL_EVENTS=$TOTAL_EVENTS"
+      source_count=$last_valid_source_count
+    else
+      last_valid_source_count=$source_count
+    fi
+
     log "progress input=$input_total source=$source_count result=$result_total"
 
     if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -ge "$TOTAL_EVENTS" && "$result_total" -ge "$TOTAL_EVENTS" ]]; then
@@ -181,6 +219,43 @@ monitor_completion() {
       log "Success: input/source/result reached $TOTAL_EVENTS"
       return 0
     fi
+
+    if [[ -n "$APP_ID" ]]; then
+      app_state=$(get_app_state)
+      app_am_host=$(get_app_am_host)
+      if [[ "$app_state" != "RUNNING" ]]; then
+        RUN_END_MS=$(date +%s%3N)
+        echo "ERROR: YARN app $APP_ID is $app_state before completion" >&2
+        return 1
+      fi
+      if [[ -z "$app_am_host" || "$app_am_host" == "N/A" ]]; then
+        RUN_END_MS=$(date +%s%3N)
+        echo "ERROR: YARN app $APP_ID has no active AM host before completion" >&2
+        return 1
+      fi
+    fi
+
+    running_nm=$(get_running_nm_count)
+    if [[ "$running_nm" -lt "$EXPECTED_NM_COUNT" ]]; then
+      RUN_END_MS=$(date +%s%3N)
+      echo "ERROR: only $running_nm/$EXPECTED_NM_COUNT YARN NodeManagers remain RUNNING" >&2
+      return 1
+    fi
+
+    if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -eq "$last_source_count" && "$result_total" -eq "$last_result_total" ]]; then
+      stalled_checks=$((stalled_checks + 1))
+    else
+      stalled_checks=0
+      last_source_count=$source_count
+      last_result_total=$result_total
+    fi
+
+    if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$stalled_checks" -ge "$PROGRESS_STALL_LIMIT" ]]; then
+      RUN_END_MS=$(date +%s%3N)
+      echo "ERROR: no source/result progress for $stalled_checks checks after producer completion" >&2
+      return 1
+    fi
+
     sleep 10
   done
 
@@ -349,14 +424,19 @@ maybe_plot() {
 }
 
 main() {
+  local monitor_status=0
   preflight
   create_result_topic
   run_harness
-  monitor_completion
-  save_artifacts
-  write_manifest
-  maybe_plot
+  monitor_completion || monitor_status=$?
+  save_artifacts || true
+  write_manifest || true
+  maybe_plot || true
   cleanup
+  if [[ "$monitor_status" -ne 0 ]]; then
+    log "Failed. Artifacts saved to $ARTIFACT_DIR"
+    exit "$monitor_status"
+  fi
   log "Done. Artifacts saved to $ARTIFACT_DIR"
 }
 
