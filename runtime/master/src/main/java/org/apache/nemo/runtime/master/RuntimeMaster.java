@@ -1177,7 +1177,7 @@ public final class RuntimeMaster {
         LOG.info("Send task output start to {}", pairTask);
 
         final String executorId = taskScheduledMap.getTaskExecutorIdMap().get(reroutingTask);
-        if (executorId.contains("Lambda")) {
+        if (RuntimeIdManager.isLambdaExecutorId(executorId)) {
           LOG.info("Deactivation done of {}", reroutingTask);
           final ExecutorRepresenter lambdaExecutor = executorRegistry.getExecutorRepresentor(executorId);
           lambdaExecutor.deactivationDoneSignal(reroutingTask);
@@ -1221,7 +1221,7 @@ public final class RuntimeMaster {
         final String pairTask = pairStageTaskManager.getPairTaskEdgeId(reroutingTask).get(0).left();
 
         final String executorId = taskScheduledMap.getTaskExecutorIdMap().get(reroutingTask);
-        if (executorId.contains("Lambda")) {
+        if (RuntimeIdManager.isLambdaExecutorId(executorId)) {
           LOG.info("Deactivation done of {}", reroutingTask);
           final ExecutorRepresenter lambdaExecutor = executorRegistry.getExecutorRepresentor(executorId);
           lambdaExecutor.deactivationDoneSignal(reroutingTask);
@@ -1384,7 +1384,7 @@ public final class RuntimeMaster {
 
         // Remove pending redirection task
         final String executorId = taskScheduledMap.getTaskExecutorIdMap().get(reroutingTask);
-        if (executorId.contains("Lambda")) {
+        if (RuntimeIdManager.isLambdaExecutorId(executorId)) {
           LOG.info("Deactivation done of {}", reroutingTask);
           final ExecutorRepresenter lambdaExecutor = executorRegistry.getExecutorRepresentor(executorId);
           lambdaExecutor.deactivationDoneSignal(reroutingTask);

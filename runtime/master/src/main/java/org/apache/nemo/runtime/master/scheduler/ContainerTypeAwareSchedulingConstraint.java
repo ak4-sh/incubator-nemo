@@ -49,6 +49,8 @@ public final class ContainerTypeAwareSchedulingConstraint implements SchedulingC
 //      executor.getContainerType().equals(executorPlacementPropertyValue));
 
     return executorPlacementPropertyValue.equals(ResourcePriorityProperty.NONE) ? true
-        : executor.getContainerType().equals(executorPlacementPropertyValue);
+        : executor.getContainerType().equals(executorPlacementPropertyValue)
+        || (executorPlacementPropertyValue.equals(ResourcePriorityProperty.LAMBDA)
+            && executor.getContainerType().equals(ResourcePriorityProperty.VM));
   }
 }

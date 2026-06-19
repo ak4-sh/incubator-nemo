@@ -18,6 +18,7 @@
  */
 package org.apache.nemo.runtime.master.resource;
 
+import org.apache.nemo.common.RuntimeIdManager;
 import org.apache.nemo.common.ir.vertex.executionproperty.ResourcePriorityProperty;
 import org.apache.nemo.conf.JobConf;
 import org.apache.nemo.runtime.master.DefaultExecutorRepresenterImpl;
@@ -325,7 +326,7 @@ public final class ContainerManager {
     synchronized (pendingContainerRequestsByContainerType) {
       ResourceSpecification selectedResourceSpec = null;
 
-      if (executorId.contains("Lambda") &&
+      if (RuntimeIdManager.isLambdaExecutorId(executorId) &&
         pendingContainerRequestsByContainerType.containsKey(ResourcePriorityProperty.LAMBDA)
         && pendingContainerRequestsByContainerType.get(ResourcePriorityProperty.LAMBDA).size() > 0) {
         selectedResourceSpec = pendingContainerRequestsByContainerType.get(ResourcePriorityProperty.LAMBDA)

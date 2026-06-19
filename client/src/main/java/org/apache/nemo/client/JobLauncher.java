@@ -57,9 +57,11 @@ import org.apache.reef.tang.annotations.Name;
 import org.apache.reef.tang.exceptions.InjectionException;
 import org.apache.reef.tang.formats.CommandLine;
 import org.apache.reef.util.EnvironmentUtils;
+import org.apache.reef.wake.remote.address.LocalAddressProvider;
 import org.apache.reef.util.Optional;
 import org.apache.reef.wake.IdentifierFactory;
 import org.apache.reef.wake.remote.address.LocalAddressProvider;
+import org.apache.nemo.driver.ShortHostnameLocalAddressProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -378,8 +380,19 @@ public final class JobLauncher {
     final String sourceLogFile = getNemoWorkingFile("source.log");
 
     try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(scalingFile));
+      final File scaling = new File(scalingFile);
+      final File sourceLog = new File(sourceLogFile);
+      final File parent = scaling.getParentFile();
+      if (parent != null) {
+        parent.mkdirs();
+      }
+      final File sourceLogParent = sourceLog.getParentFile();
+      if (sourceLogParent != null) {
+        sourceLogParent.mkdirs();
+      }
+      BufferedWriter writer = new BufferedWriter(new FileWriter(scaling));
       writer.close();
+      sourceLog.createNewFile();
     } catch (final Exception e) {
       e.printStackTrace();
       throw new RuntimeException(e);
@@ -698,7 +711,7 @@ public final class JobLauncher {
     }
 
 
-    return DriverConfiguration.CONF
+    final Configuration driverConf = DriverConfiguration.CONF
         .setMultiple(DriverConfiguration.GLOBAL_LIBRARIES, EnvironmentUtils.getAllClasspathJars()
         .stream().filter(path -> {
           LOG.info("Library path: {}", path);
@@ -719,6 +732,12 @@ public final class JobLauncher {
         .set(DriverConfiguration.DRIVER_IDENTIFIER, jobId)
         .set(DriverConfiguration.DRIVER_MEMORY, driverMemory)
         .build();
+
+    final Configuration localAddrConf = Tang.Factory.getTang().newConfigurationBuilder()
+        .bindImplementation(LocalAddressProvider.class, ShortHostnameLocalAddressProvider.class)
+        .build();
+
+    return Configurations.merge(driverConf, localAddrConf);
   }
 
   private static Class<? extends OffloadingRequester> getRequesterConf(final String offloadingType) {

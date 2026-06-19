@@ -29,6 +29,7 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.Future;
 
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.apache.nemo.common.RuntimeIdManager;
 import org.apache.nemo.conf.JobConf;
 import org.apache.nemo.runtime.executor.common.ByteTransport;
 import org.apache.nemo.runtime.executor.common.ByteTransportChannelInitializer;
@@ -106,7 +107,7 @@ public final class LambdaByteTransport implements ByteTransport {//implements Au
   @Override
   public ChannelFuture connectTo(final String remoteExecutorId) {
 
-    if (remoteExecutorId.contains("Lambda")) {
+    if (RuntimeIdManager.isLambdaExecutorId(remoteExecutorId)) {
       throw new RuntimeException("Should not connect to " + remoteExecutorId);
     }
 

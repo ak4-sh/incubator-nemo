@@ -32,8 +32,9 @@ CLIENT_JAR="${ROOT_DIR}/client/target/nemo-client-${VERSION}-shaded.jar"
 NEXMARK_JAR="${ROOT_DIR}/examples/nexmark/target/nexmark-${VERSION}-shaded.jar"
 LAMBDA_JAR="${ROOT_DIR}/offloading/workers/lambda/target/offloading-lambda-${VERSION}.jar"
 HADOOP_COMMON_JAR="${HADOOP_COMMON_JAR:-${HOME}/.m2/repository/org/apache/hadoop/hadoop-common/2.7.2/hadoop-common-2.7.2.jar}"
+BEAM_GRPC_JAR="${BEAM_GRPC_JAR:-${HOME}/.m2/repository/org/apache/beam/beam-vendor-grpc-1_21_0/0.1/beam-vendor-grpc-1_21_0-0.1.jar}"
 
-for jar in "${CLIENT_JAR}" "${NEXMARK_JAR}" "${LAMBDA_JAR}" "${HADOOP_COMMON_JAR}"; do
+for jar in "${CLIENT_JAR}" "${NEXMARK_JAR}" "${LAMBDA_JAR}" "${HADOOP_COMMON_JAR}" "${BEAM_GRPC_JAR}"; do
   if [[ ! -f "${jar}" ]]; then
     echo "Missing required jar: ${jar}" >&2
     echo "Build Nemo first with: mvn clean install -DskipTests -T 2C" >&2
@@ -50,5 +51,5 @@ JAVA_OPTS="${NEMO_JAVA_OPTS:---add-opens=java.base/java.lang=ALL-UNNAMED --add-o
 
 exec java ${JAVA_OPTS} \
   -Dlog4j.configuration="file://${ROOT_DIR}/log4j.properties" \
-  -cp "${LAMBDA_JAR}:${HADOOP_COMMON_JAR}:${CLIENT_JAR}:${YARN_CLASSPATH}:${NEXMARK_JAR}" \
+  -cp "${LAMBDA_JAR}:${HADOOP_COMMON_JAR}:${CLIENT_JAR}:${YARN_CLASSPATH}:${NEXMARK_JAR}:${BEAM_GRPC_JAR}" \
   org.apache.nemo.client.JobLauncher "$@"

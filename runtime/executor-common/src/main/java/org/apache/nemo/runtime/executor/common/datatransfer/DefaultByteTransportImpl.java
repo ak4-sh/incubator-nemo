@@ -21,6 +21,7 @@ package org.apache.nemo.runtime.executor.common.datatransfer;
 import org.apache.nemo.conf.EvalConf;
 import org.apache.nemo.conf.JobConf;
 import org.apache.nemo.common.NetworkUtils;
+import org.apache.nemo.common.RuntimeIdManager;
 import org.apache.nemo.offloading.common.Pair;
 import org.apache.nemo.runtime.executor.common.ByteTransportChannelInitializer;
 import org.apache.nemo.runtime.executor.common.ExecutorChannelMap;
@@ -278,7 +279,7 @@ public final class DefaultByteTransportImpl implements ByteTransport {
   @Override
   public ChannelFuture connectTo(final String remoteExecutorId) {
 
-    if (remoteExecutorId.contains("Lambda")) {
+    if (RuntimeIdManager.isLambdaExecutorId(remoteExecutorId)) {
       final long st = System.currentTimeMillis();
       while (!executorChannelMap.map.containsKey(remoteExecutorId)) {
 

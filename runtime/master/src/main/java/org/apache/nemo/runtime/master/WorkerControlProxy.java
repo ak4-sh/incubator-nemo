@@ -1,5 +1,6 @@
 package org.apache.nemo.runtime.master;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.Channel;
 import org.apache.nemo.offloading.common.EventHandler;
@@ -111,6 +112,9 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
         synchronized (pendingActivationWorkers) {
           pendingActivationWorkers.add(this);
         }
+        // Send ACTIVATE event to the VM worker so it responds with ACTIVATE
+        final ByteBuf buf = controlChannel.alloc().ioBuffer(Integer.BYTES).writeInt(requestId);
+        controlChannel.writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.ACTIVATE, buf));
         activator.activate();
       } else {
         throw new RuntimeException("Worker " + requestId + "/" + state +
@@ -124,6 +128,7 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
       if (state.get().equals(ACTIVATE)) {
         state.set(DEACTIVATING);
         LOG.info("Send end message for deactivating worker {}", requestId);
+        LOG.info("deactivate() called from:", new Exception("Stack trace for deactivate()"));
         controlChannel
           .writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.END, null));
       } else {

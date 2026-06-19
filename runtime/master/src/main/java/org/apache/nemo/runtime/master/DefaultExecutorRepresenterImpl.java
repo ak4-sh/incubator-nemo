@@ -316,7 +316,7 @@ public final class DefaultExecutorRepresenterImpl implements ExecutorRepresenter
 
   @Override
   public synchronized void activationDoneSignal(final String taskId) {
-    if (!executorId.contains("Lambda")) {
+    if (!RuntimeIdManager.isLambdaExecutorId(executorId)) {
       throw new RuntimeException("Non lambda executor receive signal " + executorId);
     }
 
@@ -462,7 +462,7 @@ public final class DefaultExecutorRepresenterImpl implements ExecutorRepresenter
       activatedTasks.add(task.getTaskId());
     }
 
-    if (lambdaControlProxy != null && executorId.contains("Lambda")) {
+    if (lambdaControlProxy != null && RuntimeIdManager.isLambdaExecutorId(executorId)) {
       if (lambdaControlProxy.isActive() || lambdaControlProxy.isActivating()) {
         // just send task
       } else {
@@ -495,7 +495,7 @@ public final class DefaultExecutorRepresenterImpl implements ExecutorRepresenter
 
       serializedTaskMap.setSerializedTask(task.getTaskId(), bos.toByteArray());
 
-      if (lambdaControlProxy != null && executorId.contains("Lambda")) {
+      if (lambdaControlProxy != null && RuntimeIdManager.isLambdaExecutorId(executorId)) {
         if (lambdaControlProxy.isActive() || lambdaControlProxy.isActivating()) {
           // just send task
         } else {
