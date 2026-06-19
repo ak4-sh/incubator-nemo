@@ -9,7 +9,7 @@ Usage:
   scripts/run_nexmark_q8_kafka_with_metrics.sh [result_dir]
 
 Common environment overrides:
-  BOOTSTRAP_SERVERS       Kafka bootstrap servers. Default: broker1:9092
+  BOOTSTRAP_SERVERS       Kafka bootstrap servers. Default: node1:9092,node2:9092,node3:9092
   CONSUMER_GROUP          Kafka consumer group to describe. Default: __ALL__
   KAFKA_TOPICS            CSV topic list for end-offset sampling. Default: __ALL__
   KAFKA_LAG_INTERVAL      Lag sampling interval seconds. Default: 1
@@ -58,7 +58,7 @@ if [[ "$CURRENT_BRANCH" != "sponge" ]]; then
 fi
 
 RESULT_DIR="${1:-results/nexmark-q8-kafka-$(date +%Y%m%d-%H%M%S)}"
-BOOTSTRAP_SERVERS="${BOOTSTRAP_SERVERS:-broker1:9092}"
+BOOTSTRAP_SERVERS="${BOOTSTRAP_SERVERS:-node1:9092,node2:9092,node3:9092}"
 CONSUMER_GROUP="${CONSUMER_GROUP:-__ALL__}"
 KAFKA_TOPICS="${KAFKA_TOPICS:-__ALL__}"
 KAFKA_LAG_INTERVAL="${KAFKA_LAG_INTERVAL:-1}"

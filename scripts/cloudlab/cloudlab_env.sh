@@ -4,12 +4,12 @@
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 export NEMO_REPO_ROOT=${NEMO_REPO_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}
 
-export JAVA_HOME=${JAVA_HOME:-/usr/lib/jvm/java-8-openjdk-amd64}
+export JAVA_HOME=${JAVA_HOME:-/usr/lib/jvm/java-11-openjdk-amd64}
 export HADOOP_HOME=${HADOOP_HOME:-/users/akash01/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-$HADOOP_HOME/etc/hadoop}
 export YARN_CONF_DIR=${YARN_CONF_DIR:-$HADOOP_CONF_DIR}
-export KAFKA_BOOTSTRAP=${KAFKA_BOOTSTRAP:-node7:9092,node8:9092,node9:9092}
-export KAFKA_NODE=${KAFKA_NODE:-node7}
+export KAFKA_BOOTSTRAP=${KAFKA_BOOTSTRAP:-node1:9092,node2:9092,node3:9092}
+export KAFKA_NODE=${KAFKA_NODE:-node1}
 export KAFKA_HOME=${KAFKA_HOME:-/opt/kafka}
 
 export BEAM_GRPC_JAR=${BEAM_GRPC_JAR:-/users/akash01/deps/beam-vendor-grpc-1_21_0-0.1.jar}

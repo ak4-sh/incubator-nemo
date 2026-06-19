@@ -63,8 +63,8 @@ echo run query $1
 	-source_parallelism $PARALLELISM \
 	-is_local_source false \
 	-min_vm_task $MIN_VM_TASK \
-        -user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=$1 --manageResources=false --monitorJobs=true --streamTimeout=$TIMEOUT --isRateLimited=true --windowSizeSec=$WINDOW --windowPeriodSec=$INTERVAL --fanout=1 --cpuDelayMs=$CPU_DELAY --samplingRate=$SAMPLING --sourceType=$sourceType --pubSubMode=$pubSubMode --bootstrapServers=broker1:9092"
+        -user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=$1 --manageResources=false --monitorJobs=true --streamTimeout=$TIMEOUT --isRateLimited=true --windowSizeSec=$WINDOW --windowPeriodSec=$INTERVAL --fanout=1 --cpuDelayMs=$CPU_DELAY --samplingRate=$SAMPLING --sourceType=$sourceType --pubSubMode=$pubSubMode --bootstrapServers=node1:9092,node2:9092,node3:9092"
 
 
-#-user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=$1 --manageResources=false --monitorJobs=true --streamTimeout=$TIMEOUT --numEventGenerators=$PARALLELISM --numEvents=$EVENTS --isRateLimited=true --windowSizeSec=$WINDOW --windowPeriodSec=$INTERVAL --fanout=1 --ratePeriodSec=$PERIOD --cpuDelayMs=$CPU_DELAY --samplingRate=$SAMPLING --sourceType=$sourceType --pubSubMode=$pubSubMode --bootstrapServers=broker1:9092"
+#-user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=$1 --manageResources=false --monitorJobs=true --streamTimeout=$TIMEOUT --numEventGenerators=$PARALLELISM --numEvents=$EVENTS --isRateLimited=true --windowSizeSec=$WINDOW --windowPeriodSec=$INTERVAL --fanout=1 --ratePeriodSec=$PERIOD --cpuDelayMs=$CPU_DELAY --samplingRate=$SAMPLING --sourceType=$sourceType --pubSubMode=$pubSubMode --bootstrapServers=node1:9092,node2:9092,node3:9092"
 

@@ -11,7 +11,11 @@ def main():
     args = parser.parse_args()
 
     lines = []
-    for node in args.nodes:
+    # Support comma-separated node lists passed as a single string
+    nodes = []
+    for n in args.nodes:
+        nodes.extend([x.strip() for x in n.split(",") if x.strip()])
+    for node in nodes:
         for i in range(args.workers_per_node):
             lines.append(f"{node}:{args.first_port + i}")
 

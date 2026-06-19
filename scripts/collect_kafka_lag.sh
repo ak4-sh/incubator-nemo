@@ -7,8 +7,8 @@ Usage:
   collect_kafka_lag.sh <bootstrap_servers> <output_csv> [interval_seconds] [consumer_group] [topics_csv]
 
 Examples:
-  collect_kafka_lag.sh broker1:9092 results/kafka_lag.csv 1
-  collect_kafka_lag.sh broker1:9092 results/kafka_lag.csv 1 nexmark-Q8-consumer person,auction
+  collect_kafka_lag.sh node1:9092,node2:9092,node3:9092 results/kafka_lag.csv 1
+  collect_kafka_lag.sh node1:9092,node2:9092,node3:9092 results/kafka_lag.csv 1 nexmark-Q8-consumer person,auction
 
 Environment:
   KAFKA_HOME  Optional Kafka installation directory. If unset, Kafka tools must be on PATH.
