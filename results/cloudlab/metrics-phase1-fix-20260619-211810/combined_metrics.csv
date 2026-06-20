@@ -1,0 +1,3 @@
+timestamp,inputOffset,resultOffset,sourceCount,inputLag,resultLag,kafkaQueueTimeP50,kafkaQueueTimeP95,kafkaQueueTimeP99,latencyMedian,latencyP95,latencyP99,latencyTail,avgCpu,avgInput,avgProcess,queueSize,numExecutors,numLambdaExecutors
+1781922020184,100100,145811,100100,0,-45711,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
+1781922032142,700100,750100,700100,0,-50000,158.3125,249.014925,252.22388,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
