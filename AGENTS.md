@@ -21,7 +21,7 @@ Current YARN State
 - NMs now register with **internal hostnames** (`node5-link-1` → `10.10.1.6`) instead of external FQDNs (`c220g2-011125.wisc.cloudlab.us` → `128.105.145.128`).
 - NMs killed and restarted fresh with distributed config files.
 - RM also restarted fresh.
-- Latest clean restart after Q8 cap4 benchmark: `application_1781894495142_0001` was killed, local subscriber/producer/collector processes were stopped, warm VMWorker pools on offload nodes were killed, RM and all five baseline NMs were restarted, and YARN shows all five baseline NMs `RUNNING` with `0` containers and no active applications.
+- Latest clean restart after `application_1781926211327_0002` (sponge-q0-test): app killed, local subscriber/producer/collector stopped, warm VMWorker pools killed, orphan REEFLauncher processes cleaned up, RM and all five baseline NMs restarted; YARN shows all five baseline NMs `RUNNING` with `0` containers and no active applications; HDFS safemode OFF, 10 live datanodes.
 - `/users/akash01/hadoop/etc/hadoop/slaves` on all nodes contains only: `node5`, `node9`, `node10`, `node11`, `node12`.
 
 Configuration Changes Applied
@@ -137,29 +137,23 @@ Current Nexmark Status
 - Full bursty run (100 prefill + 100000 live = 100100 total) succeeded with 200 VMWorkers.
 - Source and KAFKA results topic offsets both confirmed at 100100.
 
-### Autoscaler Smoke Test (Latest)
-- `run_q8_subscriber_yarn.sh` now launches the Java subscriber with `nohup ... > "$LOG_FILE" 2>&1 &` and writes `/tmp/nemo-subscriber-${TOPIC}.pid`, so the harness returns after writing `scaling.txt` and producing live events.
-- `run_autoscaler_smoke.sh` default total events is now 500 (100 prefill + 400 live) and reads the subscriber PID file.
-- `run_autoscaler_smoke.sh` no longer starts the redundant background `source.log` sync loop. The client reads `source.log` locally on node0 and sends input updates to the AM via RPC, so syncing the file to the AM host is unnecessary.
-- `run_autoscaler_smoke.sh` now clears AM-side fallback metric files (`/tmp/scaling_decisions.csv`, `/tmp/source_metrics.csv`, `/tmp/task_metrics.csv`) on the captured AM host after the YARN app reaches RUNNING and before metrics collection starts.
-- Latest Q8 autoscaling rerun with wrong Source capacity: topic `nexmark-auto-133500`, app `application_1781894049447_0001`.
-  - Command used `QUERY=8 EXECUTOR_JSON=configs/cloudlab/nemo-yarn-kafka-1source-8compute.json` with 8M events, 8 Kafka partitions, and producer parallelism 8.
-  - Producer sent all `8,000,000` events, but this config has only Source `slot: 1`; Q8 had four Source tasks, so `Stage0-1/2/3` never scheduled.
-  - Scale-out was blocked at the `ScaleInOutManager` wait-for-all-tasks scheduling gate. The app was killed and rerun with the cap4 config.
-- Latest Q8 autoscaling rerun with Source capacity 4: topic `nexmark-auto-134204`, app `application_1781894495142_0001`, AM host `node12`.
-  - Command used: `TOTAL_EVENTS=8000000 PREFILL_EVENTS=100 FIRST_RATE=50000 NEXT_RATE=200000 RATE_PERIOD_SEC=50 CPU_DELAY_MS=2 QUERY=8 EXECUTOR_JSON=configs/cloudlab/nemo-yarn-kafka-1source-cap4-8compute.json BASELINE_NODES='node5 node9 node10 node11 node12' EXPECTED_NM_COUNT=5 KAFKA_PARTITIONS=8 PRODUCER_PARALLELISM=8 scripts/cloudlab/run_autoscaler_smoke.sh`.
-  - Producer sent `7,999,900` live records plus 100 prefill = `8,000,000` total at ~74.0K ev/s average.
-  - Kafka offsets confirmed `8,000,000` across 8 partitions.
-  - Scale-out triggered once: `1781894710766,SCALE_OUT,0.0648,146500.0000,50884.6000,44977.0000,44977,0.7621,179`.
-  - VM task migration succeeded. AM logs scheduled Stage1/Stage2 tasks to `VM-76`, `VM-77`, `VM-78`, `VM-79`, `VM-110`, `VM-111`, `VM-112`, and `VM-116`.
-  - Offload node task metrics confirmed current-run VM rows: `node6` had 508 rows for `VM-78/VM-79`, and `node7` had 510 rows for `VM-111/VM-112`. Note these rows are written on offload nodes, not the AM host.
-  - Scale-in triggered once too early: `1781894728769,SCALE_IN,0.0195,0.0000,0.0000,315884.0000,315884,1.0000,179`.
-  - Root cause of early scale-in: `scaleInIfIdle()` checked idle input/process rates and low CPU but did not require backlog to be drained. `source_metrics.csv` plateaued at `7,684,016` while Kafka offset was `8,000,000`, leaving ~315K queue backlog.
-  - Fix added after this run: `scaleInIfIdle()` now requires `queue = aggInput - currSourceEvent <= 0` before scale-in.
-  - Cleanup: app killed, local subscriber/producer/collector stopped, warm VMWorker pools killed, RM and five baseline NMs restarted; YARN returned to five `RUNNING` NMs with `0` containers.
-- Recent Q0 regression checkpoints remain valid:
-  - Sustained Q0 `nexmark-auto-123054`, app `application_1781890212133_0001`: source consumed all 8M records, scale-out fired once, scale-in fired once, no repeat scale-in loop.
-  - Earlier Q0 `nexmark-auto-193044`: 500k events consumed with zero loss, scale-out/scale-in fired once each, metrics pipeline worked end-to-end.
+### Phase 1 Metrics Instrumentation
+- **Problem:** Source-task queue time was not tracked; per-executor aggregate source metrics and per-task metrics shared the same CSV file (`source_metrics.csv`) with incompatible schemas; scaler only wrote decision rows without periodic state; task metrics lacked `jobId` and `executorId` columns.
+- **Solution (commit `32c280b1b`):**
+  - `UnboundedSourceReadable.java`: tracks per-source-task Kafka queue time (avg/max/samples every 5s), writes `source_task_metrics.csv` with 10-column schema (`timestamp,jobId,taskId,idleTimeNs,kafkaQueueTimeNs,kafkaQueueTimeAvgNs,kafkaQueueTimeMaxNs,kafkaQueueSamples,inputRate,recordsRead`).
+  - `SourceEventAggregator.java`: writes `source_aggregate_metrics.csv` with 5-column schema (`timestamp,jobId,totalSourceCount,executorId,executorSourceCount`), separate from task-level metrics to avoid schema conflicts.
+  - `InputAndCpuBasedScaler.java`: writes periodic `scaler_metrics.csv` every 1s with 10 columns (`timestamp,jobId,avgCpu,avgInput,avgProcess,queue,numExecutors,numLambdaExecutors,lastActionWasScaleOut,prevFutureCompleted`) with NaN/Infinity guard.
+  - `TaskEventRateCalculator.java`: 12-column schema with `jobId`, `executorId`; `mkdirs` guard.
+  - `JobConf.java`: default `JobId` to `"unknown"` instead of null.
+  - `OffloadingExecutor.java`: throw `RuntimeException` on `InjectionException` (fail fast instead of silent `WORKER_INIT_DONE`).
+  - `RuntimeMaster.java`: remove `taskDispatcher.setWaiting(true/false)` and `resourceRequestCounter` increment during lambda container provisioning (fixes scale-out stall where container request paused `TaskDispatcher` and blocked all task scheduling).
+- **Script changes (same commit):**
+  - `run_autoscaler_smoke.sh`: propagate `NEMO_JOB_ID`, clean stale baseline worker metrics (`/tmp/source_task_metrics.csv`, `/tmp/task_metrics.csv`), pass `result_topic` and source hosts to collector.
+  - `run_q8_subscriber_yarn.sh`: pass `-Dnemo.job.id=$JOB_ID`.
+  - `run_sponge_q0_benchmark.sh`: filter `scaler_metrics.csv` by run window/jobId, exclude `NaN`/`Infinity`; filter `task_metrics.csv` by `NF==12`; generate README with lag/queue metrics; collect `source_aggregate_metrics.csv` from AM host; collect `source_task_metrics.csv` from each baseline node.
+  - `metrics_collector.py`: track `resultOffset`/`resultLag`; read source queue-time from baseline worker nodes; use `scaler_metrics.csv`; poll source queue-time p50/p95/p99.
+  - `plot_metrics.py`: plot `kafka_result_lag`, `source_kafka_queue_time`; handle 12-column `task_metrics`; backward-compatible with older CSVs.
+- **Build:** `mvn -pl runtime/master,client,offloading/workers/vm -am -DskipTests package` passed after all changes. Shaded client jar rebuilt with latest timestamp 2026-06-19 23:57 -0600.
 
 ### Full Sponge Q0 Benchmark (Latest)
 - New wrapper `scripts/cloudlab/run_sponge_q0_benchmark.sh` created with full Sponge defaults: `TOTAL_EVENTS=23850000`, `RATE_PERIOD_SEC=450`, `FIRST_RATE=50000`, `NEXT_RATE=200000`.
@@ -234,8 +228,8 @@ Current Nexmark Status
 - `StandaloneNexmarkKafkaProducer.java`: source-log writes are cumulative and append-mode; the final write uses the final total.
 - `UnboundedSourceReadable.java`: tracks `idleTimeNs` (waiting for advance/pollRecord), samples `queueTimeNs` every 1000 msgs (time since message timestamp), reports input rate.
 - `TaskEventRateCalculator.java`: writes `task_metrics.csv` with per-task inputRate, outputRate, processingTime, deserTime, inbytes, etc.
-- `SourceEventAggregator.java`: writes `source_metrics.csv` with per-executor source counts every 1s.
-- `InputAndCpuBasedScaler.java`: writes `scaling_decisions.csv` with timestamp, action, avgCpu, avgInput, avgProcess, queue, ratio, numExecutors.
+- `SourceEventAggregator.java`: writes `source_aggregate_metrics.csv` with per-executor source counts every 1s (separate from task-level metrics to avoid schema conflicts).
+- `InputAndCpuBasedScaler.java`: writes `scaling_decisions.csv` (on decision) with timestamp, action, avgCpu, avgInput, avgProcess, queue, ratio, numExecutors; writes `scaler_metrics.csv` (periodic every 1s) with avgCpu, avgInput, avgProcess, queue, numExecutors, numLambdaExecutors, flags.
 - `metrics_collector.py` (new): background collector running on submit node (node0). Polls every 5s: Kafka latest offset via SSH to node1, source counts/CPU/scaling data via SSH to AM host. Writes `combined_metrics.csv`.
 - `plot_metrics.py` (new): post-run plotting script that reads CSV files.
 - All CSV writers fall back to `/tmp` when `nemo.work.dir` system property is unset (since YARN containers don't inherit client env vars).
@@ -296,7 +290,7 @@ Relevant Files
 - `runtime/driver/src/main/java/org/apache/nemo/driver/ShortHostnameLocalAddressProvider.java`: returns short hostname
 - `client/src/main/java/org/apache/nemo/client/JobLauncher.java`: binds `ShortHostnameLocalAddressProvider`, scaling service, source.log reader
 - `common/src/main/java/org/apache/nemo/common/NetworkUtils.java`: internal `10.10.*` address selection for Netty server binding
-- `runtime/master/src/main/java/org/apache/nemo/runtime/master/SourceEventAggregator.java`: writes `source_metrics.csv`
+- `runtime/master/src/main/java/org/apache/nemo/runtime/master/SourceEventAggregator.java`: writes `source_aggregate_metrics.csv`
 - `runtime/master/src/main/java/org/apache/nemo/runtime/master/backpressure/InputAndQueueSizeBasedBackpressure.java`: backpressure with aggInput tracking
 - `runtime/executor-common/src/main/java/org/apache/nemo/runtime/executor/common/monitoring/TaskEventRateCalculator.java`: writes `task_metrics.csv`
 - `compiler/frontend/beam/src/main/java/org/apache/nemo/compiler/frontend/beam/source/UnboundedSourceReadable.java`: tracks idle time, queue time (sampled 1000 msgs), input rate
@@ -324,7 +318,7 @@ Relevant Files
 - `configs/cloudlab/nemo-yarn-1source-5compute-small.json`
 
 ### Built JARs
-- `client/target/nemo-client-0.2-SNAPSHOT-shaded.jar` (rebuilt after Q8 schedulability fix; latest timestamp observed: 2026-06-19 13:31:33 -0500; not yet rebuilt after scale-in backlog guard)
+- `client/target/nemo-client-0.2-SNAPSHOT-shaded.jar` (rebuilt after Phase 1 metrics + runtime fixes commit `32c280b1b`; latest timestamp observed: 2026-06-19 23:57 -0600)
 - `examples/nexmark/target/nexmark-0.2-SNAPSHOT-shaded.jar`
 - `offloading/workers/vm/target/offloading-vm-0.2-SNAPSHOT-shaded.jar`
 
@@ -376,4 +370,6 @@ Critical Context Reminders
 - `metrics_collector.py` needs `am_host` as 4th argument to read driver-side CSVs via SSH; `run_autoscaler_smoke.sh` now captures `AM_HOST` from `yarn application -status` after the app reaches RUNNING.
 - VM executor task metrics are written to offload nodes' local `/tmp/task_metrics.csv`, not the AM host. Check `node4,node6,node7,node8,node13` for current-run `VM-*` rows.
 - Before the next benchmark, the workspace is clean for YARN runtime state: latest app was killed, local subscriber/producer/collector are stopped, warm VMWorker pools were killed, and YARN showed exactly five RUNNING baseline NMs with zero containers. The harness now removes AM-side fallback metric files automatically after it discovers the AM host.
+- Phase 1 metrics instrumentation complete. CSV schema contract: `source_task_metrics.csv` is 10-column (source-task level), `source_aggregate_metrics.csv` is 5-column (AM-side per-executor aggregates), `scaler_metrics.csv` is 10-column (periodic scaler state at 1s), `task_metrics.csv` is 12-column (per-task rates), `scaling_decisions.csv` is 8-column (decision events only).
+- Final Phase 1 full Q0 run `sponge-q0-test-20260619-230438` succeeded: 23.85M events in/out, 1 SCALE_OUT, 1 SCALE_IN, 589 VM rows, max queue-time p95=6141ms, no NaN/Infinity in any CSV.
 - Full Sponge Q0 benchmark completed successfully: `sponge-q0-20260619-164645`, app `application_1781901266080_0002`, AM host `node9`. Input/source/result all reached `23,850,000`. Scale-out and scale-in fired exactly once each with no phantom loop. VM task metrics confirmed 132 rows. Artifacts saved to `results/cloudlab/sponge-q0-20260619-164645/`.
