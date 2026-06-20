@@ -346,10 +346,10 @@ Next Steps
    - Is `avgSrcProcessingRate` populated correctly?
    - Are executor metrics arriving at `ExecutorMetricMap`?
    - Is `scaleInOutManager.sendMigrationAllStages` called with correct ratio?
-2. Rerun Q8 sustained benchmark with the cap4 config after rebuilding the shaded client jar with the scale-in backlog guard; verify scale-out → VM task migration → no scale-in until `queue <= 0`.
+2. Rerun Q8 sustained benchmark with the cap4 config to verify E2E latency also appears for multi-stage query.
 3. Investigate why Q8 source metrics plateaued at `7,684,016` of `8,000,000` in `nexmark-auto-134204` after VM migration.
 4. For the Pado scheduler deadlock, investigate `StreamingScheduler`/`TaskDispatcher` to prefer upstream tasks over downstream tasks.
-5. Consider additional benchmark harness improvements: collect YARN logs, aggregate METRICLOG counters, auto-kill stale processes (timeout/watchdog already present in `run_sponge_q0_benchmark.sh`).
+5. Consider additional benchmark harness improvements: collect YARN logs, aggregate METRICLOG counters, auto-kill stale processes.
 
 Critical Context Reminders
 -------------------------
@@ -373,3 +373,10 @@ Critical Context Reminders
 - Phase 1 metrics instrumentation complete. CSV schema contract: `source_task_metrics.csv` is 10-column (source-task level), `source_aggregate_metrics.csv` is 5-column (AM-side per-executor aggregates), `scaler_metrics.csv` is 10-column (periodic scaler state at 1s), `task_metrics.csv` is 12-column (per-task rates), `scaling_decisions.csv` is 8-column (decision events only).
 - Final Phase 1 full Q0 run `sponge-q0-test-20260619-230438` succeeded: 23.85M events in/out, 1 SCALE_OUT, 1 SCALE_IN, 589 VM rows, max queue-time p95=6141ms, no NaN/Infinity in any CSV.
 - Full Sponge Q0 benchmark completed successfully: `sponge-q0-20260619-164645`, app `application_1781901266080_0002`, AM host `node9`. Input/source/result all reached `23,850,000`. Scale-out and scale-in fired exactly once each with no phantom loop. VM task metrics confirmed 132 rows. Artifacts saved to `results/cloudlab/sponge-q0-20260619-164645/`.
+
+### E2E Latency Fix (Commit `903ca46e5`)
+- **Root cause of empty latency plot:** Two latency mechanisms — `OperatorVertexOutputCollector.java:158-201` was inside `/* ... */` comment (dead code); `OperatorMetricCollector.processDone()` was only called from `SinkEmtter` (zero-output vertices), not from `ExternalMainEmitter` (Kafka sink path).
+- **Fix:** Added `processDone()` calls to `ExternalMainEmitter.emitData()` and `InternalExternalMainEmitter.emitData()`.
+- **Preflight fix:** `run_sponge_q0_benchmark.sh` Kafka SSH check wrapped with `timeout 10` to prevent hanging on stale SSH agent.
+- **Autoscaler smoke test (50K events):** Confirmed `COLLECT_LATENCY` lines appear every ~1s; steady-state median 5-108ms.
+- **Full benchmark `sponge-q0-20260620-134020`:** 23.85M events in/out via KAFKA sink, 234 COLLECT_LATENCY rows, median 5-186ms, tail max 1,160ms, 1 SCALE_OUT + 1 SCALE_IN, all 8 plots (including latency.png at 57KB) generated. Artifacts at `results/cloudlab/sponge-q0-20260620-134020/`.
