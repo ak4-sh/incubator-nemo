@@ -322,6 +322,8 @@ public final class OperatorVertexOutputCollector<O> extends AbstractOutputCollec
       for (final OutputWriter externalWriter : externalMainOutputs) {
         emit(externalWriter, new TimestampAndValue<>(inputTimestamp, data));
       }
+      operatorMetricCollector.processDone(inputTimestamp,
+        irVertex.getId(), executorId, taskId, latencyLimit, data, persistentConnectionToMasterMap);
     }
   }
 
@@ -344,6 +346,8 @@ public final class OperatorVertexOutputCollector<O> extends AbstractOutputCollec
       for (final OutputWriter externalWriter : externalMainOutputs) {
         emit(externalWriter, new TimestampAndValue<>(inputTimestamp, data));
       }
+      operatorMetricCollector.processDone(inputTimestamp,
+        irVertex.getId(), executorId, taskId, latencyLimit, data, persistentConnectionToMasterMap);
     }
   }
 
