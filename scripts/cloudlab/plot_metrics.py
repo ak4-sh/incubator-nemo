@@ -20,6 +20,15 @@ def load_combined(work_dir: str) -> pd.DataFrame:
         print(f"[plot] missing {path}")
         return pd.DataFrame()
     df = pd.read_csv(path)
+    for col in ["topicOffset", "sourceCount", "kafkaLag"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    if {"topicOffset", "sourceCount"}.issubset(df.columns):
+        # AM-side fallback metrics can contain stale rows from older runs.
+        invalid = df["sourceCount"] > df["topicOffset"]
+        df.loc[invalid, "sourceCount"] = pd.NA
+        df["sourceCount"] = df["sourceCount"].ffill().fillna(0)
+        df["kafkaLag"] = df["topicOffset"] - df["sourceCount"]
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
     # relative time in seconds
     t0 = df["timestamp"].min()
@@ -33,11 +42,14 @@ def load_task_metrics(work_dir: str) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     cols = [
-        "timestamp", "executorId", "taskId", "inputRate", "outputRate",
+        "timestamp", "executorId", "taskId", "inputReceiveRate", "inputRate", "outputRate",
         "processingTime", "deserTime", "inbytes", "serializedTime", "outbytes"
     ]
     df = pd.read_csv(path, names=cols, header=None)
+    df = df[pd.to_numeric(df["timestamp"], errors="coerce").notna()].copy()
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+    for col in cols[3:]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
     t0 = df["timestamp"].min()
     df["rel_s"] = (df["timestamp"] - t0).dt.total_seconds()
     return df[df["rel_s"] >= WARMUP_MS / 1000]

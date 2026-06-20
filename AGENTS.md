@@ -195,6 +195,16 @@ Current Nexmark Status
   - Aggregated YARN logs also showed `HDFSUtils` warning `java.net.UnknownHostException: hdfs-master` during setup; this was not confirmed as the root cause because the job processed ~8.2M records before the runtime failure.
   - Cleanup performed: killed `application_1781901266080_0008`, killed stale submit-side `JobLauncher`, restarted RM and all five baseline NMs; YARN returned to 5 RUNNING NMs with 0 containers and no active apps.
 - `run_sponge_q0_benchmark.sh` now fails fast during monitoring if the YARN app leaves `RUNNING`, AM host becomes `N/A`, RUNNING NM count drops below `EXPECTED_NM_COUNT`, or source/result progress stalls after producer completion. It saves artifacts and runs cleanup on monitor failure.
+- **Run `sponge-q0-20260619-185649`, app `application_1781911776702_0001`, AM host `node11`:**
+  - Producer generated exactly `23,849,900` live records plus 100 prefill = `23,850,000` total at ~93.3K ev/s average.
+  - Kafka input offsets reached `23,850,000`; Kafka result topic reached `23,850,000`, so Q0 end-to-end completed successfully.
+  - Scale-out fired once: `1781913628070,SCALE_OUT,0.1408,200000.0000,49939.2000,179554.0000,179554,0.8527,179`.
+  - Scale-in fired once after drain: `1781913768080,SCALE_IN,0.0130,0.0000,0.0000,-100.0000,-100,1.0000,179`.
+  - VM task metrics: 663 rows across `VM-78`, `VM-79`, `VM-111`, and `VM-112`.
+  - Raw AM source metrics still contained stale fallback rows (`8215025`/`78000000`), but sanitized combined metrics and Kafka result offsets confirmed completion.
+  - Plots generated with `scripts/cloudlab/plot_metrics.py`; plot script now handles 11-column `task_metrics.csv` and filters stale source counts where `sourceCount > topicOffset`.
+  - Artifacts saved to `results/cloudlab/sponge-q0-20260619-185649/`.
+  - After cleanup, YARN NMs dropped to 0; all five baseline NMs were restarted and verified RUNNING with 0 containers.
 
 ### Scale-In Loop Fix
 - **Root cause:** `scaleInIfIdle()` used `executorRegistry.getLambdaExecutors().size() > 0` as its only guard. After scale-in moved all tasks back, lambda executors remained registered forever, so every 1s idle tick re-triggered scale-in. `writeScalingDecision("SCALE_IN")` was called before checking whether lambda executors actually had eligible tasks, so no-op attempts were recorded as real scale-in rows.
