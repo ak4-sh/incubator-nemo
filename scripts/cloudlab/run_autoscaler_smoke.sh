@@ -154,7 +154,7 @@ echo "Starting warm VMWorker pools"
 IFS=',' read -ra OFFLOAD_NODE_ARRAY <<< "$OFFLOAD_NODES"
 for node in "${OFFLOAD_NODE_ARRAY[@]}"; do
   echo "  Starting pool on $node"
-  ssh -A "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true; rm -f /tmp/vmworker-*.log" || true
+  ssh -A "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true; rm -f /tmp/vmworker-*.log /tmp/task_metrics.csv /tmp/source_task_metrics.csv" || true
   ssh -A "$node" "mkdir -p /tmp/nemo-cloudlab-offload" || true
   scp "$SCRIPT_DIR/start_warm_pool.sh" "$node:/tmp/nemo-cloudlab-offload/start_warm_pool.sh" >/dev/null
   scp "$VM_WORKER_JAR" "$node:/tmp/nemo-cloudlab-offload/offloading-vm.jar" >/dev/null
@@ -179,6 +179,11 @@ fi
 # 4. Preflight check: YARN NMs must be up before we submit
 ensure_yarn_nodes
 
+echo "Cleaning stale baseline worker metrics"
+for node in $BASELINE_NODES; do
+  ssh -A "$node" "rm -f /tmp/source_task_metrics.csv /tmp/task_metrics.csv" || true
+done
+
 # 5. Launch subscriber with offloading enabled
 echo "Launching subscriber with autoscaling enabled"
 export TOPIC QUERY EXECUTOR_JSON NUM_EVENTS=$TOTAL_EVENTS STREAM_TIMEOUT
@@ -186,6 +191,7 @@ export LOG_FILE="$SUB_LOG"
 export OFFLOADING=1
 export NUM_MAX_LAMBDA
 export NEMO_WORK_DIR="$WORK_DIR"
+export NEMO_JOB_ID="nx-q${QUERY}-${TOPIC}"
 
 # Run subscriber from repo root so JobLauncher finds vm_addresses.txt
 (cd "$NEMO_REPO_ROOT" && "$SCRIPT_DIR/run_q8_subscriber_yarn.sh")
@@ -202,7 +208,7 @@ echo "  AM Host: $AM_HOST"
 
 if [[ -n "$AM_HOST" && "$AM_HOST" != "N/A" ]]; then
   echo "Cleaning stale AM-side fallback metrics on $AM_HOST"
-  ssh -A "$AM_HOST" "rm -f /tmp/scaling_decisions.csv /tmp/source_metrics.csv /tmp/task_metrics.csv" || true
+  ssh -A "$AM_HOST" "rm -f /tmp/scaling_decisions.csv /tmp/scaler_metrics.csv /tmp/source_metrics.csv /tmp/source_aggregate_metrics.csv /tmp/source_task_metrics.csv /tmp/task_metrics.csv" || true
 else
   echo "WARNING: AM host unavailable; skipping AM-side metrics cleanup" >&2
 fi
@@ -220,6 +226,9 @@ if ! grep -q 'Scaling service invoked' "$SUB_LOG"; then
   exit 1
 fi
 
+echo "Waiting ${SUBSCRIBER_WAIT}s before enabling autoscaler commands"
+sleep "$SUBSCRIBER_WAIT"
+
 # 8. Write scaling commands after service is ready
 echo "Writing scaling commands to $WORK_DIR/scaling.txt"
 printf 'add-lambda-executor %d %d %d %d\n' "$NUM_MAX_LAMBDA" "$LAMBDA_CAPACITY" "$LAMBDA_SLOT" "$LAMBDA_MEMORY" >> "$WORK_DIR/scaling.txt"
@@ -228,7 +237,7 @@ printf 'start-backpressure\n' >> "$WORK_DIR/scaling.txt"
 
 # 9. Start metrics collector in background (pass AM host for driver-side CSV polling)
 echo "Starting metrics collector (AM host: $AM_HOST)"
-python3 "$SCRIPT_DIR/metrics_collector.py" "$TOPIC" "$WORK_DIR" "$SUB_LOG" "$AM_HOST" > "$WORK_DIR/metrics_collector.log" 2>&1 &
+python3 "$SCRIPT_DIR/metrics_collector.py" "$TOPIC" "$WORK_DIR" "$SUB_LOG" "$AM_HOST" "$KAFKA_RESULTS_TOPIC" "$BASELINE_NODES" > "$WORK_DIR/metrics_collector.log" 2>&1 &
 METRICS_PID=$!
 echo "Metrics collector PID: $METRICS_PID"
 

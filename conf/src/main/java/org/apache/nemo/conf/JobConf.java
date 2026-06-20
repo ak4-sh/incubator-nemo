@@ -35,7 +35,7 @@ public final class JobConf extends ConfigurationModuleBuilder {
   /**
    * Job id.
    */
-  @NamedParameter(doc = "Job id", short_name = "job_id")
+  @NamedParameter(doc = "Job id", short_name = "job_id", default_value = "unknown")
   public final class JobId implements Name<String> {
   }
 

@@ -341,6 +341,7 @@ public final class OffloadingExecutor implements OffloadingTransform<Object, Obj
       executor.start();
     } catch (InjectionException e) {
       e.printStackTrace();
+      throw new RuntimeException("Failed to initialize offloading executor " + executorId, e);
     }
 
     LOG.info("Executor thread created: {}", executorId);

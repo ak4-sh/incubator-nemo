@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,7 +58,11 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
   private PrintWriter metricsWriter;
   private final AtomicLong recordsRead = new AtomicLong(0);
   private final AtomicLong samplingCounter = new AtomicLong(0);
+  private final AtomicLong kafkaQueueTimeSumNs = new AtomicLong(0);
+  private final AtomicLong kafkaQueueTimeMaxNs = new AtomicLong(0);
+  private final AtomicLong kafkaQueueTimeSamples = new AtomicLong(0);
   private long lastMetricTime = 0;
+  private long lastMetricRecords = 0;
   private long idleTimeNs = 0;
   private long totalIdleTimeNs = 0;
 
@@ -160,12 +165,21 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
     taskId = readableContext.getTaskId();
     stateStore = readableContext.getStateStore();
 
-    // Initialize Kafka metrics writer
+    // Initialize Kafka source task metrics writer. Aggregate source progress is
+    // written separately by SourceEventAggregator.
     final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
     final String outDir = workDir != null ? workDir : "/tmp";
     try {
-      metricsWriter = new PrintWriter(new FileWriter(outDir + "/source_metrics.csv", true));
-      metricsWriter.println("timestamp,taskId,idleTimeNs,queueTimeNs,inputRate,recordsRead");
+      final File outFile = new File(outDir, "source_task_metrics.csv");
+      final File parent = outFile.getParentFile();
+      if (parent != null && !parent.exists() && !parent.mkdirs()) {
+        LOG.warn("Failed to create source task metrics directory {}", parent);
+      }
+      final boolean writeHeader = !outFile.exists() || outFile.length() == 0;
+      metricsWriter = new PrintWriter(new FileWriter(outFile, true));
+      if (writeHeader) {
+        metricsWriter.println("timestamp,jobId,taskId,idleTimeNs,kafkaQueueTimeNs,kafkaQueueTimeAvgNs,kafkaQueueTimeMaxNs,kafkaQueueSamples,inputRate,recordsRead");
+      }
       metricsWriter.flush();
     } catch (IOException e) {
       LOG.warn("Failed to create metrics writer", e);
@@ -264,17 +278,29 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
         // Kafka message timestamp is available via getCurrentTimestamp
         // Queue time = current time - message timestamp
         queueTimeNs = (currentTimeMs - currTs.getMillis()) * 1_000_000L;
+        kafkaQueueTimeSumNs.addAndGet(queueTimeNs);
+        kafkaQueueTimeSamples.incrementAndGet();
+        kafkaQueueTimeMaxNs.accumulateAndGet(queueTimeNs, Math::max);
       }
 
       // Report metrics every 5 seconds
       if (metricsWriter != null && currentTimeMs - lastMetricTime >= 5000) {
         final long totalRecords = recordsRead.get();
-        final double inputRate = totalRecords * 1000.0 / Math.max(1, currentTimeMs - lastMetricTime);
-        metricsWriter.printf("%d,%s,%d,%d,%.2f,%d%n",
-          currentTimeMs, taskId, totalIdleTimeNs, queueTimeNs, inputRate, totalRecords);
+        final long elapsedMs = Math.max(1, currentTimeMs - lastMetricTime);
+        final long deltaRecords = totalRecords - lastMetricRecords;
+        final double inputRate = deltaRecords * 1000.0 / elapsedMs;
+        final long queueSamples = kafkaQueueTimeSamples.getAndSet(0);
+        final long queueSum = kafkaQueueTimeSumNs.getAndSet(0);
+        final long queueMax = kafkaQueueTimeMaxNs.getAndSet(0);
+        final long queueAvg = queueSamples > 0 ? queueSum / queueSamples : -1;
+        final String jobId = System.getProperty("nemo.job.id", System.getenv("NEMO_JOB_ID"));
+        metricsWriter.printf("%d,%s,%s,%d,%d,%d,%d,%d,%.2f,%d%n",
+          currentTimeMs, jobId != null ? jobId : "unknown", taskId, totalIdleTimeNs, queueTimeNs,
+          queueAvg, queueMax, queueSamples, inputRate, totalRecords);
         metricsWriter.flush();
         totalIdleTimeNs = 0;
         lastMetricTime = currentTimeMs;
+        lastMetricRecords = totalRecords;
       }
 
       try {

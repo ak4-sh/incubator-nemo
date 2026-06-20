@@ -73,11 +73,12 @@ sum_topic_offsets() {
 }
 
 get_source_count() {
+  local max_count=${1:-0}
   if [[ -z "$AM_HOST" || "$AM_HOST" == "N/A" ]]; then
     echo 0
     return
   fi
-  ssh -A "$AM_HOST" "if [ -f /tmp/source_metrics.csv ]; then tail -n 1 /tmp/source_metrics.csv | awk -F, '{print \$2 + 0}'; else echo 0; fi" 2>/dev/null || echo 0
+  ssh -A "$AM_HOST" "if [ -f /tmp/source_aggregate_metrics.csv ]; then tail -n 50 /tmp/source_aggregate_metrics.csv | awk -F, -v max='$max_count' 'BEGIN {v=0} /^[0-9]/ {candidate=\$3 + 0; if (candidate >= 0 && (max <= 0 || candidate <= max)) v=candidate} END {print v + 0}'; else echo 0; fi" 2>/dev/null || echo 0
 }
 
 get_active_app_count() {
@@ -203,7 +204,7 @@ monitor_completion() {
   while [[ "$SECONDS" -lt "$deadline" ]]; do
     input_total=$(sum_topic_offsets "$TOPIC")
     result_total=$(sum_topic_offsets "$KAFKA_RESULTS_TOPIC")
-    source_count=$(get_source_count)
+    source_count=$(get_source_count "$input_total")
 
     if [[ "$source_count" -gt "$TOTAL_EVENTS" ]]; then
       log "warning ignoring impossible source_count=$source_count greater than TOTAL_EVENTS=$TOTAL_EVENTS"
@@ -294,30 +295,67 @@ save_artifacts() {
 
   if [[ -n "$AM_HOST" && "$AM_HOST" != "N/A" ]]; then
     copy_remote_if_exists "$AM_HOST" /tmp/scaling_decisions.csv "$ARTIFACT_DIR/am-$AM_HOST/scaling_decisions.csv"
-    copy_remote_if_exists "$AM_HOST" /tmp/source_metrics.csv "$ARTIFACT_DIR/am-$AM_HOST/source_metrics.csv"
+    copy_remote_if_exists "$AM_HOST" /tmp/scaler_metrics.csv "$ARTIFACT_DIR/am-$AM_HOST/scaler_metrics.csv"
+    copy_remote_if_exists "$AM_HOST" /tmp/source_aggregate_metrics.csv "$ARTIFACT_DIR/am-$AM_HOST/source_aggregate_metrics.csv"
+    copy_remote_if_exists "$AM_HOST" /tmp/source_task_metrics.csv "$ARTIFACT_DIR/am-$AM_HOST/source_task_metrics.csv"
     copy_remote_if_exists "$AM_HOST" /tmp/task_metrics.csv "$ARTIFACT_DIR/am-$AM_HOST/task_metrics.csv"
-    copy_if_exists "$ARTIFACT_DIR/am-$AM_HOST/scaling_decisions.csv" "$ARTIFACT_DIR/scaling_decisions.csv"
-    copy_if_exists "$ARTIFACT_DIR/am-$AM_HOST/source_metrics.csv" "$ARTIFACT_DIR/source_metrics.csv"
+    copy_if_exists "$ARTIFACT_DIR/am-$AM_HOST/source_aggregate_metrics.csv" "$ARTIFACT_DIR/source_aggregate_metrics.csv"
   fi
+
+  if [[ -s "$ARTIFACT_DIR/am-$AM_HOST/scaling_decisions.csv" ]]; then
+    awk -F, -v start="$RUN_START_MS" -v end="${RUN_END_MS:-$(date +%s%3N)}" '/^[0-9]/ && $1 >= start && $1 <= end {print}' \
+      "$ARTIFACT_DIR/am-$AM_HOST/scaling_decisions.csv" > "$ARTIFACT_DIR/scaling_decisions.csv"
+  fi
+
+  printf 'timestamp,jobId,avgCpu,avgInput,avgProcess,queue,numExecutors,numLambdaExecutors,lastActionWasScaleOut,prevFutureCompleted\n' > "$ARTIFACT_DIR/scaler_metrics.csv"
+  if [[ -s "$ARTIFACT_DIR/am-$AM_HOST/scaler_metrics.csv" ]]; then
+    local job_id
+    job_id=$(grep -o 'nx-q[0-9]-nexmark-[A-Za-z0-9._-]*' "$SUB_LOG" | head -1 || true)
+    awk -F, -v start="$RUN_START_MS" -v end="${RUN_END_MS:-$(date +%s%3N)}" -v job_id="$job_id" \
+      '/^[0-9]/ && NF == 10 && $1 >= start && $1 <= end && (job_id == "" || $2 == job_id) && $0 !~ /(NaN|Infinity)/ {print}' \
+      "$ARTIFACT_DIR/am-$AM_HOST/scaler_metrics.csv" >> "$ARTIFACT_DIR/scaler_metrics.csv"
+  fi
+
+  printf 'timestamp,jobId,taskId,idleTimeNs,kafkaQueueTimeNs,kafkaQueueTimeAvgNs,kafkaQueueTimeMaxNs,kafkaQueueSamples,inputRate,recordsRead\n' > "$ARTIFACT_DIR/source_task_metrics.csv"
+  for node in $BASELINE_NODES; do
+    copy_remote_if_exists "$node" /tmp/source_task_metrics.csv "$ARTIFACT_DIR/${node}-source_task_metrics.csv"
+    if [[ -s "$ARTIFACT_DIR/${node}-source_task_metrics.csv" ]]; then
+      awk -F, -v start="$RUN_START_MS" -v end="${RUN_END_MS:-$(date +%s%3N)}" '/^[0-9]/ && NF == 10 && $1 >= start && $1 <= end {print}' "$ARTIFACT_DIR/${node}-source_task_metrics.csv" >> "$ARTIFACT_DIR/source_task_metrics.csv"
+    fi
+  done
 
   IFS=',' read -ra offload_array <<< "$OFFLOAD_NODES"
   for node in "${offload_array[@]}"; do
     copy_remote_if_exists "$node" /tmp/task_metrics.csv "$ARTIFACT_DIR/offload-task-metrics/${node}-task_metrics.csv"
   done
 
-  : > "$ARTIFACT_DIR/task_metrics.csv"
+  printf 'timestamp,jobId,executorId,taskId,inputReceiveRate,inputRate,outputRate,processingTimeNs,deserTimeNs,inBytes,serializedTimeNs,outBytes\n' > "$ARTIFACT_DIR/task_metrics.csv"
   for file in "$ARTIFACT_DIR"/am-*/task_metrics.csv "$ARTIFACT_DIR"/offload-task-metrics/*-task_metrics.csv; do
     if [[ -s "$file" ]]; then
-      awk -F, -v start="$RUN_START_MS" -v end="${RUN_END_MS:-$(date +%s%3N)}" '$1 >= start && $1 <= end {print}' "$file" >> "$ARTIFACT_DIR/task_metrics.csv"
+      awk -F, -v start="$RUN_START_MS" -v end="${RUN_END_MS:-$(date +%s%3N)}" '/^[0-9]/ && NF == 12 && $1 >= start && $1 <= end {print}' "$file" >> "$ARTIFACT_DIR/task_metrics.csv"
     fi
   done
 }
 
 write_manifest() {
   local input_total result_total source_count scale_count scale_out_count scale_in_count vm_rows
+  local max_input_lag max_result_lag max_queue max_kafka_queue_p95
   input_total=$(sum_topic_offsets "$TOPIC")
   result_total=$(sum_topic_offsets "$KAFKA_RESULTS_TOPIC")
-  source_count=$(get_source_count)
+  source_count=$(get_source_count "$input_total")
+  max_input_lag=0
+  max_result_lag=0
+  max_queue=0
+  max_kafka_queue_p95=-1
+  if [[ -f "$ARTIFACT_DIR/combined_metrics.csv" ]]; then
+    max_input_lag=$(awk -F, 'NR > 1 && $5 >= 0 && $5 > m {m=$5} END {print m + 0}' "$ARTIFACT_DIR/combined_metrics.csv")
+    max_result_lag=$(awk -F, 'NR > 1 && $6 >= 0 && $6 > m {m=$6} END {print m + 0}' "$ARTIFACT_DIR/combined_metrics.csv")
+    max_kafka_queue_p95=$(awk -F, 'NR > 1 && $8 >= 0 && $8 > m {m=$8} END {if (m == "") print -1; else printf "%.3f", m}' "$ARTIFACT_DIR/combined_metrics.csv")
+    max_queue=$(awk -F, 'NR > 1 && $17 != "" && $17 > m {m=$17} END {print m + 0}' "$ARTIFACT_DIR/combined_metrics.csv")
+  fi
+  if [[ -f "$ARTIFACT_DIR/source_aggregate_metrics.csv" ]]; then
+    source_count=$(awk -F, -v max="$input_total" 'NR > 1 {candidate=$3 + 0; if (candidate >= 0 && (max <= 0 || candidate <= max)) v=candidate} END {print v + 0}' "$ARTIFACT_DIR/source_aggregate_metrics.csv")
+  fi
   scale_count=0
   scale_out_count=0
   scale_in_count=0
@@ -364,6 +402,10 @@ Full Sponge-style Q0 Kafka source to Kafka sink benchmark with VM offloading.
 - Input Kafka offset total: \`$input_total\`
 - Result Kafka offset total: \`$result_total\`
 - Final source count: \`$source_count\`
+- Max input/source lag: \`$max_input_lag\`
+- Max input/result lag: \`$max_result_lag\`
+- Max scaler queue: \`$max_queue\`
+- Max Kafka queue-time p95: \`$max_kafka_queue_p95\` ms
 - Scaling decisions: \`$scale_count\`
 - Scale-out decisions: \`$scale_out_count\`
 - Scale-in decisions: \`$scale_in_count\`
@@ -372,6 +414,9 @@ Full Sponge-style Q0 Kafka source to Kafka sink benchmark with VM offloading.
 ## Files
 
 - \`combined_metrics.csv\`: collector timeline.
+- \`source_aggregate_metrics.csv\`: AM-side source progress timeline.
+- \`source_task_metrics.csv\`: source-task queue time, idle time, and input rate.
+- \`scaler_metrics.csv\`: periodic scaler state timeline.
 - \`producer_metrics.csv\`: producer throughput timeline.
 - \`scaling_decisions.csv\`: plot-compatible scaling decisions.
 - \`source_metrics.csv\`: plot-compatible source metrics.

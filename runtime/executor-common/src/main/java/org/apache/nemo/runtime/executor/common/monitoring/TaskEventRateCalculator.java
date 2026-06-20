@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,12 +24,15 @@ public final class TaskEventRateCalculator {
 
   private final ConcurrentMap<TaskExecutor, Boolean> taskExecutorMap;
   private final String executorId;
+  private final String jobId;
 
   @Inject
   private TaskEventRateCalculator(final TaskExecutorMapWrapper taskExecutorMapWrapper,
-                                  @Parameter(JobConf.ExecutorId.class) final String executorId) {
+                                   @Parameter(JobConf.ExecutorId.class) final String executorId,
+                                   @Parameter(JobConf.JobId.class) final String jobId) {
     this.taskExecutorMap = taskExecutorMapWrapper.getTaskExecutorMap();
     this.executorId = executorId;
+    this.jobId = jobId;
   }
 
   public Pair<Integer, Integer> calculateProcessedEvent() {
@@ -46,7 +50,16 @@ public final class TaskEventRateCalculator {
     final String outDir = workDir != null ? workDir : "/tmp";
     PrintWriter csvWriter = null;
     try {
-      csvWriter = new PrintWriter(new FileWriter(outDir + "/task_metrics.csv", true));
+      final File outFile = new File(outDir, "task_metrics.csv");
+      final File parent = outFile.getParentFile();
+      if (parent != null && !parent.exists() && !parent.mkdirs()) {
+        LOG.warn("Failed to create task metrics directory {}", parent);
+      }
+      final boolean writeHeader = !outFile.exists() || outFile.length() == 0;
+      csvWriter = new PrintWriter(new FileWriter(outFile, true));
+      if (writeHeader) {
+        csvWriter.println("timestamp,jobId,executorId,taskId,inputReceiveRate,inputRate,outputRate,processingTimeNs,deserTimeNs,inBytes,serializedTimeNs,outBytes");
+      }
     } catch (IOException e) {
       LOG.warn("Failed to create task metrics CSV", e);
     }
@@ -87,8 +100,8 @@ public final class TaskEventRateCalculator {
       sb.append("\n");
 
       if (csvWriter != null) {
-        csvWriter.printf("%d,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d%n",
-          now, executorId, taskExecutor.getId(),
+        csvWriter.printf("%d,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d%n",
+          now, jobId, executorId, taskExecutor.getId(),
           taskMetrics.inputReceiveElement, taskMetrics.inputElement,
           taskMetrics.outputElement, taskMetrics.computation,
           taskMetrics.deserTime, taskMetrics.inbytes,

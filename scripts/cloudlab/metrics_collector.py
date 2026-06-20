@@ -40,48 +40,59 @@ def get_topic_offset(topic: str) -> int:
     return -1
 
 
-def _ssh_read_last_line(host: str, filepath: str) -> str:
-    """Return the last line of a remote file via SSH, or empty string."""
+def _ssh_read_tail(host: str, filepath: str, lines: int = 50) -> list[str]:
+    """Return the tail of a remote file via SSH."""
     try:
         out = subprocess.check_output(
-            ["ssh", host, "tail", "-1", shlex.quote(filepath)],
+            ["ssh", host, "tail", "-n", str(lines), shlex.quote(filepath)],
             stderr=subprocess.DEVNULL, text=True, timeout=5
         )
-        return out.strip()
+        return [line.strip() for line in out.splitlines() if line.strip()]
     except Exception:
-        return ""
+        return []
 
 
-def _read_last_line_local(filepath: str) -> str:
-    """Return the last line of a local file, or empty string."""
+def _read_tail_local(filepath: str, lines: int = 50) -> list[str]:
+    """Return the tail of a local file."""
     try:
         with open(filepath) as f:
-            lines = f.readlines()
-            return lines[-1].strip() if lines else ""
+            data = f.readlines()
+            return [line.strip() for line in data[-lines:] if line.strip()]
     except Exception:
-        return ""
+        return []
 
 
-def _read_last_line(host: str | None, filepath: str) -> str:
+def _read_tail(host: str | None, filepath: str, lines: int = 50) -> list[str]:
     if host:
-        return _ssh_read_last_line(host, filepath)
-    return _read_last_line_local(filepath)
+        return _ssh_read_tail(host, filepath, lines)
+    return _read_tail_local(filepath, lines)
 
 
-def read_source_count(work_dir: str, am_host: str | None = None) -> int:
-    """Read the latest source count from source_metrics.csv."""
-    path = str(Path(work_dir) / "source_metrics.csv")
+def read_source_count(work_dir: str, input_offset: int, am_host: str | None = None,
+                      last_valid: int = -1) -> tuple[int, int]:
+    """Read the latest valid aggregate source count."""
+    path = str(Path(work_dir) / "source_aggregate_metrics.csv")
     if am_host:
-        path = "/tmp/source_metrics.csv"
-    line = _read_last_line(am_host, path)
-    if line:
+        path = "/tmp/source_aggregate_metrics.csv"
+    for line in reversed(_read_tail(am_host, path)):
+        if line.startswith("timestamp"):
+            continue
         parts = line.split(",")
-        if len(parts) >= 2:
+        if len(parts) >= 3:
             try:
-                return int(parts[1])
+                source = int(float(parts[2]))
+                if source < 0:
+                    continue
+                if input_offset >= 0 and source > input_offset:
+                    print(
+                        f"[metrics] ignoring invalid sourceCount={source} > inputOffset={input_offset}",
+                        file=sys.stderr,
+                    )
+                    continue
+                return source, source
             except ValueError:
-                pass
-    return -1
+                continue
+    return last_valid, last_valid
 
 
 def read_latency(log_file: str) -> dict:
@@ -117,63 +128,111 @@ def read_latency(log_file: str) -> dict:
     return {}
 
 
-def read_cpu_metrics(work_dir: str, am_host: str | None = None) -> dict:
-    """Read the latest avgCpu from scaling_decisions.csv (or return empty)."""
-    path = str(Path(work_dir) / "scaling_decisions.csv")
+def read_scaler_metrics(work_dir: str, am_host: str | None = None) -> dict:
+    """Read the latest continuous scaler metrics row."""
+    path = str(Path(work_dir) / "scaler_metrics.csv")
     if am_host:
-        path = "/tmp/scaling_decisions.csv"
-    line = _read_last_line(am_host, path)
-    if line:
+        path = "/tmp/scaler_metrics.csv"
+    for line in reversed(_read_tail(am_host, path)):
+        if line.startswith("timestamp"):
+            continue
         parts = line.split(",")
-        if len(parts) >= 9:
+        if len(parts) >= 10:
             try:
                 return {
                     "avgCpu": float(parts[2]),
                     "avgInput": float(parts[3]),
                     "avgProcess": float(parts[4]),
                     "queue": float(parts[5]),
-                    "numExecutors": int(parts[8]),
+                    "numExecutors": int(parts[6]),
+                    "numLambdaExecutors": int(parts[7]),
                 }
             except (ValueError, IndexError):
-                pass
+                continue
     return {}
+
+
+def read_source_queue_metrics(work_dir: str, am_host: str | None = None,
+                              source_hosts: list[str] | None = None) -> dict:
+    """Read latest source task Kafka queue-time metrics if available."""
+    paths: list[tuple[str | None, str]] = [(None, str(Path(work_dir) / "source_task_metrics.csv"))]
+    if am_host:
+        paths.append((am_host, "/tmp/source_task_metrics.csv"))
+    for host in source_hosts or []:
+        if host and host != am_host:
+            paths.append((host, "/tmp/source_task_metrics.csv"))
+    values = []
+    for host, path in paths:
+        for line in _read_tail(host, path, 200):
+            if line.startswith("timestamp"):
+                continue
+            parts = line.split(",")
+            if len(parts) >= 10:
+                try:
+                    avg_ns = float(parts[5])
+                    samples = int(float(parts[7]))
+                    if avg_ns >= 0 and samples > 0:
+                        values.append(avg_ns / 1_000_000.0)
+                except (ValueError, IndexError):
+                    continue
+    if not values:
+        return {}
+    values.sort()
+    def pct(p: float) -> float:
+        idx = min(len(values) - 1, max(0, int(round((len(values) - 1) * p))))
+        return values[idx]
+    return {"p50": pct(0.50), "p95": pct(0.95), "p99": pct(0.99)}
 
 
 # ── main loop ─────────────────────────────────────────────────────────────
 def main():
     if len(sys.argv) < 3:
-        print("Usage: metrics_collector.py <topic> <work_dir> [subscriber_log_file] [am_host]")
+        print("Usage: metrics_collector.py <input_topic> <work_dir> [subscriber_log_file] [am_host] [result_topic] [source_hosts]")
         sys.exit(1)
 
     topic = sys.argv[1]
     work_dir = sys.argv[2]
     log_file = sys.argv[3] if len(sys.argv) > 3 else "/tmp/nx-auto-sub-{}.log".format(topic)
     am_host = sys.argv[4] if len(sys.argv) > 4 else None
+    result_topic = sys.argv[5] if len(sys.argv) > 5 and sys.argv[5] else None
+    source_hosts = []
+    if len(sys.argv) > 6 and sys.argv[6]:
+        source_hosts = [host for host in re.split(r"[ ,]+", sys.argv[6]) if host]
+    last_valid_source = -1
 
     os.makedirs(work_dir, exist_ok=True)
 
     combined_csv = Path(work_dir) / "combined_metrics.csv"
     with open(combined_csv, "w") as f:
         f.write(
-            "timestamp,topicOffset,sourceCount,kafkaLag,latencyMedian,latencyP95,"
-            "latencyP99,latencyTail,avgCpu,avgInput,avgProcess,queueSize,numExecutors\n"
+            "timestamp,inputOffset,resultOffset,sourceCount,inputLag,resultLag,"
+            "kafkaQueueTimeP50,kafkaQueueTimeP95,kafkaQueueTimeP99,latencyMedian,latencyP95,"
+            "latencyP99,latencyTail,avgCpu,avgInput,avgProcess,queueSize,numExecutors,numLambdaExecutors\n"
         )
 
-    print(f"[metrics] collector started for topic={topic} work_dir={work_dir}")
+    print(f"[metrics] collector started for topic={topic} result_topic={result_topic} work_dir={work_dir}")
 
     while True:
         ts = int(time.time() * 1000)
         offset = get_topic_offset(topic)
-        source = read_source_count(work_dir, am_host)
-        lag = offset - source if offset >= 0 and source >= 0 else -1
+        result_offset = get_topic_offset(result_topic) if result_topic else -1
+        source, last_valid_source = read_source_count(work_dir, offset, am_host, last_valid_source)
+        input_lag = max(0, offset - source) if offset >= 0 and source >= 0 else -1
+        result_lag = max(0, offset - result_offset) if offset >= 0 and result_offset >= 0 else -1
         lat = read_latency(log_file)
-        cpu = read_cpu_metrics(work_dir, am_host)
+        source_queue = read_source_queue_metrics(work_dir, am_host, source_hosts)
+        cpu = read_scaler_metrics(work_dir, am_host)
 
         row = [
             ts,
             offset,
+            result_offset,
             source,
-            lag,
+            input_lag,
+            result_lag,
+            source_queue.get("p50", -1),
+            source_queue.get("p95", -1),
+            source_queue.get("p99", -1),
             lat.get("median", -1),
             lat.get("p95", -1),
             lat.get("p99", -1),
@@ -183,14 +242,16 @@ def main():
             cpu.get("avgProcess", -1),
             cpu.get("queue", -1),
             cpu.get("numExecutors", -1),
+            cpu.get("numLambdaExecutors", -1),
         ]
 
         with open(combined_csv, "a") as f:
             f.write(",".join(str(v) for v in row) + "\n")
 
         print(
-            f"[metrics] ts={ts} offset={offset} source={source} lag={lag} "
-            f"lat median={lat.get('median', -1):.1f} p95={lat.get('p95', -1):.1f} "
+            f"[metrics] ts={ts} input={offset} result={result_offset} source={source} "
+            f"inputLag={input_lag} resultLag={result_lag} "
+            f"kafkaQueueP95={source_queue.get('p95', -1):.1f}ms "
             f"cpu={cpu.get('avgCpu', -1):.4f} queue={cpu.get('queue', -1):.0f}"
         )
 

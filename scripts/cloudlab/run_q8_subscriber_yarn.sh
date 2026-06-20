@@ -39,7 +39,7 @@ if [[ "$SINK_TYPE" == "KAFKA" && -n "$KAFKA_RESULTS_TOPIC" ]]; then
   SINK_ARGS="${SINK_ARGS} --kafkaResultsTopic=${KAFKA_RESULTS_TOPIC}"
 fi
 
-nohup java -Dnemo.work.dir="${NEMO_WORK_DIR:-/tmp}" -cp "$NEMO_CLIENT_CP" org.apache.nemo.client.JobLauncher \
+nohup java -Dnemo.work.dir="${NEMO_WORK_DIR:-/tmp}" -Dnemo.job.id="$JOB_ID" -cp "$NEMO_CLIENT_CP" org.apache.nemo.client.JobLauncher \
   -job_id "$JOB_ID" \
   -user_main org.apache.beam.sdk.nexmark.Main \
   -deploy_mode yarn \

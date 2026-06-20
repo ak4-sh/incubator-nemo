@@ -20,39 +20,80 @@ def load_combined(work_dir: str) -> pd.DataFrame:
         print(f"[plot] missing {path}")
         return pd.DataFrame()
     df = pd.read_csv(path)
-    for col in ["topicOffset", "sourceCount", "kafkaLag"]:
+    # Backward compatibility for older artifacts.
+    if "topicOffset" in df.columns and "inputOffset" not in df.columns:
+        df = df.rename(columns={"topicOffset": "inputOffset", "kafkaLag": "inputLag"})
+        if "resultOffset" not in df.columns:
+            df["resultOffset"] = pd.NA
+        if "resultLag" not in df.columns:
+            df["resultLag"] = pd.NA
+    for col in [
+        "inputOffset", "resultOffset", "sourceCount", "inputLag", "resultLag",
+        "kafkaQueueTimeP50", "kafkaQueueTimeP95", "kafkaQueueTimeP99",
+        "avgCpu", "avgInput", "avgProcess", "queueSize", "numExecutors", "numLambdaExecutors"
+    ]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
-    if {"topicOffset", "sourceCount"}.issubset(df.columns):
+    if {"inputOffset", "sourceCount"}.issubset(df.columns):
         # AM-side fallback metrics can contain stale rows from older runs.
-        invalid = df["sourceCount"] > df["topicOffset"]
+        invalid = df["sourceCount"] > df["inputOffset"]
         df.loc[invalid, "sourceCount"] = pd.NA
         df["sourceCount"] = df["sourceCount"].ffill().fillna(0)
-        df["kafkaLag"] = df["topicOffset"] - df["sourceCount"]
+        df["inputLag"] = (df["inputOffset"] - df["sourceCount"]).clip(lower=0)
+    if {"inputOffset", "resultOffset"}.issubset(df.columns):
+        df["resultLag"] = (df["inputOffset"] - df["resultOffset"]).clip(lower=0)
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
     # relative time in seconds
     t0 = df["timestamp"].min()
     df["rel_s"] = (df["timestamp"] - t0).dt.total_seconds()
-    # skip warmup
-    return df[df["rel_s"] >= WARMUP_MS / 1000]
+    # Skip warmup for full runs, but keep short smoke runs plottable.
+    warmed = df[df["rel_s"] >= WARMUP_MS / 1000]
+    return warmed if not warmed.empty else df
 
 
 def load_task_metrics(work_dir: str) -> pd.DataFrame:
     path = Path(work_dir) / "task_metrics.csv"
     if not path.exists():
         return pd.DataFrame()
-    cols = [
-        "timestamp", "executorId", "taskId", "inputReceiveRate", "inputRate", "outputRate",
-        "processingTime", "deserTime", "inbytes", "serializedTime", "outbytes"
-    ]
-    df = pd.read_csv(path, names=cols, header=None)
+    df = pd.read_csv(path)
+    if "timestamp" not in df.columns:
+        cols = [
+            "timestamp", "executorId", "taskId", "inputReceiveRate", "inputRate", "outputRate",
+            "processingTime", "deserTime", "inbytes", "serializedTime", "outbytes"
+        ]
+        df = pd.read_csv(path, names=cols, header=None)
+    if "jobId" not in df.columns:
+        df["jobId"] = "unknown"
     df = df[pd.to_numeric(df["timestamp"], errors="coerce").notna()].copy()
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
-    for col in cols[3:]:
-        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    for col in ["inputReceiveRate", "inputRate", "outputRate", "processingTimeNs", "processingTime",
+                "deserTimeNs", "deserTime", "inBytes", "inbytes", "serializedTimeNs",
+                "serializedTime", "outBytes", "outbytes"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
     t0 = df["timestamp"].min()
     df["rel_s"] = (df["timestamp"] - t0).dt.total_seconds()
-    return df[df["rel_s"] >= WARMUP_MS / 1000]
+    warmed = df[df["rel_s"] >= WARMUP_MS / 1000]
+    return warmed if not warmed.empty else df
+
+
+def load_source_task_metrics(work_dir: str) -> pd.DataFrame:
+    path = Path(work_dir) / "source_task_metrics.csv"
+    if not path.exists():
+        return pd.DataFrame()
+    df = pd.read_csv(path)
+    if df.empty or "timestamp" not in df.columns:
+        return pd.DataFrame()
+    df = df[pd.to_numeric(df["timestamp"], errors="coerce").notna()].copy()
+    df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+    for col in ["idleTimeNs", "kafkaQueueTimeNs", "kafkaQueueTimeAvgNs", "kafkaQueueTimeMaxNs",
+                "kafkaQueueSamples", "inputRate", "recordsRead"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(-1)
+    t0 = df["timestamp"].min()
+    df["rel_s"] = (df["timestamp"] - t0).dt.total_seconds()
+    warmed = df[df["rel_s"] >= WARMUP_MS / 1000]
+    return warmed if not warmed.empty else df
 
 
 def save_plot(work_dir: str, name: str):
@@ -70,7 +111,9 @@ def plot_input_rate(df: pd.DataFrame, work_dir: str):
         return
     plt.figure(figsize=(10, 5))
     plt.plot(df["rel_s"], df["sourceCount"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Source input rate")
-    plt.plot(df["rel_s"], df["topicOffset"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Kafka topic offset rate")
+    plt.plot(df["rel_s"], df["inputOffset"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Kafka input offset rate")
+    if "resultOffset" in df.columns and df["resultOffset"].notna().any():
+        plt.plot(df["rel_s"], df["resultOffset"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Kafka result offset rate")
     plt.xlabel("Time (s)")
     plt.ylabel("Events / s")
     plt.title("Input Rate vs Kafka Offset Rate")
@@ -80,16 +123,50 @@ def plot_input_rate(df: pd.DataFrame, work_dir: str):
 
 
 def plot_kafka_lag(df: pd.DataFrame, work_dir: str):
-    if df.empty or "kafkaLag" not in df.columns:
+    if df.empty or "inputLag" not in df.columns:
         return
     plt.figure(figsize=(10, 5))
-    plt.plot(df["rel_s"], df["kafkaLag"], label="Kafka Lag", color="red")
+    valid = df["inputLag"] >= 0
+    plt.plot(df.loc[valid, "rel_s"], df.loc[valid, "inputLag"], label="Input offset - source count", color="red")
     plt.xlabel("Time (s)")
     plt.ylabel("Events")
-    plt.title("Kafka Consumer Lag")
+    plt.title("Kafka Source Lag")
     plt.legend()
     plt.grid(True)
-    save_plot(work_dir, "kafka_lag")
+    save_plot(work_dir, "kafka_source_lag")
+
+
+def plot_kafka_result_lag(df: pd.DataFrame, work_dir: str):
+    if df.empty or "resultLag" not in df.columns:
+        return
+    valid = df["resultLag"] >= 0
+    if not valid.any():
+        return
+    plt.figure(figsize=(10, 5))
+    plt.plot(df.loc[valid, "rel_s"], df.loc[valid, "resultLag"], label="Input offset - result offset", color="purple")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Events")
+    plt.title("Kafka Result Lag")
+    plt.legend()
+    plt.grid(True)
+    save_plot(work_dir, "kafka_result_lag")
+
+
+def plot_source_queue_time(source_df: pd.DataFrame, work_dir: str):
+    if source_df.empty or "kafkaQueueTimeAvgNs" not in source_df.columns:
+        return
+    valid = source_df["kafkaQueueTimeAvgNs"] >= 0
+    if not valid.any():
+        return
+    plt.figure(figsize=(10, 5))
+    for task, group in source_df.loc[valid].groupby("taskId"):
+        plt.plot(group["rel_s"], group["kafkaQueueTimeAvgNs"] / 1_000_000.0, label=f"{task} avg")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Kafka queue time (ms)")
+    plt.title("Source Kafka Queue Time")
+    plt.legend()
+    plt.grid(True)
+    save_plot(work_dir, "source_kafka_queue_time")
 
 
 def plot_latency(df: pd.DataFrame, work_dir: str):
@@ -137,7 +214,8 @@ def plot_scaling_events(df: pd.DataFrame, work_dir: str):
 
     plt.figure(figsize=(10, 5))
     # Plot source rate
-    plt.plot(df["rel_s"], df["sourceCount"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Source rate")
+    y_col = "resultLag" if "resultLag" in df.columns and (df["resultLag"] >= 0).any() else "inputLag"
+    plt.plot(df["rel_s"], df[y_col], label=y_col)
 
     # Overlay scaling events
     for _, row in dec.iterrows():
@@ -146,8 +224,8 @@ def plot_scaling_events(df: pd.DataFrame, work_dir: str):
         plt.axvline(x=row["rel_s"], color=color, linestyle="--", alpha=0.7, label=label)
 
     plt.xlabel("Time (s)")
-    plt.ylabel("Events / s")
-    plt.title("Input Rate with Scaling Events")
+    plt.ylabel("Events")
+    plt.title("Kafka Lag with Scaling Events")
     plt.legend()
     plt.grid(True)
     save_plot(work_dir, "scaling_events")
@@ -178,6 +256,7 @@ def main():
     work_dir = sys.argv[1]
     df = load_combined(work_dir)
     task_df = load_task_metrics(work_dir)
+    source_task_df = load_source_task_metrics(work_dir)
 
     if df.empty:
         print("[plot] No combined metrics found; nothing to plot.")
@@ -185,6 +264,8 @@ def main():
 
     plot_input_rate(df, work_dir)
     plot_kafka_lag(df, work_dir)
+    plot_kafka_result_lag(df, work_dir)
+    plot_source_queue_time(source_task_df, work_dir)
     plot_latency(df, work_dir)
     plot_cpu(df, work_dir)
     plot_scaling_events(df, work_dir)

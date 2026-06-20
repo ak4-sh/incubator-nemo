@@ -2,6 +2,7 @@ package org.apache.nemo.runtime.master.scaler;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.nemo.common.ir.vertex.executionproperty.ResourcePriorityProperty;
+import org.apache.nemo.conf.JobConf;
 import org.apache.nemo.conf.PolicyConf;
 import org.apache.nemo.runtime.message.comm.ControlMessage;
 import org.apache.nemo.runtime.master.ClientRPC;
@@ -12,8 +13,10 @@ import org.apache.nemo.runtime.master.metric.ExecutorMetricInfo;
 import org.apache.nemo.runtime.master.scheduler.ExecutorRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.reef.tang.annotations.Parameter;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -67,14 +70,16 @@ public final class InputAndCpuBasedScaler implements Scaler {
   private final Backpressure backpressure;
 
   private final ClientRPC clientRPC;
+  private final String jobId;
 
   @Inject
   private InputAndCpuBasedScaler(final ExecutorMetricMap executorMetricMap,
                                  final ScaleInOutManager scaleInOutManager,
-                                 final ExecutorRegistry executorRegistry,
-                                 final Backpressure backpressure,
-                                 final ClientRPC clientRPC,
-                                 final PolicyConf policyConf) {
+                                  final ExecutorRegistry executorRegistry,
+                                  final Backpressure backpressure,
+                                  final ClientRPC clientRPC,
+                                  final PolicyConf policyConf,
+                                  @Parameter(JobConf.JobId.class) final String jobId) {
     this.executorMetricMap = executorMetricMap;
     this.policyConf = policyConf;
     this.scaleInOutManager = scaleInOutManager;
@@ -87,6 +92,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
     this.currRate = policyConf.bpMinEvent;
     this.backpressure = backpressure;
     this.clientRPC = clientRPC;
+    this.jobId = jobId;
 
     scheduledExecutorService.scheduleAtFixedRate(() -> {
       try {
@@ -100,6 +106,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
         final double avgCpu = avgCpuUse.getMean();
         final double avgProcess = avgSrcProcessingRate.getMean();
         final double avgInput = avgInputRate.getMean();
+        final long queue = aggInput.get() - currSourceEvent;
 
         clientRPC.send(ControlMessage.DriverToClientMessage.newBuilder()
           .setType(ControlMessage.DriverToClientMessageType.PrintLog)
@@ -111,7 +118,9 @@ public final class InputAndCpuBasedScaler implements Scaler {
             avgInput,
             avgProcess,
             currInputRate,
-            info.numExecutor)).build());
+          info.numExecutor)).build());
+
+        writeScalerMetrics(avgCpu, avgInput, avgProcess, queue, info.numExecutor);
 
         final double avgExpectedCpuVal;
         if (avgProcess > 0 && avgInput > 0 && info.numExecutor > 0) {
@@ -430,7 +439,12 @@ public final class InputAndCpuBasedScaler implements Scaler {
   private void writeScalingDecision(final String action, final double ratio) {
     final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
     final String outDir = workDir != null ? workDir : "/tmp";
-    try (PrintWriter writer = new PrintWriter(new FileWriter(outDir + "/scaling_decisions.csv", true))) {
+    final File outFile = new File(outDir, "scaling_decisions.csv");
+    final File parent = outFile.getParentFile();
+    if (parent != null && !parent.exists() && !parent.mkdirs()) {
+      LOG.warn("Failed to create scaling decision metrics directory {}", parent);
+    }
+    try (PrintWriter writer = new PrintWriter(new FileWriter(outFile, true))) {
       final long now = System.currentTimeMillis();
       final double avgCpu = avgCpuUse.getMean();
       final double avgInput = avgInputRate.getMean();
@@ -441,6 +455,34 @@ public final class InputAndCpuBasedScaler implements Scaler {
         now, action, avgCpu, avgInput, avgProcess, (double) queue, queue, ratio, numExecutors);
     } catch (IOException e) {
       LOG.warn("Failed to write scaling decision", e);
+    }
+  }
+
+  private void writeScalerMetrics(final double avgCpu,
+                                   final double avgInput,
+                                   final double avgProcess,
+                                   final long queue,
+                                   final int numExecutors) {
+    final double safeAvgCpu = Double.isFinite(avgCpu) ? avgCpu : -1.0;
+    final double safeAvgInput = Double.isFinite(avgInput) ? avgInput : -1.0;
+    final double safeAvgProcess = Double.isFinite(avgProcess) ? avgProcess : -1.0;
+    final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    final String outDir = workDir != null ? workDir : "/tmp";
+    final File outFile = new File(outDir, "scaler_metrics.csv");
+    final File parent = outFile.getParentFile();
+    if (parent != null && !parent.exists() && !parent.mkdirs()) {
+      LOG.warn("Failed to create scaler metrics directory {}", parent);
+    }
+    final boolean writeHeader = !outFile.exists() || outFile.length() == 0;
+    try (PrintWriter writer = new PrintWriter(new FileWriter(outFile, true))) {
+      if (writeHeader) {
+        writer.println("timestamp,jobId,avgCpu,avgInput,avgProcess,queue,numExecutors,numLambdaExecutors,lastActionWasScaleOut,prevFutureCompleted");
+      }
+      writer.printf("%d,%s,%.4f,%.4f,%.4f,%d,%d,%d,%s,%s%n",
+        System.currentTimeMillis(), jobId, safeAvgCpu, safeAvgInput, safeAvgProcess, queue, numExecutors,
+        executorRegistry.getLambdaExecutors().size(), lastActionWasScaleOut, prevFutureCompleted.get());
+    } catch (IOException e) {
+      LOG.warn("Failed to write scaler metrics", e);
     }
   }
 }
