@@ -1,0 +1,109 @@
+diff --git a/build.gradle b/build.gradle
+index 86ef460d4a..8101596f8b 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -52,9 +52,9 @@ buildscript {
+     classpath 'net.researchgate:gradle-release:2.6.0'                                                   // Enable gradle-based release management
+     classpath "net.ltgt.gradle:gradle-apt-plugin:0.13"                                                  // Enable a Java annotation processor
+     classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.5"                                        // Enable proto code generation
+-    classpath "io.spring.gradle:propdeps-plugin:0.0.9.RELEASE"
++    classpath "io.spring.gradle:propdeps-plugin:0.0.10.RELEASE"
+     classpath "gradle.plugin.org.nosphere.apache:creadur-rat-gradle:0.3.1"                              // Enable Apache license enforcement
+-    classpath "com.commercehub.gradle.plugin:gradle-avro-plugin:0.11.0"                                 // Enable Avro code generation
++    classpath "com.commercehub.gradle.plugin:gradle-avro-plugin:0.14.2"                                 // Enable Avro code generation
+     //classpath "com.diffplug.spotless:spotless-plugin-gradle:3.6.0"                                      // Enable a code formatting plugin
+     classpath "gradle.plugin.com.github.blindpirate:gogradle:0.10"                                      // Enable Go code compilation
+     classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.13.0"                           // Enable building Docker containers
+diff --git a/sdks/java/core/build.gradle b/sdks/java/core/build.gradle
+index a1358056e0..f05c933d18 100644
+--- a/sdks/java/core/build.gradle
++++ b/sdks/java/core/build.gradle
+@@ -51,6 +51,7 @@ test {
+ }
+ 
+ dependencies {
++  compile "org.hamcrest:hamcrest-library:1.3"
+   compile library.java.guava
+   compile library.java.protobuf_java
+   compile library.java.byte_buddy
+diff --git a/sdks/java/extensions/google-cloud-platform-core/build.gradle b/sdks/java/extensions/google-cloud-platform-core/build.gradle
+index 9e673bb33c..b6dfe08082 100644
+--- a/sdks/java/extensions/google-cloud-platform-core/build.gradle
++++ b/sdks/java/extensions/google-cloud-platform-core/build.gradle
+@@ -32,6 +32,7 @@ test {
+ }
+ 
+ dependencies {
++  compile "org.hamcrest:hamcrest-library:1.3"
+   compile library.java.guava
+   shadow project(path: ":beam-sdks-java-core", configuration: "shadow")
+   shadow library.java.google_http_client_jackson2
+diff --git a/sdks/java/fn-execution/build.gradle b/sdks/java/fn-execution/build.gradle
+index 4e3a0203a5..40a01a94c8 100644
+--- a/sdks/java/fn-execution/build.gradle
++++ b/sdks/java/fn-execution/build.gradle
+@@ -24,6 +24,7 @@ ext.summary = """Contains code shared across the Beam Java SDK Harness and Java
+ the Beam Portability Framework."""
+ 
+ dependencies {
++  compile "junit:junit:4.12"
+   compile library.java.guava
+   shadow project(path: ":beam-model-pipeline", configuration: "shadow")
+   shadow project(path: ":beam-model-fn-execution", configuration: "shadow")
+diff --git a/sdks/java/nexmark/build.gradle b/sdks/java/nexmark/build.gradle
+index 5c65c4087a..d2bea9b1c3 100644
+--- a/sdks/java/nexmark/build.gradle
++++ b/sdks/java/nexmark/build.gradle
+@@ -31,7 +31,7 @@ def nexmarkArgs = project.hasProperty(nexmarkArgsProperty) ?
+ def nexmarkRunnerProperty = "nexmark.runner"
+ def nexmarkRunnerDependency = (project.hasProperty(nexmarkRunnerProperty)
+         ? project.getProperty(nexmarkRunnerProperty)
+-        : ":beam-runners-direct-java")
++        : null)
+ def shouldProvideSpark = ":beam-runners-spark".equals(nexmarkRunnerDependency)
+ 
+ configurations {
+@@ -43,12 +43,16 @@ configurations {
+ 
+ dependencies {
+   compile library.java.guava
++  compile project(path: ":beam-sdks-java-io-google-cloud-platform", configuration: "shadow")
++  compile project(path: ":beam-sdks-java-extensions-google-cloud-platform-core", configuration: "shadow")
++  compile project(path: ":beam-sdks-java-extensions-sql", configuration: "shadow")
++  compile library.java.google_api_services_bigquery
++  compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.429'
++  compile library.java.junit
++  compile library.java.hamcrest_core
++  compile library.java.hamcrest_library
+   shadow project(path: ":beam-sdks-java-core", configuration: "shadow")
+-  shadow project(path: ":beam-sdks-java-io-google-cloud-platform", configuration: "shadow")
+-  shadow project(path: ":beam-sdks-java-extensions-google-cloud-platform-core", configuration: "shadow")
+-  shadow project(path: ":beam-sdks-java-extensions-sql", configuration: "shadow")
+   shadow project(path: ":beam-sdks-java-io-kafka", configuration: "shadow")
+-  shadow library.java.google_api_services_bigquery
+   shadow library.java.jackson_core
+   shadow library.java.jackson_annotations
+   shadow library.java.jackson_databind
+@@ -57,19 +61,17 @@ dependencies {
+   shadow library.java.slf4j_api
+   shadow library.java.commons_lang3
+   shadow library.java.kafka_clients
+-  shadow project(path: ":beam-runners-direct-java", configuration: "shadow")
+   shadow library.java.slf4j_jdk14
+   provided library.java.junit
+   provided library.java.hamcrest_core
+-  shadow project(path: ":beam-sdks-java-io-google-cloud-platform", configuration: "shadow")
+-  shadowTest project(path: ":beam-sdks-java-io-google-cloud-platform", configuration: "shadowTest")
+   testCompile library.java.hamcrest_core
+   testCompile library.java.hamcrest_library
+-  shadow group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.429'
+ 
+ 
+   gradleRun project(path: project.path, configuration: "shadow")
+-  gradleRun project(path: nexmarkRunnerDependency, configuration: "shadow")
++  if (nexmarkRunnerDependency != null) {
++    gradleRun project(path: nexmarkRunnerDependency, configuration: "shadow")
++  }
+ 
+   // The Spark runner requires the user to provide a Spark dependency. For self-contained
+   // runs with the Spark runner, we can provide such a dependency. This is deliberately phrased
