@@ -10,7 +10,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-$HADOOP_HOME/etc/hadoop}
 export YARN_CONF_DIR=${YARN_CONF_DIR:-$HADOOP_CONF_DIR}
 export KAFKA_BOOTSTRAP=${KAFKA_BOOTSTRAP:-node1:9092,node2:9092,node3:9092}
 export KAFKA_NODE=${KAFKA_NODE:-node1}
-export KAFKA_HOME=${KAFKA_HOME:-/opt/kafka}
+export KAFKA_HOME=${KAFKA_HOME:-/users/akash01/kafka}
 
 export BEAM_GRPC_JAR=${BEAM_GRPC_JAR:-/users/akash01/deps/beam-vendor-grpc-1_21_0-0.1.jar}
 export REBUILT_NEMO=${REBUILT_NEMO:-$NEMO_REPO_ROOT/client/target/nemo-client-0.2-SNAPSHOT-shaded.jar}

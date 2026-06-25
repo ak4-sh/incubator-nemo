@@ -10,7 +10,7 @@ WARM_NODE=${WARM_NODE:-node10}
 WORKERS=${WORKERS:-4}
 FIRST_PORT=${FIRST_PORT:-25321}
 LOG_FILE=${LOG_FILE:-/tmp/nx-cloudlab-vm-forced-$TOPIC.log}
-EXECUTOR_JSON=${EXECUTOR_JSON:-$NEMO_REPO_ROOT/configs/cloudlab/nemo-yarn-kafka-1source-8compute.json}
+EXECUTOR_JSON=${EXECUTOR_JSON:-$NEMO_REPO_ROOT/configs/cloudlab/nemo-yarn-kafka-1source-8slot-8compute.json}
 REMOTE_WARM_DIR=${REMOTE_WARM_DIR:-/tmp/nemo-cloudlab-offload}
 
 mkdir -p "$WORK_DIR"

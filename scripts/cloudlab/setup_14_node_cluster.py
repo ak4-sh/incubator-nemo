@@ -33,7 +33,7 @@ DEFAULT_WORKER_NODES = "node5,node9,node10,node11,node12"
 
 DEFAULT_JAVA_HOME = "/usr/lib/jvm/java-11-openjdk-amd64"
 DEFAULT_HADOOP_HOME = "/users/akash01/hadoop"
-DEFAULT_KAFKA_HOME = "/opt/kafka"
+DEFAULT_KAFKA_HOME = "/users/akash01/kafka"
 DEFAULT_BEAM_GRPC_JAR = "/users/akash01/deps/beam-vendor-grpc-1_21_0-0.1.jar"
 
 
