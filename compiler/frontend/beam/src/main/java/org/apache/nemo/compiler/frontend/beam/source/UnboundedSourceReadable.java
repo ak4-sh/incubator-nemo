@@ -1,9 +1,9 @@
 package org.apache.nemo.compiler.frontend.beam.source;
 
-import io.netty.buffer.ByteBufOutputStream;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.UnboundedSource;
 import org.apache.beam.sdk.io.kafka.KafkaUnboundedReader;
+import org.apache.beam.sdk.io.kafka.KafkaUnboundedSource;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.windowing.GlobalWindow;
 import org.apache.beam.sdk.util.WindowedValue;
@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +89,19 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
     return unboundedSource;
   }
 
+  private boolean isKafkaSource() {
+    return unboundedSource instanceof KafkaUnboundedSource;
+  }
+
   @Override
   public void checkpoint() {
+    if (isKafkaSource()) {
+      // Kafka offsets are managed by consumer group auto-commit.
+      // No need to persist checkpoint marks to state store.
+      LOG.debug("Checkpoint skipped - Kafka auto-commit handles offset tracking");
+      return;
+    }
+
     final UnboundedSource.CheckpointMark checkpointMark = getReader().getCheckpointMark();
     final Coder<UnboundedSource.CheckpointMark> checkpointMarkCoder = getUnboundedSource().getCheckpointMarkCoder();
 
@@ -113,7 +123,7 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
 
   @Override
   public void restore() {
-    if (stateStore.containsState(taskId)) {
+    if (!isKafkaSource() && stateStore.containsState(taskId)) {
       LOG.info("Task " + taskId + " has checkpointMark state... we should deserialize it.");
       final Coder<UnboundedSource.CheckpointMark> checkpointMarkCoder = (Coder<UnboundedSource.CheckpointMark>)
         unboundedSource.getCheckpointMarkCoder();
@@ -138,11 +148,10 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
     }
 
     try {
-
       final long et = System.currentTimeMillis();
 
       readableService = ReadableService.getInstance();
-      reader = unboundedSource.createReader(pipelineOptions, checkpointMark);
+      reader = unboundedSource.createReader(pipelineOptions, isKafkaSource() ? null : checkpointMark);
       kafkaReader = reader instanceof KafkaUnboundedReader ? (KafkaUnboundedReader) reader : null;
 
       final long et2 = System.currentTimeMillis();
@@ -154,6 +163,12 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
       LOG.info("Task {} reader start time {}", taskId, System.currentTimeMillis() - et2);
 
     } catch (final Exception e) {
+      LOG.error("Error during source restore", e);
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+      }
       throw new RuntimeException(e);
     }
   }
@@ -186,7 +201,7 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
     }
     lastMetricTime = System.currentTimeMillis();
 
-    if (stateStore.containsState(taskId)) {
+    if (!isKafkaSource() && stateStore.containsState(taskId)) {
       LOG.info("Task " + taskId + " has checkpointMark state... we should deserialize it.");
       final Coder<UnboundedSource.CheckpointMark> checkpointMarkCoder = (Coder<UnboundedSource.CheckpointMark>)
         unboundedSource.getCheckpointMarkCoder();
@@ -211,11 +226,10 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
     }
 
     try {
-
       final long et = System.currentTimeMillis();
 
       readableService = ReadableService.getInstance();
-      reader = unboundedSource.createReader(pipelineOptions, checkpointMark);
+      reader = unboundedSource.createReader(pipelineOptions, isKafkaSource() ? null : checkpointMark);
       kafkaReader = reader instanceof KafkaUnboundedReader ? (KafkaUnboundedReader) reader : null;
 
       final long et2 = System.currentTimeMillis();
@@ -227,6 +241,12 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
       LOG.info("Task {} reader start time {}", taskId, System.currentTimeMillis() - et2);
 
     } catch (final Exception e) {
+      LOG.error("Error during source prepare", e);
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+      }
       throw new RuntimeException(e);
     }
   }
@@ -248,8 +268,17 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
         }
         isCurrentAvailable =  reader.advance();
       } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
+        if (kafkaReader == null) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
+        LOG.error("Kafka source error in isAvailable(), retrying", e);
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+        }
+        isCurrentAvailable = false;
       }
       idleTimeNs += System.nanoTime() - idleStart;
       return isCurrentAvailable;
@@ -294,6 +323,8 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
         final long queueMax = kafkaQueueTimeMaxNs.getAndSet(0);
         final long queueAvg = queueSamples > 0 ? queueSum / queueSamples : -1;
         final String jobId = System.getProperty("nemo.job.id", System.getenv("NEMO_JOB_ID"));
+        totalIdleTimeNs += idleTimeNs;
+        idleTimeNs = 0;
         metricsWriter.printf("%d,%s,%s,%d,%d,%d,%d,%d,%.2f,%d%n",
           currentTimeMs, jobId != null ? jobId : "unknown", taskId, totalIdleTimeNs, queueTimeNs,
           queueAvg, queueMax, queueSamples, inputRate, totalRecords);
@@ -306,8 +337,17 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
       try {
         isCurrentAvailable =  reader.advance();
       } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
+        if (kafkaReader == null) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
+        LOG.error("Kafka source error in readCurrent(), retrying", e);
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+        }
+        isCurrentAvailable = false;
       }
 
       return new TimestampAndValue<>(currTs.getMillis(),
@@ -319,11 +359,20 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
         kafkaReader.pollRecord(5);
       }
       // set current available
-      try{
+      try {
         isCurrentAvailable = reader.advance();
       } catch (final IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
+        if (kafkaReader == null) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
+        LOG.error("Kafka source error in readCurrent() else branch, retrying", e);
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+        }
+        isCurrentAvailable = false;
       }
       idleTimeNs += System.nanoTime() - idleStart;
       isKafkaPolling = false;

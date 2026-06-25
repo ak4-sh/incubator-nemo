@@ -7,7 +7,9 @@ source "$SCRIPT_DIR/cloudlab_env.sh"
 # Full Sponge-style Q0 defaults. Override any variable from the environment.
 RUN_ID=${RUN_ID:-sponge-q0-$(date +%Y%m%d-%H%M%S)}
 QUERY=${QUERY:-0}
+BENCHMARK_NAME=${BENCHMARK_NAME:-nexmark-q${QUERY}}
 SINK_TYPE=${SINK_TYPE:-KAFKA}
+COMPLETION_MODE=${COMPLETION_MODE:-exact_output}
 
 # Burst mode configuration (default: custom sustained bursts)
 BURST_MODE=${BURST_MODE:-custom}
@@ -42,6 +44,7 @@ PROGRESS_STALL_LIMIT=${PROGRESS_STALL_LIMIT:-12}
 
 TOPIC=${TOPIC:-nexmark-${RUN_ID}}
 KAFKA_RESULTS_TOPIC=${KAFKA_RESULTS_TOPIC:-${TOPIC}-results}
+KAFKA_CONSUMER_GROUP=${KAFKA_CONSUMER_GROUP:-${RUN_ID}-consumer}
 WORK_DIR=${WORK_DIR:-/tmp/nx-${RUN_ID}}
 SUB_LOG=${SUB_LOG:-/tmp/nx-sub-${RUN_ID}.log}
 ARTIFACT_DIR=${ARTIFACT_DIR:-$NEMO_REPO_ROOT/results/cloudlab/$RUN_ID}
@@ -55,7 +58,7 @@ RUN_START_MS=$(date +%s%3N)
 RUN_END_MS=""
 
 log() {
-  printf '[sponge-q0] %s\n' "$*"
+  printf '[%s] %s\n' "$BENCHMARK_NAME" "$*"
 }
 
 require_file() {
@@ -162,9 +165,12 @@ run_harness() {
   RATE_PERIOD_SEC=$RATE_PERIOD_SEC \
   CPU_DELAY_MS=$CPU_DELAY_MS \
   QUERY=$QUERY \
+  BENCHMARK_NAME=$BENCHMARK_NAME \
+  COMPLETION_MODE=$COMPLETION_MODE \
   TOPIC=$TOPIC \
   SINK_TYPE=$SINK_TYPE \
   KAFKA_RESULTS_TOPIC=$KAFKA_RESULTS_TOPIC \
+  KAFKA_CONSUMER_GROUP=$KAFKA_CONSUMER_GROUP \
   EXECUTOR_JSON=$EXECUTOR_JSON \
   OFFLOAD_NODES=$OFFLOAD_NODES \
   WORKERS_PER_NODE=$WORKERS_PER_NODE \
@@ -188,7 +194,7 @@ run_harness() {
 }
 
 monitor_completion() {
-  log "Monitoring completion for $TOTAL_EVENTS input/source/result records"
+  log "Monitoring completion for $TOTAL_EVENTS records with mode=$COMPLETION_MODE"
   local deadline=$((SECONDS + BENCHMARK_TIMEOUT_SEC))
   local input_total=0
   local result_total=0
@@ -215,11 +221,33 @@ monitor_completion() {
 
     log "progress input=$input_total source=$source_count result=$result_total"
 
-    if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -ge "$TOTAL_EVENTS" && "$result_total" -ge "$TOTAL_EVENTS" ]]; then
-      RUN_END_MS=$(date +%s%3N)
-      log "Success: input/source/result reached $TOTAL_EVENTS"
-      return 0
-    fi
+    case "$COMPLETION_MODE" in
+      exact_output)
+        if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -ge "$TOTAL_EVENTS" && "$result_total" -ge "$TOTAL_EVENTS" ]]; then
+          RUN_END_MS=$(date +%s%3N)
+          log "Success: input/source/result reached $TOTAL_EVENTS"
+          return 0
+        fi
+        ;;
+      source_only)
+        if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -ge "$TOTAL_EVENTS" ]]; then
+          RUN_END_MS=$(date +%s%3N)
+          log "Success: input/source reached $TOTAL_EVENTS"
+          return 0
+        fi
+        ;;
+      source_plus_some_output)
+        if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -ge "$TOTAL_EVENTS" && "$result_total" -gt 0 ]]; then
+          RUN_END_MS=$(date +%s%3N)
+          log "Success: input/source reached $TOTAL_EVENTS and result output was observed"
+          return 0
+        fi
+        ;;
+      *)
+        echo "ERROR: unknown COMPLETION_MODE=$COMPLETION_MODE" >&2
+        return 1
+        ;;
+    esac
 
     if [[ -n "$APP_ID" ]]; then
       app_state=$(get_app_state)
@@ -367,17 +395,19 @@ write_manifest() {
   vm_rows=$(grep -c 'VM-' "$ARTIFACT_DIR/task_metrics.csv" 2>/dev/null || true)
 
   cat > "$ARTIFACT_DIR/README.md" <<EOF
-# Sponge Q0 Benchmark Run
+# $BENCHMARK_NAME Benchmark Run
 
-Full Sponge-style Q0 Kafka source to Kafka sink benchmark with VM offloading.
+Kafka source benchmark with VM offloading.
 
 ## Run IDs
 
 - Run ID: \`$RUN_ID\`
 - Application: \`${APP_ID:-unknown}\`
 - Query: \`$QUERY\`
+- Completion mode: \`$COMPLETION_MODE\`
 - Input topic: \`$TOPIC\`
 - Result topic: \`$KAFKA_RESULTS_TOPIC\`
+- Kafka consumer group: \`$KAFKA_CONSUMER_GROUP\`
 - Executor config: \`$EXECUTOR_JSON\`
 - Work dir: \`$WORK_DIR\`
 - AM host: \`${AM_HOST:-unknown}\`
@@ -391,6 +421,7 @@ Full Sponge-style Q0 Kafka source to Kafka sink benchmark with VM offloading.
 - Next rate target: \`$NEXT_RATE\` events/s
 - Rate period: \`$RATE_PERIOD_SEC\` seconds
 - CPU delay: \`$CPU_DELAY_MS\` ms
+- Completion mode: \`$COMPLETION_MODE\`
 - Kafka partitions: \`$KAFKA_PARTITIONS\`
 - Producer parallelism: \`$PRODUCER_PARALLELISM\`
 - Offload nodes: \`$OFFLOAD_NODES\`

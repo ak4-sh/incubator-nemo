@@ -9,6 +9,7 @@ TOPIC=${TOPIC:?Set TOPIC to a Kafka topic}
 SINK_TYPE=${SINK_TYPE:-COUNT_ONLY}
 KAFKA_RESULTS_TOPIC=${KAFKA_RESULTS_TOPIC:-}
 JOB_ID=${JOB_ID:-nx-q${QUERY}-${TOPIC}-$(date +%H%M%S)}
+KAFKA_CONSUMER_GROUP=${KAFKA_CONSUMER_GROUP:-disaggregated-streaming}
 EXECUTOR_JSON=${EXECUTOR_JSON:-$NEMO_REPO_ROOT/configs/cloudlab/nemo-yarn-kafka-1source-8compute.json}
 STREAM_TIMEOUT=${STREAM_TIMEOUT:-240}
 NUM_EVENTS=${NUM_EVENTS:-100000}
@@ -30,6 +31,7 @@ echo "Launching Q${QUERY} subscriber"
 echo "  topic=$TOPIC"
 echo "  sink=$SINK_TYPE"
 echo "  job_id=$JOB_ID"
+echo "  kafka_consumer_group=$KAFKA_CONSUMER_GROUP"
 echo "  executor_json=$EXECUTOR_JSON"
 echo "  offloading=$OFFLOADING"
 echo "  log=$LOG_FILE"
@@ -47,7 +49,7 @@ nohup java -Dnemo.work.dir="${NEMO_WORK_DIR:-/tmp}" -Dnemo.job.id="$JOB_ID" -cp 
   -optimization_policy org.apache.nemo.compiler.optimizer.policy.StreamingPolicy \
   -scheduler_impl_class_name org.apache.nemo.runtime.master.scheduler.StreamingScheduler \
   "${EXTRA_ARGS[@]}" \
-  -user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=${QUERY} --manageResources=false --monitorJobs=true --streamTimeout=${STREAM_TIMEOUT} --isRateLimited=false --windowSizeSec=10 --windowPeriodSec=1 --fanout=1 --cpuDelayMs=${CPU_DELAY_MS} --samplingRate=1.0 --numEvents=${NUM_EVENTS} --sourceType=KAFKA --pubSubMode=SUBSCRIBE_ONLY --bootstrapServers=${KAFKA_BOOTSTRAP} --kafkaTopic=${TOPIC} ${SINK_ARGS} --jobName=${JOB_ID}" \
+  -user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=${QUERY} --manageResources=false --monitorJobs=true --streamTimeout=${STREAM_TIMEOUT} --isRateLimited=false --windowSizeSec=10 --windowPeriodSec=1 --fanout=1 --cpuDelayMs=${CPU_DELAY_MS} --samplingRate=1.0 --numEvents=${NUM_EVENTS} --sourceType=KAFKA --pubSubMode=SUBSCRIBE_ONLY --bootstrapServers=${KAFKA_BOOTSTRAP} --kafkaTopic=${TOPIC} --kafkaConsumerGroup=${KAFKA_CONSUMER_GROUP} ${SINK_ARGS} --jobName=${JOB_ID}" \
   > "$LOG_FILE" 2>&1 &
 
 SUB_PID=$!
