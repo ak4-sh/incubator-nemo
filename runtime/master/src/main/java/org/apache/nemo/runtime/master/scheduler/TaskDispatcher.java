@@ -142,7 +142,7 @@ public final class TaskDispatcher {
     tl.sort(new Comparator<Task>() {
       @Override
       public int compare(Task o1, Task o2) {
-        return -RuntimeIdManager.getStageIdFromTaskId(o1.getTaskId())
+        return RuntimeIdManager.getStageIdFromTaskId(o1.getTaskId())
           .compareTo(RuntimeIdManager.getStageIdFromTaskId(o2.getTaskId()));
       }
     });

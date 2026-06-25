@@ -18,7 +18,6 @@
  */
 package org.apache.nemo.runtime.master.scheduler;
 
-import com.google.common.collect.Lists;
 import org.apache.nemo.common.Pair;
 import org.apache.nemo.common.exception.UnknownExecutionStateException;
 import org.apache.nemo.common.ir.Readable;
@@ -103,8 +102,8 @@ public final class StreamingScheduler implements Scheduler {
     // Prepare tasks
     pairStageTaskManager.registerStageDag(submittedPhysicalPlan.getStageDAG());
 
-    // Reverse topological sort
-    final List<Stage> allStages = Lists.reverse(submittedPhysicalPlan.getStageDAG().getTopologicalSort());
+    // Topological sort (upstream stages first)
+    final List<Stage> allStages = submittedPhysicalPlan.getStageDAG().getTopologicalSort();
 
     final List<Task> allTasks = new ArrayList<>();
 
