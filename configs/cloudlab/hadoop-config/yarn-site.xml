@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <property><name>yarn.resourcemanager.hostname</name><value>node0</value></property>
+  <property><name>yarn.resourcemanager.address</name><value>node0:8032</value></property>
+  <property><name>yarn.resourcemanager.scheduler.address</name><value>node0:8030</value></property>
+  <property><name>yarn.resourcemanager.resource-tracker.address</name><value>node0:8031</value></property>
+  <property><name>yarn.resourcemanager.admin.address</name><value>node0:8033</value></property>
+  <property><name>yarn.resourcemanager.webapp.address</name><value>node0:8088</value></property>
+  <property><name>yarn.nodemanager.aux-services</name><value>mapreduce_shuffle</value></property>
+  <property><name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name><value>org.apache.hadoop.mapred.ShuffleHandler</value></property>
+  <property><name>yarn.nodemanager.hostname</name><value>${NM_HOST}</value></property>
+  <property><name>yarn.nodemanager.local-dirs</name><value>/data/hadoop/yarn/local</value></property>
+  <property><name>yarn.nodemanager.log-dirs</name><value>/data/hadoop/yarn/logs</value></property>
+  <property><name>yarn.log-aggregation-enable</name><value>true</value></property>
+  <property><name>yarn.nodemanager.vmem-check-enabled</name><value>false</value></property>
+  <property><name>yarn.scheduler.minimum-allocation-mb</name><value>512</value></property>
+  <property><name>yarn.scheduler.maximum-allocation-mb</name><value>176128</value></property>
+  <property><name>yarn.scheduler.minimum-allocation-vcores</name><value>1</value></property>
+  <property><name>yarn.scheduler.maximum-allocation-vcores</name><value>36</value></property>
+  <property><name>yarn.nodemanager.resource.memory-mb</name><value>176128</value></property>
+  <property><name>yarn.nodemanager.resource.cpu-vcores</name><value>36</value></property>
+<property><name>yarn.application.classpath</name><value>/users/akash01/hadoop/etc/hadoop,/users/akash01/hadoop/share/hadoop/common/*,/users/akash01/hadoop/share/hadoop/common/lib/*,/users/akash01/hadoop/share/hadoop/hdfs/*,/users/akash01/hadoop/share/hadoop/hdfs/lib/*,/users/akash01/hadoop/share/hadoop/yarn/*,/users/akash01/hadoop/share/hadoop/yarn/lib/*,/users/akash01/hadoop/share/hadoop/mapreduce/*,/users/akash01/hadoop/share/hadoop/mapreduce/lib/*</value></property>
+</configuration>
