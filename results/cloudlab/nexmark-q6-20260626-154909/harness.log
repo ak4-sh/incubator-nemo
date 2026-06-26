@@ -1,0 +1,221 @@
+Generating vm_addresses.txt for offloading nodes: node4,node6,node7,node8,node13
+Generated /users/akash01/incubator-nemo/vm_addresses.txt: 160 workers
+Starting warm VMWorker pools
+  Starting pool on node4
+  Starting pool on node6
+  Starting pool on node7
+  Starting pool on node8
+  Starting pool on node13
+Creating Kafka topic nexmark-q6-20260626-154909 with 8 partitions
+Created topic "nexmark-q6-20260626-154909".
+Completed Updating config for entity: topic 'nexmark-q6-20260626-154909'.
+Prefilling 100 records
+=== NEXMark Custom Burst Mode ===
+  steadyRate: 50000 ev/s
+  burstRate: 200000 ev/s
+  steadyDuration: 60s
+  burstDuration: 45s
+  numBursts: 3
+  rampUpSec: 60s
+  generators: 8
+  maxEvents: 100
+  totalEvents: 100 (~12 per gen)
+  per-generator: steady=6250 burst=25000 ev/s
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+  [gen-4] ramp-up 60s at 6250 ev/s
+  [gen-2] ramp-up 60s at 6250 ev/s
+  [gen-1] ramp-up 60s at 6250 ev/s
+  [gen-5] ramp-up 60s at 6250 ev/s
+  [gen-6] ramp-up 60s at 6250 ev/s
+  [gen-3] ramp-up 60s at 6250 ev/s
+  [gen-7] ramp-up 60s at 6250 ev/s
+  [gen-0] ramp-up 60s at 6250 ev/s
+  [gen-4] burst 1/3 steady 60s at 6250 ev/s
+  [gen-2] burst 1/3 steady 60s at 6250 ev/s
+  [gen-2] burst 1/3 burst 45s at 25000 ev/s
+  [gen-2] burst 2/3 steady 60s at 6250 ev/s
+  [gen-2] burst 2/3 burst 45s at 25000 ev/s
+  [gen-2] burst 3/3 steady 60s at 6250 ev/s
+  [gen-2] burst 3/3 burst 45s at 25000 ev/s
+  [gen-1] burst 1/3 steady 60s at 6250 ev/s
+  [gen-1] burst 1/3 burst 45s at 25000 ev/s
+  [gen-1] burst 2/3 steady 60s at 6250 ev/s
+  [gen-1] burst 2/3 burst 45s at 25000 ev/s
+  [gen-1] burst 3/3 steady 60s at 6250 ev/s
+  [gen-1] burst 3/3 burst 45s at 25000 ev/s
+  [gen-4] burst 1/3 burst 45s at 25000 ev/s
+  [gen-4] burst 2/3 steady 60s at 6250 ev/s
+  [gen-4] burst 2/3 burst 45s at 25000 ev/s
+  [gen-4] burst 3/3 steady 60s at 6250 ev/s
+  [gen-4] burst 3/3 burst 45s at 25000 ev/s
+  [gen-0] burst 1/3 steady 60s at 6250 ev/s
+  [gen-0] burst 1/3 burst 45s at 25000 ev/s
+  [gen-0] burst 2/3 steady 60s at 6250 ev/s
+  [gen-0] burst 2/3 burst 45s at 25000 ev/s
+  [gen-0] burst 3/3 steady 60s at 6250 ev/s
+  [gen-0] burst 3/3 burst 45s at 25000 ev/s
+  [gen-7] burst 1/3 steady 60s at 6250 ev/s
+  [gen-7] burst 1/3 burst 45s at 25000 ev/s
+  [gen-7] burst 2/3 steady 60s at 6250 ev/s
+  [gen-7] burst 2/3 burst 45s at 25000 ev/s
+  [gen-7] burst 3/3 steady 60s at 6250 ev/s
+  [gen-7] burst 3/3 burst 45s at 25000 ev/s
+  [gen-3] burst 1/3 steady 60s at 6250 ev/s
+  [gen-3] burst 1/3 burst 45s at 25000 ev/s
+  [gen-3] burst 2/3 steady 60s at 6250 ev/s
+  [gen-3] burst 2/3 burst 45s at 25000 ev/s
+  [gen-3] burst 3/3 steady 60s at 6250 ev/s
+  [gen-3] burst 3/3 burst 45s at 25000 ev/s
+  [gen-6] burst 1/3 steady 60s at 6250 ev/s
+  [gen-6] burst 1/3 burst 45s at 25000 ev/s
+  [gen-6] burst 2/3 steady 60s at 6250 ev/s
+  [gen-6] burst 2/3 burst 45s at 25000 ev/s
+  [gen-6] burst 3/3 steady 60s at 6250 ev/s
+  [gen-6] burst 3/3 burst 45s at 25000 ev/s
+  [gen-5] burst 1/3 steady 60s at 6250 ev/s
+  [gen-5] burst 1/3 burst 45s at 25000 ev/s
+  [gen-5] burst 2/3 steady 60s at 6250 ev/s
+  [gen-5] burst 2/3 burst 45s at 25000 ev/s
+  [gen-5] burst 3/3 steady 60s at 6250 ev/s
+  [gen-5] burst 3/3 burst 45s at 25000 ev/s
+  [gen-6] done: 12 events in 1036 ms
+  [gen-3] done: 13 events in 1035 ms
+  [gen-4] done: 12 events in 1042 ms
+  [gen-1] done: 13 events in 1045 ms
+  [gen-2] done: 13 events in 1045 ms
+  [gen-0] done: 13 events in 1045 ms
+  [gen-5] done: 12 events in 1046 ms
+  [gen-7] done: 12 events in 1046 ms
+  All generators done: 100 events in 1491 ms (67.1 ev/s avg)
+KAFKA_PRODUCER_DONE topic=nexmark-q6-20260626-154909 totalSent=100 elapsedMs=1491 avgRate=67.07
+Checking VM worker connectivity...
+  All VM workers reachable
+Preflight passed: 5/5 YARN NodeManagers running.
+Cleaning stale baseline worker metrics
+Launching subscriber with autoscaling enabled
+Launching Q6 subscriber
+  topic=nexmark-q6-20260626-154909
+  sink=KAFKA
+  job_id=nx-q6-nexmark-q6-20260626-154909-154951
+  kafka_consumer_group=nexmark-q6-20260626-154909-consumer
+  executor_json=configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json
+  offloading=1
+  autoscaling=false
+  log=/tmp/nx-sub-nexmark-q6-20260626-154909.log
+Subscriber launched in background (PID: 158680, log: /tmp/nx-sub-nexmark-q6-20260626-154909.log)
+YARN app submitted: application_1782444527113_0002
+YARN app application_1782444527113_0002 is RUNNING.
+  App ID: application_1782444527113_0002
+  AM Host: node12
+Cleaning stale AM-side fallback metrics on node12
+Waiting 10s before enabling autoscaler commands
+Writing scaling commands to /tmp/nx-nexmark-q6-20260626-154909/scaling.txt
+Starting metrics collector (AM host: node12)
+Metrics collector PID: 159483
+Producing 23849900 live bursty records
+=== NEXMark Custom Burst Mode ===
+  steadyRate: 50000 ev/s
+  burstRate: 200000 ev/s
+  steadyDuration: 60s
+  burstDuration: 45s
+  numBursts: 3
+  rampUpSec: 60s
+  generators: 8
+  maxEvents: 23849900
+  totalEvents: 23849900 (~2981237 per gen)
+  per-generator: steady=6250 burst=25000 ev/s
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+  [gen-4] ramp-up 60s at 6250 ev/s
+  [gen-3] ramp-up 60s at 6250 ev/s
+  [gen-0] ramp-up 60s at 6250 ev/s
+  [gen-6] ramp-up 60s at 6250 ev/s
+  [gen-2] ramp-up 60s at 6250 ev/s
+  [gen-5] ramp-up 60s at 6250 ev/s
+  [gen-1] ramp-up 60s at 6250 ev/s
+  [gen-7] ramp-up 60s at 6250 ev/s
+  [gen-5] burst 1/3 steady 60s at 6250 ev/s
+  [gen-3] burst 1/3 steady 60s at 6250 ev/s
+  [gen-4] burst 1/3 steady 60s at 6250 ev/s
+  [gen-6] burst 1/3 steady 60s at 6250 ev/s
+  [gen-2] burst 1/3 steady 60s at 6250 ev/s
+  [gen-1] burst 1/3 steady 60s at 6250 ev/s
+  [gen-0] burst 1/3 steady 60s at 6250 ev/s
+  [gen-7] burst 1/3 steady 60s at 6250 ev/s
+  [gen-3] burst 1/3 burst 45s at 25000 ev/s
+  [gen-5] burst 1/3 burst 45s at 25000 ev/s
+  [gen-2] burst 1/3 burst 45s at 25000 ev/s
+  [gen-4] burst 1/3 burst 45s at 25000 ev/s
+  [gen-6] burst 1/3 burst 45s at 25000 ev/s
+  [gen-0] burst 1/3 burst 45s at 25000 ev/s
+  [gen-1] burst 1/3 burst 45s at 25000 ev/s
+  [gen-7] burst 1/3 burst 45s at 25000 ev/s
+  [gen-3] burst 2/3 steady 60s at 6250 ev/s
+  [gen-5] burst 2/3 steady 60s at 6250 ev/s
+  [gen-2] burst 2/3 steady 60s at 6250 ev/s
+  [gen-6] burst 2/3 steady 60s at 6250 ev/s
+  [gen-4] burst 2/3 steady 60s at 6250 ev/s
+  [gen-0] burst 2/3 steady 60s at 6250 ev/s
+  [gen-7] burst 2/3 steady 60s at 6250 ev/s
+  [gen-1] burst 2/3 steady 60s at 6250 ev/s
+  [gen-3] burst 2/3 burst 45s at 25000 ev/s
+  [gen-2] burst 2/3 burst 45s at 25000 ev/s
+  [gen-5] burst 2/3 burst 45s at 25000 ev/s
+  [gen-6] burst 2/3 burst 45s at 25000 ev/s
+  [gen-4] burst 2/3 burst 45s at 25000 ev/s
+  [gen-0] burst 2/3 burst 45s at 25000 ev/s
+  [gen-7] burst 2/3 burst 45s at 25000 ev/s
+  [gen-1] burst 2/3 burst 45s at 25000 ev/s
+  [gen-3] burst 3/3 steady 60s at 6250 ev/s
+  [gen-3] burst 3/3 burst 45s at 25000 ev/s
+  [gen-5] burst 3/3 steady 60s at 6250 ev/s
+  [gen-5] burst 3/3 burst 45s at 25000 ev/s
+  [gen-2] burst 3/3 steady 60s at 6250 ev/s
+  [gen-2] burst 3/3 burst 45s at 25000 ev/s
+  [gen-6] burst 3/3 steady 60s at 6250 ev/s
+  [gen-6] burst 3/3 burst 45s at 25000 ev/s
+  [gen-0] burst 3/3 steady 60s at 6250 ev/s
+  [gen-0] burst 3/3 burst 45s at 25000 ev/s
+  [gen-4] burst 3/3 steady 60s at 6250 ev/s
+  [gen-4] burst 3/3 burst 45s at 25000 ev/s
+  [gen-5] done: 2981237 events in 255051 ms
+  [gen-2] done: 2981238 events in 255057 ms
+  [gen-3] done: 2981238 events in 255060 ms
+  [gen-1] burst 3/3 steady 60s at 6250 ev/s
+  [gen-1] burst 3/3 burst 45s at 25000 ev/s
+  [gen-6] done: 2981237 events in 255065 ms
+  [gen-0] done: 2981238 events in 255066 ms
+  [gen-7] burst 3/3 steady 60s at 6250 ev/s
+  [gen-7] burst 3/3 burst 45s at 25000 ev/s
+  [gen-4] done: 2981237 events in 255069 ms
+  [gen-1] done: 2981238 events in 255073 ms
+  [gen-7] done: 2981237 events in 255075 ms
+  All generators done: 23849900 events in 255501 ms (93345.6 ev/s avg)
+KAFKA_PRODUCER_DONE topic=nexmark-q6-20260626-154909 totalSent=23849900 elapsedMs=255501 avgRate=93345.62
+
+Autoscaler harness running.
+  Subscriber PID: 158680
+  Subscriber log: /tmp/nx-sub-nexmark-q6-20260626-154909.log
+  Work dir: /tmp/nx-nexmark-q6-20260626-154909
+  Scaling commands: /tmp/nx-nexmark-q6-20260626-154909/scaling.txt
+  Metrics collector PID: 159483
+  Metrics collector log: /tmp/nx-nexmark-q6-20260626-154909/metrics_collector.log
+
+To monitor:
+  tail -f /tmp/nx-sub-nexmark-q6-20260626-154909.log
+  tail -f /tmp/nx-nexmark-q6-20260626-154909/metrics_collector.log
+  yarn application -list
+
+To stop:
+  yarn application -kill <APP_ID>
+  kill 158680
+  kill 159483
+
+To check Kafka offsets:
+  ssh node1 "/users/akash01/kafka/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list 'node1:9092,node2:9092,node3:9092' --topic 'nexmark-q6-20260626-154909' --time -1"
+
+To plot metrics after the test:
+  python3 /users/akash01/incubator-nemo/scripts/cloudlab/plot_metrics.py /tmp/nx-nexmark-q6-20260626-154909

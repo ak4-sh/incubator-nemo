@@ -51,7 +51,7 @@ def load_combined(work_dir: str) -> pd.DataFrame:
     return warmed if not warmed.empty else df
 
 
-def load_task_metrics(work_dir: str) -> pd.DataFrame:
+def load_task_metrics(work_dir: str, job_id: str = None) -> pd.DataFrame:
     path = Path(work_dir) / "task_metrics.csv"
     if not path.exists():
         return pd.DataFrame()
@@ -64,6 +64,12 @@ def load_task_metrics(work_dir: str) -> pd.DataFrame:
         df = pd.read_csv(path, names=cols, header=None)
     if "jobId" not in df.columns:
         df["jobId"] = "unknown"
+    if job_id:
+        before = len(df)
+        df = df[df["jobId"].astype(str) == job_id].copy()
+        if df.empty:
+            print(f"[plot] no task_metrics rows for jobId={job_id}; skipping task rate plot ({before} stale rows ignored)")
+            return pd.DataFrame()
     df = df[pd.to_numeric(df["timestamp"], errors="coerce").notna()].copy()
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
     for col in ["inputReceiveRate", "inputRate", "outputRate", "processingTimeNs", "processingTime",
@@ -104,6 +110,25 @@ def save_plot(work_dir: str, name: str):
     plt.close()
     print(f"[plot] saved {path}")
 
+
+
+def infer_job_id(work_dir: str):
+    """Infer the current run's jobId from per-run metrics files."""
+    for name in ["scaler_metrics.csv", "source_aggregate_metrics.csv", "task_metrics.csv"]:
+        path = Path(work_dir) / name
+        if not path.exists():
+            continue
+        try:
+            df = pd.read_csv(path, usecols=lambda c: c == "jobId")
+        except Exception:
+            continue
+        if "jobId" not in df.columns:
+            continue
+        vals = df["jobId"].dropna().astype(str)
+        vals = vals[(vals != "") & (vals != "unknown")]
+        if not vals.empty:
+            return vals.mode().iloc[0]
+    return None
 
 # ── plot generators ─────────────────────────────────────────────────────────
 def plot_input_rate(df: pd.DataFrame, work_dir: str):
@@ -254,8 +279,13 @@ def main():
         sys.exit(1)
 
     work_dir = sys.argv[1]
+    job_id = infer_job_id(work_dir)
+    if job_id:
+        print(f"[plot] inferred jobId={job_id}")
+    else:
+        print("[plot] could not infer jobId; task metrics will not be filtered")
     df = load_combined(work_dir)
-    task_df = load_task_metrics(work_dir)
+    task_df = load_task_metrics(work_dir, job_id)
     source_task_df = load_source_task_metrics(work_dir)
 
     if df.empty:

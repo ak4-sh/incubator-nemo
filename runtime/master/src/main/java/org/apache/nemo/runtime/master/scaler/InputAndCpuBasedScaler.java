@@ -4,6 +4,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.nemo.common.ir.vertex.executionproperty.ResourcePriorityProperty;
 import org.apache.nemo.conf.JobConf;
 import org.apache.nemo.conf.PolicyConf;
+import org.apache.nemo.conf.EvalConf;
 import org.apache.nemo.runtime.message.comm.ControlMessage;
 import org.apache.nemo.runtime.master.ClientRPC;
 import org.apache.nemo.runtime.master.ExecutorRepresenter;
@@ -68,6 +69,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
   private boolean started = false;
 
   private final Backpressure backpressure;
+  private final boolean autoscaling;
 
   private final ClientRPC clientRPC;
   private final String jobId;
@@ -79,6 +81,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
                                   final Backpressure backpressure,
                                   final ClientRPC clientRPC,
                                   final PolicyConf policyConf,
+                                  @Parameter(EvalConf.Autoscaling.class) final boolean autoscaling,
                                   @Parameter(JobConf.JobId.class) final String jobId) {
     this.executorMetricMap = executorMetricMap;
     this.policyConf = policyConf;
@@ -91,6 +94,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
     this.avgExpectedCpu = new DescriptiveStatistics(windowSize);
     this.currRate = policyConf.bpMinEvent;
     this.backpressure = backpressure;
+    this.autoscaling = autoscaling;
     this.clientRPC = clientRPC;
     this.jobId = jobId;
 
@@ -156,6 +160,10 @@ public final class InputAndCpuBasedScaler implements Scaler {
 
         if (System.currentTimeMillis() - sourceHandlingStartTime
           <= TimeUnit.SECONDS.toMillis(30)) {
+          return;
+        }
+
+        if (!autoscaling) {
           return;
         }
 
