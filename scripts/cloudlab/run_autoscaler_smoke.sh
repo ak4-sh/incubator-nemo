@@ -22,12 +22,15 @@ PREFILL_EVENTS=${PREFILL_EVENTS:-100}
 LIVE_EVENTS=$((TOTAL_EVENTS - PREFILL_EVENTS))
 RATE_PERIOD_SEC=${RATE_PERIOD_SEC:-50}
 SUBSCRIBER_WAIT=${SUBSCRIBER_WAIT:-10}
+PRODUCER_RATE_LIMITED=${PRODUCER_RATE_LIMITED:-true}
 
 QUERY=${QUERY:-0}
 EXECUTOR_JSON=${EXECUTOR_JSON:-$NEMO_REPO_ROOT/configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json}
 STREAM_TIMEOUT=${STREAM_TIMEOUT:-900}
 NUM_EVENTS=${NUM_EVENTS:-$TOTAL_EVENTS}
 CPU_DELAY_MS=${CPU_DELAY_MS:-0}
+AUTOSCALING=${AUTOSCALING:-false}
+JOB_ID=${JOB_ID:-nx-q${QUERY}-${TOPIC}}
 
 # Offloading nodes
 OFFLOAD_NODES=${OFFLOAD_NODES:-node4,node6,node7,node8,node13}
@@ -103,7 +106,7 @@ wait_for_yarn_app_running() {
     return 1
   fi
   echo "YARN app submitted: $app_id"
-  for i in $(seq 1 60); do
+  for i in $(seq 1 180); do
     if yarn application -status "$app_id" 2>/dev/null | grep -q 'State : RUNNING'; then
       echo "YARN app $app_id is RUNNING."
       return 0
@@ -129,11 +132,11 @@ run_producer_with_source_log() {
       maxEvents="$events"
     fi
     java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
-      "$KAFKA_BOOTSTRAP" "$TOPIC" "$FIRST_RATE" "$NEXT_RATE" "$STEADY_DURATION_SEC" "$BURST_DURATION_SEC" "$NUM_BURSTS" "$live" "$parallelism" "$RAMP_UP_SEC" "$maxEvents" &
+      "$KAFKA_BOOTSTRAP" "$TOPIC" "$FIRST_RATE" "$NEXT_RATE" "$STEADY_DURATION_SEC" "$BURST_DURATION_SEC" "$NUM_BURSTS" "$PRODUCER_RATE_LIMITED" "$parallelism" "$RAMP_UP_SEC" "$maxEvents" &
   else
     # Legacy BURSTY mode
     java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
-      "$KAFKA_BOOTSTRAP" "$TOPIC" "$events" "$FIRST_RATE" "$NEXT_RATE" "$RATE_PERIOD_SEC" "$live" "$parallelism" &
+      "$KAFKA_BOOTSTRAP" "$TOPIC" "$events" "$FIRST_RATE" "$NEXT_RATE" "$RATE_PERIOD_SEC" "$PRODUCER_RATE_LIMITED" "$parallelism" &
   fi
   producer_pid=$!
 
@@ -209,13 +212,15 @@ for node in $BASELINE_NODES; do
 done
 
 # 5. Launch subscriber with offloading enabled
-echo "Launching subscriber with autoscaling enabled"
+echo "Launching subscriber"
 export TOPIC QUERY EXECUTOR_JSON NUM_EVENTS=$TOTAL_EVENTS STREAM_TIMEOUT
 export LOG_FILE="$SUB_LOG"
 export OFFLOADING=1
 export NUM_MAX_LAMBDA
+export AUTOSCALING
+export JOB_ID
 export NEMO_WORK_DIR="$WORK_DIR"
-export NEMO_JOB_ID="nx-q${QUERY}-${TOPIC}"
+export NEMO_JOB_ID="$JOB_ID"
 
 # Run subscriber from repo root so JobLauncher finds vm_addresses.txt
 (cd "$NEMO_REPO_ROOT" && "$SCRIPT_DIR/run_q8_subscriber_yarn.sh")
@@ -242,11 +247,11 @@ SUB_PID_FILE="/tmp/nemo-subscriber-${TOPIC}.pid"
 SUB_PID=$(cat "$SUB_PID_FILE" 2>/dev/null || echo "unknown")
 
 for _ in $(seq 1 300); do
-  grep -q 'Scaling service invoked' "$SUB_LOG" && break
+  grep -Eq 'Scaling service invoked|Avg cpu:' "$SUB_LOG" && break
   sleep 1
 done
-if ! grep -q 'Scaling service invoked' "$SUB_LOG"; then
-  echo "ERROR: Scaling service did not start in time; aborting" >&2
+if ! grep -Eq 'Scaling service invoked|Avg cpu:' "$SUB_LOG"; then
+  echo "ERROR: subscriber/scaler metrics did not appear in time; aborting" >&2
   exit 1
 fi
 

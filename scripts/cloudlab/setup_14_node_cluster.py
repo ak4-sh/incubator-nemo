@@ -411,7 +411,7 @@ def main() -> int:
     print(f"  Kafka bootstrap: {args.kafka_bootstrap}")
     print(f"  VM addresses:    {args.vm_addresses}")
     print(f"  VMWorkers:       {len(offload_nodes) * args.workers_per_offload_node}")
-    print("  Recommended executor JSON: configs/cloudlab/nemo-yarn-kafka-1source-cap4-8compute.json")
+    print("  Recommended executor JSON: configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json")
     if args.run_benchmark:
         run_nexmark_benchmark(runner, args, offload_nodes, worker_nodes)
     else:

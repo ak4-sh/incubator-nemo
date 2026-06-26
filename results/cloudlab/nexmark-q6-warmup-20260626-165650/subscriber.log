@@ -1,0 +1,819 @@
+
+Powered by
+    _   __                   
+   / | / /__  ____ ___  ____ 
+  /  |/ / _ \/ __ `__ \/ __ \
+ / /|  /  __/ / / / / / /_/ /
+/_/ |_/\___/_/ /_/ /_/\____/ 
+
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/users/akash01/incubator-nemo/client/target/nemo-client-0.2-SNAPSHOT-shaded.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/users/akash01/deps/hadoop-2.7.2/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+ INFO 06-26 21:57:27,068 JobLauncher:832 [main] - VM scaling addresses node4:25321
+node4:25322
+node4:25323
+node4:25324
+node4:25325
+node4:25326
+node4:25327
+node4:25328
+node4:25329
+node4:25330
+node4:25331
+node4:25332
+node4:25333
+node4:25334
+node4:25335
+node4:25336
+node4:25337
+node4:25338
+node4:25339
+node4:25340
+node4:25341
+node4:25342
+node4:25343
+node4:25344
+node4:25345
+node4:25346
+node4:25347
+node4:25348
+node4:25349
+node4:25350
+node4:25351
+node4:25352
+node6:25321
+node6:25322
+node6:25323
+node6:25324
+node6:25325
+node6:25326
+node6:25327
+node6:25328
+node6:25329
+node6:25330
+node6:25331
+node6:25332
+node6:25333
+node6:25334
+node6:25335
+node6:25336
+node6:25337
+node6:25338
+node6:25339
+node6:25340
+node6:25341
+node6:25342
+node6:25343
+node6:25344
+node6:25345
+node6:25346
+node6:25347
+node6:25348
+node6:25349
+node6:25350
+node6:25351
+node6:25352
+node7:25321
+node7:25322
+node7:25323
+node7:25324
+node7:25325
+node7:25326
+node7:25327
+node7:25328
+node7:25329
+node7:25330
+node7:25331
+node7:25332
+node7:25333
+node7:25334
+node7:25335
+node7:25336
+node7:25337
+node7:25338
+node7:25339
+node7:25340
+node7:25341
+node7:25342
+node7:25343
+node7:25344
+node7:25345
+node7:25346
+node7:25347
+node7:25348
+node7:25349
+node7:25350
+node7:25351
+node7:25352
+node8:25321
+node8:25322
+node8:25323
+node8:25324
+node8:25325
+node8:25326
+node8:25327
+node8:25328
+node8:25329
+node8:25330
+node8:25331
+node8:25332
+node8:25333
+node8:25334
+node8:25335
+node8:25336
+node8:25337
+node8:25338
+node8:25339
+node8:25340
+node8:25341
+node8:25342
+node8:25343
+node8:25344
+node8:25345
+node8:25346
+node8:25347
+node8:25348
+node8:25349
+node8:25350
+node8:25351
+node8:25352
+node13:25321
+node13:25322
+node13:25323
+node13:25324
+node13:25325
+node13:25326
+node13:25327
+node13:25328
+node13:25329
+node13:25330
+node13:25331
+node13:25332
+node13:25333
+node13:25334
+node13:25335
+node13:25336
+node13:25337
+node13:25338
+node13:25339
+node13:25340
+node13:25341
+node13:25342
+node13:25343
+node13:25344
+node13:25345
+node13:25346
+node13:25347
+node13:25348
+node13:25349
+node13:25350
+node13:25351
+node13:25352
+
+ INFO 06-26 21:57:27,091 JobLauncher:179 [main] - Launching RPC Server
+ INFO 06-26 21:57:27,292 DriverRPCServer:94 [main] - DriverRPCServer running at 10382
+ INFO 06-26 21:57:27,403 JobLauncher:717 [main] - Library path: /users/akash01/incubator-nemo/client/target/nemo-client-0.2-SNAPSHOT-shaded.jar
+ INFO 06-26 21:57:27,404 JobLauncher:717 [main] - Library path: /users/akash01/deps/beam-vendor-grpc-1_21_0-0.1.jar
+ INFO 06-26 21:57:27,404 JobLauncher:717 [main] - Library path: /users/akash01/incubator-nemo/examples/nexmark/target/nexmark-0.2-SNAPSHOT-shaded.jar
+ INFO 06-26 21:57:27,549 JobLauncher:254 [main] - Launching driver
+ERROR StatusLogger Unrecognized format specifier [d]
+ERROR StatusLogger Unrecognized conversion specifier [d] starting at position 16 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [thread]
+ERROR StatusLogger Unrecognized conversion specifier [thread] starting at position 25 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [level]
+ERROR StatusLogger Unrecognized conversion specifier [level] starting at position 35 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [logger]
+ERROR StatusLogger Unrecognized conversion specifier [logger] starting at position 47 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [msg]
+ERROR StatusLogger Unrecognized conversion specifier [msg] starting at position 54 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [n]
+ERROR StatusLogger Unrecognized conversion specifier [n] starting at position 56 in conversion pattern.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console. Set system property 'org.apache.logging.log4j.simplelog.StatusLogger.level' to TRACE to show Log4j2 internal initialization logging.
+ERROR StatusLogger Unrecognized format specifier [d]
+ERROR StatusLogger Unrecognized conversion specifier [d] starting at position 16 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [thread]
+ERROR StatusLogger Unrecognized conversion specifier [thread] starting at position 25 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [level]
+ERROR StatusLogger Unrecognized conversion specifier [level] starting at position 35 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [logger]
+ERROR StatusLogger Unrecognized conversion specifier [logger] starting at position 47 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [msg]
+ERROR StatusLogger Unrecognized conversion specifier [msg] starting at position 54 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [n]
+ERROR StatusLogger Unrecognized conversion specifier [n] starting at position 56 in conversion pattern.
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/users/akash01/incubator-nemo/client/target/nemo-client-0.2-SNAPSHOT-shaded.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+
+Powered by
+     ___________  ______  ______  _______
+    /  ______  / /  ___/ /  ___/ /  ____/
+   /     _____/ /  /__  /  /__  /  /___
+  /  /\  \     /  ___/ /  ___/ /  ____/
+ /  /  \  \   /  /__  /  /__  /  /
+/__/    \__\ /_____/ /_____/ /__/
+
+Jun 26, 2026 9:57:28 PM org.apache.reef.util.REEFVersion logVersion
+INFO: REEF Version: 0.16.0
+Jun 26, 2026 9:57:28 PM org.apache.reef.runtime.yarn.client.YarnSubmissionHelper <init>
+INFO: YARN Application ID: application_1782444527113_0006
+Jun 26, 2026 9:57:39 PM org.apache.reef.runtime.common.files.JobJarMaker createJobSubmissionJAR
+WARNING: Failed to delete [/tmp/reef-job-15619955979759822765]
+Jun 26, 2026 9:57:40 PM org.apache.reef.runtime.yarn.client.YarnSubmissionHelper submit
+INFO: Submitting REEF Application to YARN. ID: application_1782444527113_0006
+Jun 26, 2026 9:57:40 PM org.apache.reef.runtime.yarn.client.YarnSubmissionHelper submit
+INFO: REEF app command: {{JAVA_HOME}}/bin/java -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=128m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/driver.conf 1> <LOG_DIR>/driver.stdout 2> <LOG_DIR>/driver.stderr
+Jun 26, 2026 9:57:40 PM org.apache.reef.client.DriverLauncher$SubmittedJobHandler onNext
+INFO: REEF job submitted: application_1782444527113_0006.
+ INFO 06-26 21:57:40,707 JobLauncher:608 [main] - Args are [--runner=org.apache.nemo.client.beam.NemoRunner, --streaming=true, --query=6, --manageResources=false, --monitorJobs=true, --streamTimeout=7200, --isRateLimited=false, --windowSizeSec=10, --windowPeriodSec=1, --fanout=1, --cpuDelayMs=2, --samplingRate=1.0, --numEvents=2500000, --sourceType=KAFKA, --pubSubMode=SUBSCRIBE_ONLY, --bootstrapServers=node1:9092,node2:9092,node3:9092, --kafkaTopic=nexmark-nexmark-q6-warmup-20260626-165650, --kafkaConsumerGroup=nexmark-q6-warmup-20260626-165650-consumer, --sinkType=KAFKA, --kafkaResultsTopic=nexmark-nexmark-q6-warmup-20260626-165650-results, --jobName=nx-q6-nexmark-nexmark-q6-warmup-20260626-165650]
+ INFO 06-26 21:57:40,711 JobLauncher:610 [main] - User code class org.apache.beam.sdk.nexmark.Main
+ INFO 06-26 21:57:40,711 JobLauncher:612 [main] - Method public static void org.apache.beam.sdk.nexmark.Main.main(java.lang.String[]) throws java.io.IOException
+ INFO 06-26 21:57:40,712 JobLauncher:622 [main] - User program started
+2026-06-26T21:57:41.228Z Running query:6; sourceType:KAFKA; sinkType:KAFKA; pubSubMode:SUBSCRIBE_ONLY; numEvents:2500000; streamTimeout:7200; windowPeriodSec:1; cpuSlowdownMs:2; fanout:1
+2026-06-26T21:57:41.400Z Reading events from Kafka Topic nexmark-nexmark-q6-warmup-20260626-165650
+2026-06-26T21:57:41.549Z Expected auction duration is 1 ms
+ INFO 06-26 21:57:41,639 NexmarkLauncher:1125 [main] - Nexmark sink .Format
+ INFO 06-26 21:57:41,646 NexmarkLauncher:1131 [main] - Sampling rate: 1.0
+2026-06-26T21:57:41.646Z Writing results to Kafka Topic nexmark-nexmark-q6-warmup-20260626-165650-results
+ INFO 06-26 21:57:41,783 OperatorVertex:52 [main] - isPushback of vertex2: false. 443401706 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6.ReadKafkaEvents/Remove Kafka Metadata/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,809 OperatorVertex:52 [main] - isPushback of vertex3: false. 1795075885 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6kvToEvent/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,820 OperatorVertex:52 [main] - isPushback of vertex4: false. 885722697 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.Monitor/ParMultiDo(Monitor)
+ INFO 06-26 21:57:41,828 OperatorVertex:52 [main] - isPushback of vertex5: false. 876458742 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.Snoop/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,834 OperatorVertex:52 [main] - isPushback of vertex6: false. 723161117 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.CpuDelay/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,839 OperatorVertex:52 [main] - isPushback of vertex7: false. 573414735 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Filter/ParDo(Anonymous)/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,841 OperatorVertex:52 [main] - isPushback of vertex8: false. WindowFnTransform / []org.apache.beam.sdk.transforms.windowing.Window$Assign / windowFn=org.apache.beam.sdk.nexmark.queries.WinningBids$AuctionOrBidWindowFn
+ INFO 06-26 21:57:41,849 OperatorVertex:52 [main] - isPushback of vertex9: false. 2133629275 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/justNewAuctions/IsNewAuction/ParDo(Anonymous)/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,855 OperatorVertex:52 [main] - isPushback of vertex10: false. 78849125 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/justNewAuctions/AsAuction/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,860 OperatorVertex:52 [main] - isPushback of vertex11: false. 1475395523 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/AuctionById / /ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,864 OperatorVertex:52 [main] - isPushback of vertex12: false. 1013700132 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/justBids/IsBid/ParDo(Anonymous)/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,869 OperatorVertex:52 [main] - isPushback of vertex13: false. 1179799230 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/justBids/AsBid/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,873 OperatorVertex:52 [main] - isPushback of vertex14: false. 1820528317 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/BidByAuction/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,877 OperatorVertex:52 [main] - isPushback of vertex15: false. 1090749131 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/CoGroupByKey/MakeUnionTable0/ParMultiDo(ConstructUnionTable)
+ INFO 06-26 21:57:41,881 OperatorVertex:52 [main] - isPushback of vertex16: false. 463688018 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/CoGroupByKey/MakeUnionTable1/ParMultiDo(ConstructUnionTable)
+ INFO 06-26 21:57:41,882 OperatorVertex:52 [main] - isPushback of vertex17: false. FlattenTransform:org.apache.nemo.compiler.frontend.beam.transform.FlattenTransform@550fa96f
+ INFO 06-26 21:57:41,890 GBKPartialCombineFn:29 [main] - Get accumCoder: IterableCoder(UnionCoder(org.apache.beam.sdk.nexmark.model.Auction$1@4db728df,org.apache.beam.sdk.nexmark.model.Bid$1@b0d3e7))
+ INFO 06-26 21:57:41,895 GBKFinalCombineFn:36 [main] - Get accumCoder: IterableCoder(UnionCoder(org.apache.beam.sdk.nexmark.model.Auction$1@6c70b7c3,org.apache.beam.sdk.nexmark.model.Bid$1@16a09809))
+ INFO 06-26 21:57:41,900 GBKFinalTransform:109 [main] - Reduce function class org.apache.beam.runners.core.SystemReduceFn$2
+ INFO 06-26 21:57:41,903 GBKFinalTransform:109 [main] - Reduce function class org.apache.beam.runners.core.SystemReduceFn$2
+ INFO 06-26 21:57:41,904 OperatorVertex:52 [main] - isPushback of vertex18: false. 108760389 / GBKFinalTransform / 
+ INFO 06-26 21:57:41,904 OperatorVertex:52 [main] - isPushback of vertex19: false. 261774911 / GBKFinalTransform / 
+ INFO 06-26 21:57:41,908 GBKFinalTransform:109 [main] - Reduce function class org.apache.beam.runners.core.SystemReduceFn$2
+ INFO 06-26 21:57:41,908 OperatorVertex:52 [main] - isPushback of vertex20: false. 569974522 / GBKFinalTransform / 
+ INFO 06-26 21:57:41,908 OperatorVertex:56 [main] - Set partial combine to vertex20, transform 569974522 / GBKFinalTransform / 
+ INFO 06-26 21:57:41,913 OperatorVertex:52 [main] - isPushback of vertex21: false. 217123986 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/CoGroupByKey/ConstructCoGbkResultFn/ParMultiDo(ConstructCoGbkResult)
+ INFO 06-26 21:57:41,917 OperatorVertex:52 [main] - isPushback of vertex22: false. 1329589315 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.WinningBids/Query6.WinningBids.Join/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,920 OperatorVertex:52 [main] - isPushback of vertex23: false. 556798624 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.Rekey/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,921 OperatorVertex:52 [main] - isPushback of vertex24: false. WindowFnTransform / []org.apache.beam.sdk.transforms.windowing.Window$Assign / trigger=Repeatedly.forever(AfterPane.elementCountAtLeast(1))
+[]org.apache.beam.sdk.transforms.windowing.Window$Assign / windowFn=org.apache.beam.sdk.transforms.windowing.GlobalWindows
+[]org.apache.beam.sdk.transforms.windowing.Window$Assign / timestampCombiner=EARLIEST
+[]org.apache.beam.sdk.transforms.windowing.Window$Assign / accumulationMode=ACCUMULATING_FIRED_PANES
+[]org.apache.beam.sdk.transforms.windowing.Window$Assign / allowedLateness=0
+ INFO 06-26 21:57:41,923 PipelineTranslator:474 [main] - Combine fn class name class org.apache.beam.sdk.nexmark.queries.Query6$MovingMeanSellingPrice
+ INFO 06-26 21:57:41,930 FinalCombineFn:37 [main] - Get accumCoder: ListCoder(org.apache.beam.sdk.nexmark.model.Bid$1@965bcbc)
+ INFO 06-26 21:57:41,934 GBKFinalTransform:109 [main] - Reduce function class org.apache.beam.runners.core.SystemReduceFn$2
+ INFO 06-26 21:57:41,937 GBKFinalTransform:109 [main] - Reduce function class org.apache.beam.runners.core.SystemReduceFn$2
+ INFO 06-26 21:57:41,938 OperatorVertex:52 [main] - isPushback of vertex25: false. 1010068549 / GBKFinalTransform / []org.apache.beam.sdk.transforms.Combine$PerKey / combineFn=org.apache.beam.sdk.nexmark.queries.Query6$MovingMeanSellingPrice
+ INFO 06-26 21:57:41,938 OperatorVertex:52 [main] - isPushback of vertex26: false. 383753182 / GBKFinalTransform / []org.apache.beam.sdk.transforms.Combine$PerKey / combineFn=org.apache.beam.sdk.nexmark.queries.Query6$MovingMeanSellingPrice
+ INFO 06-26 21:57:41,941 GBKFinalTransform:109 [main] - Reduce function class org.apache.beam.runners.core.SystemReduceFn$2
+ INFO 06-26 21:57:41,941 OperatorVertex:52 [main] - isPushback of vertex27: false. 47865820 / GBKFinalTransform / []org.apache.beam.sdk.transforms.Combine$PerKey / combineFn=org.apache.beam.sdk.nexmark.queries.Query6$MovingMeanSellingPrice
+ INFO 06-26 21:57:41,946 OperatorVertex:52 [main] - isPushback of vertex28: false. 305964128 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.Select/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,950 OperatorVertex:52 [main] - isPushback of vertex29: false. 425246937 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.Forget/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,954 OperatorVertex:52 [main] - isPushback of vertex30: false. 1637432600 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.Debug/ParMultiDo(Monitor)
+ INFO 06-26 21:57:41,957 OperatorVertex:52 [main] - isPushback of vertex31: false. 653648989 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6/Query6.Stamp/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,962 OperatorVertex:52 [main] - isPushback of vertex32: false. 1615804266 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6.Format/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,965 OperatorVertex:52 [main] - isPushback of vertex33: false. 587142002 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6.Sampling/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,971 OperatorVertex:52 [main] - isPushback of vertex34: false. 1890686675 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6.WriteKafkaResults/Kafka values with default key/Map/ParMultiDo(Anonymous)
+ INFO 06-26 21:57:41,974 OperatorVertex:52 [main] - isPushback of vertex35: false. 859456754 / DoFnTransform / []org.apache.nemo.compiler.frontend.beam.PipelineTranslator / name=Query6.WriteKafkaResults/KafkaIO.Write/ParDo(KafkaWriter)/ParMultiDo(KafkaWriter)
+ INFO 06-26 21:57:41,994 JobLauncher:360 [main] - Waiting for the driver to be ready
+Jun 26, 2026 9:57:46 PM org.apache.reef.client.DriverLauncher$RunningJobHandler onNext
+INFO: The Job nx-q6-nexmark-nexmark-q6-warmup-20260626-165650 is running.
+Jun 26, 2026 9:57:49 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:49 PM org.apache.reef.runtime.common.driver.evaluator.EvaluatorManagerFactory getNewEvaluatorManagerInstanceForResource
+WARNING: Node {} is not in our catalog, adding it
+Jun 26, 2026 9:57:49 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.common.driver.evaluator.EvaluatorManagerFactory getNewEvaluatorManagerInstanceForResource
+WARNING: Node {} is not in our catalog, adding it
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.common.driver.evaluator.EvaluatorManagerFactory getNewEvaluatorManagerInstanceForResource
+WARNING: Node {} is not in our catalog, adding it
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.common.driver.evaluator.EvaluatorManagerFactory getNewEvaluatorManagerInstanceForResource
+WARNING: Node {} is not in our catalog, adding it
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:51 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:52 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.yarn.driver.DefaultRackNameFormatter getRackName
+WARNING: Could not get information from the rack name, should use the default
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:53 PM org.apache.reef.runtime.common.driver.evaluator.AllocatedEvaluatorImpl makeRootServiceConfiguration
+INFO: No service configuration given and no ConfigurationProviders set.
+Jun 26, 2026 9:57:54 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager handleNewContainer
+WARNING: Got an extra container container_1782444527113_0006_01_000015 that doesnt match, releasing...
+Jun 26, 2026 9:57:54 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager handleNewContainer
+WARNING: Got an extra container container_1782444527113_0006_01_000016 that doesnt match, releasing...
+Jun 26, 2026 9:57:54 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager handleNewContainer
+WARNING: Got an extra container container_1782444527113_0006_01_000017 that doesnt match, releasing...
+Jun 26, 2026 9:57:54 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager handleNewContainer
+WARNING: Got an extra container container_1782444527113_0006_01_000018 that doesnt match, releasing...
+Jun 26, 2026 9:57:55 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager handleNewContainer
+WARNING: Got an extra container container_1782444527113_0006_01_000019 that doesnt match, releasing...
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-5476854306575710080]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-13308496832043499225]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000002 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=668m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=668m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-7268695873680254806.jar" } size: 1785 timestamp: 1782511080140 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-15282019775927986251]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000014 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-9591631635293751946.jar" } size: 1800 timestamp: 1782511080174 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000013 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-801445663357426602.jar" } size: 1795 timestamp: 1782511080195 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-7406143638746932834]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000012 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-3025598528926592645.jar" } size: 1794 timestamp: 1782511080218 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-5136306974684301496]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000011 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-4406036718122854295.jar" } size: 1795 timestamp: 1782511080248 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-14921679092850273560]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000010 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-15590947439540070015.jar" } size: 1790 timestamp: 1782511080270 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-6143627031854046272]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000009 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-133684048253858957.jar" } size: 1797 timestamp: 1782511080293 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-16568555230323471196]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000008 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-13602935487192336011.jar" } size: 1796 timestamp: 1782511080322 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-775579912706159294]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000007 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-16252241640021555001.jar" } size: 1790 timestamp: 1782511080344 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-18009938460815570320]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000006 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-11542633522294237732.jar" } size: 1794 timestamp: 1782511080361 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-4687226976393597105]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000005 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-12735958344849092070.jar" } size: 1788 timestamp: 1782511080384 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-18325963134964332178]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000004 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-815671704477173232.jar" } size: 1795 timestamp: 1782511080413 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.EvaluatorSetupHelper getResources
+WARNING: Failed to delete [/users/akash01/hadoop-data/tmp/nm-local-dir/usercache/akash01/appcache/application_1782444527113_0006/container_1782444527113_0006_01_000001/./reef/temp/reef-evaluator-15850910201924005162]
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YARNResourceLaunchHandler onNext
+INFO: TIME: Run ResourceLaunchProto container_1782444527113_0006_01_000003 command: {{JAVA_HOME}}/bin/java -XX:-OmitStackTraceInFastThrow -XX:InitialHeapSize=924m -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=128m -XX:MaxHeapSize=924m -classpath /users/akash01/hadoop/etc/hadoop:{{HADOOP_CONF_DIR}}:reef/local/*:reef/global/*:/users/akash01/hadoop/share/hadoop/common/*:/users/akash01/hadoop/share/hadoop/common/lib/*:/users/akash01/hadoop/share/hadoop/hdfs/*:/users/akash01/hadoop/share/hadoop/hdfs/lib/*:/users/akash01/hadoop/share/hadoop/yarn/*:/users/akash01/hadoop/share/hadoop/yarn/lib/*:/users/akash01/hadoop/share/hadoop/mapreduce/*:/users/akash01/hadoop/share/hadoop/mapreduce/lib/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/*:{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*:{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*:{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/* -Dproc_reef org.apache.reef.runtime.common.REEFLauncher reef/local/evaluator.conf 1> <LOG_DIR>/evaluator.stdout 2> <LOG_DIR>/evaluator.stderr resources: {reef/global=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/global.jar" } size: 240177881 timestamp: 1782511080060 type: ARCHIVE visibility: APPLICATION, reef/local=resource { scheme: "hdfs" host: "node0" port: 9000 file: "/tmp/2026_06_26_21_57_28_reef-job-6/reef-evaluator-11664846801791561106.jar" } size: 1791 timestamp: 1782511080435 type: ARCHIVE visibility: APPLICATION}
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.util.YarnTypes getContainerLaunchContext
+INFO: Added tokens to container launch context
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+Jun 26, 2026 9:58:00 PM org.apache.reef.runtime.yarn.driver.YarnContainerManager onContainerStatus
+INFO: Container running
+ INFO 06-26 21:58:05,530 JobLauncher:368 [main] - Launching DAG...
+ INFO 06-26 21:58:05,672 JobLauncher:402 [pool-1-thread-1] - Scaling service invoked...
+ INFO 06-26 21:58:05,676 JobLauncher:580 [main] - Waiting for the DAG to finish execution
+ INFO 06-26 21:58:16,416 JobLauncher:425 [pool-1-thread-1] - Read line add-lambda-executor 160 1 1 1024 ... send Scaling
+ INFO 06-26 21:58:16,417 JobLauncher:505 [pool-1-thread-1] - Send add-lambda-executor 160 1 1 1024
+ INFO 06-26 21:58:16,418 JobLauncher:425 [pool-1-thread-1] - Read line start-scaler ... send Scaling
+ INFO 06-26 21:58:16,418 JobLauncher:505 [pool-1-thread-1] - Send start-scaler
+ INFO 06-26 21:58:16,419 JobLauncher:425 [pool-1-thread-1] - Read line start-backpressure ... send Scaling
+ INFO 06-26 21:58:16,419 JobLauncher:505 [pool-1-thread-1] - Send start-backpressure
+ INFO 06-26 21:58:17,309 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	NaN	p95	NaN	p99	NaN	tail	NaN
+ INFO 06-26 21:58:18,328 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	9.000000	p95	9.000000	p99	9.000000	tail	153.000000
+ INFO 06-26 21:58:18,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 9283, input 8000.000000, avg cpu: 0.351167 , avg max cpu: 0.412000
+ INFO 06-26 21:58:19,516 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	1173.000000
+ INFO 06-26 21:58:19,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 21390, input 13752.000000, avg cpu: 0.183897 , avg max cpu: 0.332000
+ INFO 06-26 21:58:20,573 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	398.000000	p95	398.000000	p99	398.000000	tail	2279.000000
+ INFO 06-26 21:58:20,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 18001, input 15001.333333, avg cpu: 0.064929 , avg max cpu: 0.338000
+ INFO 06-26 21:58:20,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 40741, input 15001.333333, avg cpu: 0.064929 , avg max cpu: 0.338000
+ INFO 06-26 21:58:21,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 19350, input 16125.000000, avg cpu: 0.078712 , avg max cpu: 0.524000
+ INFO 06-26 21:58:21,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 28249, input 16125.000000, avg cpu: 0.078712 , avg max cpu: 0.524000
+ INFO 06-26 21:58:21,653 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	3403.000000
+ INFO 06-26 21:58:22,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 20160, input 16800.000000, avg cpu: 0.114212 , avg max cpu: 0.628000
+ INFO 06-26 21:58:22,693 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2796.000000
+ INFO 06-26 21:58:23,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23040, input 19200.000000, avg cpu: 0.144712 , avg max cpu: 0.710000
+ INFO 06-26 21:58:23,713 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2064.000000
+ INFO 06-26 21:58:24,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23159, input 19299.200000, avg cpu: 0.153647 , avg max cpu: 0.660000
+ INFO 06-26 21:58:24,714 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2016.000000
+ INFO 06-26 21:58:25,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23759, input 19799.200000, avg cpu: 0.158949 , avg max cpu: 0.512000
+ INFO 06-26 21:58:25,772 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2211.000000
+ INFO 06-26 21:58:26,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23880, input 19900.000000, avg cpu: 0.165833 , avg max cpu: 0.374000
+ INFO 06-26 21:58:26,860 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2268.000000
+ INFO 06-26 21:58:27,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 24000, input 20000.000000, avg cpu: 0.157667 , avg max cpu: 0.338000
+ INFO 06-26 21:58:27,897 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2233.000000
+ INFO 06-26 21:58:28,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 24000, input 20000.000000, avg cpu: 0.151500 , avg max cpu: 0.318000
+ INFO 06-26 21:58:28,915 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2121.000000
+ INFO 06-26 21:58:29,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23929, input 19941.400000, avg cpu: 0.148667 , avg max cpu: 0.302000
+ INFO 06-26 21:58:29,934 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2104.000000
+ INFO 06-26 21:58:30,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23640, input 19700.000000, avg cpu: 0.146667 , avg max cpu: 0.294000
+ INFO 06-26 21:58:30,956 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2096.000000
+ INFO 06-26 21:58:31,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23280, input 19400.000000, avg cpu: 0.145333 , avg max cpu: 0.292000
+ INFO 06-26 21:58:31,976 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2071.000000
+ INFO 06-26 21:58:32,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23160, input 19300.000000, avg cpu: 0.136333 , avg max cpu: 0.266000
+ INFO 06-26 21:58:32,995 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2051.000000
+ INFO 06-26 21:58:33,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23040, input 19200.000000, avg cpu: 0.131167 , avg max cpu: 0.246000
+ INFO 06-26 21:58:34,015 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2089.000000
+ INFO 06-26 21:58:34,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23110, input 19258.600000, avg cpu: 0.130000 , avg max cpu: 0.266000
+ INFO 06-26 21:58:35,038 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2000.000000
+ INFO 06-26 21:58:35,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23400, input 19500.000000, avg cpu: 0.123167 , avg max cpu: 0.266000
+ INFO 06-26 21:58:36,074 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2091.000000
+ INFO 06-26 21:58:36,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23760, input 19800.000000, avg cpu: 0.117500 , avg max cpu: 0.272000
+ INFO 06-26 21:58:37,094 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2112.000000
+ INFO 06-26 21:58:37,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23880, input 19900.000000, avg cpu: 0.116167 , avg max cpu: 0.276000
+ INFO 06-26 21:58:38,113 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2088.000000
+ INFO 06-26 21:58:38,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 24000, input 20000.000000, avg cpu: 0.112833 , avg max cpu: 0.274000
+ INFO 06-26 21:58:39,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2057.000000
+ INFO 06-26 21:58:39,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23640, input 19700.000000, avg cpu: 0.109667 , avg max cpu: 0.254000
+ INFO 06-26 21:58:40,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2034.000000
+ INFO 06-26 21:58:40,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23616, input 19680.000000, avg cpu: 0.111333 , avg max cpu: 0.254000
+ INFO 06-26 21:58:41,194 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2050.000000
+ INFO 06-26 21:58:41,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23160, input 19300.000000, avg cpu: 0.111667 , avg max cpu: 0.242000
+ INFO 06-26 21:58:42,195 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2117.000000
+ INFO 06-26 21:58:42,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23040, input 19200.000000, avg cpu: 0.113000 , avg max cpu: 0.254000
+ INFO 06-26 21:58:43,196 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2002.000000
+ INFO 06-26 21:58:43,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23040, input 19200.000000, avg cpu: 0.115833 , avg max cpu: 0.254000
+ INFO 06-26 21:58:44,197 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2145.000000
+ INFO 06-26 21:58:44,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23400, input 19500.000000, avg cpu: 0.114500 , avg max cpu: 0.250000
+ INFO 06-26 21:58:45,199 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	8.000000	p95	8.000000	p99	8.000000	tail	2113.000000
+ INFO 06-26 21:58:45,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23424, input 19520.000000, avg cpu: 0.116833 , avg max cpu: 0.258000
+ INFO 06-26 21:58:46,206 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2072.000000
+ INFO 06-26 21:58:46,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23880, input 19900.000000, avg cpu: 0.117167 , avg max cpu: 0.252000
+ INFO 06-26 21:58:47,241 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2039.000000
+ INFO 06-26 21:58:47,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23559, input 19632.600000, avg cpu: 0.116167 , avg max cpu: 0.230000
+ INFO 06-26 21:58:48,273 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2122.000000
+ INFO 06-26 21:58:48,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23189, input 19324.400000, avg cpu: 0.114167 , avg max cpu: 0.246000
+ INFO 06-26 21:58:49,313 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2047.000000
+ INFO 06-26 21:58:49,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23160, input 19300.000000, avg cpu: 0.111667 , avg max cpu: 0.254000
+ INFO 06-26 21:58:50,352 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2053.000000
+ INFO 06-26 21:58:50,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23040, input 19200.000000, avg cpu: 0.108500 , avg max cpu: 0.260000
+ INFO 06-26 21:58:51,412 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2003.000000
+ INFO 06-26 21:58:51,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23040, input 19200.000000, avg cpu: 0.105833 , avg max cpu: 0.262000
+ INFO 06-26 21:58:52,456 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2076.000000
+ INFO 06-26 21:58:52,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23480, input 19567.400000, avg cpu: 0.103667 , avg max cpu: 0.264000
+ INFO 06-26 21:58:53,513 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2115.000000
+ INFO 06-26 21:58:53,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23850, input 19875.600000, avg cpu: 0.104000 , avg max cpu: 0.246000
+ INFO 06-26 21:58:54,533 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	11.000000	p95	11.000000	p99	11.000000	tail	2123.000000
+ INFO 06-26 21:58:54,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23880, input 19900.000000, avg cpu: 0.107667 , avg max cpu: 0.244000
+ INFO 06-26 21:58:55,552 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2075.000000
+ INFO 06-26 21:58:55,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23880, input 19900.000000, avg cpu: 0.109667 , avg max cpu: 0.246000
+ INFO 06-26 21:58:56,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23640, input 19700.000000, avg cpu: 0.110500 , avg max cpu: 0.248000
+ INFO 06-26 21:58:56,652 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2025.000000
+ INFO 06-26 21:58:57,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23425, input 19521.600000, avg cpu: 0.112500 , avg max cpu: 0.246000
+ INFO 06-26 21:58:57,653 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2009.000000
+ INFO 06-26 21:58:58,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23400, input 19500.000000, avg cpu: 0.113000 , avg max cpu: 0.244000
+ INFO 06-26 21:58:58,693 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2026.000000
+ INFO 06-26 21:58:59,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23280, input 19400.000000, avg cpu: 0.112833 , avg max cpu: 0.244000
+ INFO 06-26 21:58:59,749 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	1985.000000
+ INFO 06-26 21:59:00,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23280, input 19400.000000, avg cpu: 0.110333 , avg max cpu: 0.224000
+ INFO 06-26 21:59:00,765 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2045.000000
+ INFO 06-26 21:59:01,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23520, input 19600.000000, avg cpu: 0.109667 , avg max cpu: 0.222000
+ INFO 06-26 21:59:01,833 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2025.000000
+ INFO 06-26 21:59:02,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23614, input 19678.400000, avg cpu: 0.107000 , avg max cpu: 0.224000
+ INFO 06-26 21:59:02,952 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2022.000000
+ INFO 06-26 21:59:03,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23640, input 19700.000000, avg cpu: 0.105167 , avg max cpu: 0.228000
+ INFO 06-26 21:59:03,972 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	2.000000	p95	2.000000	p99	2.000000	tail	1985.000000
+ INFO 06-26 21:59:04,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23760, input 19800.000000, avg cpu: 0.103500 , avg max cpu: 0.222000
+ INFO 06-26 21:59:05,033 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2220.000000
+ INFO 06-26 21:59:05,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23880, input 19900.000000, avg cpu: 0.104667 , avg max cpu: 0.258000
+ INFO 06-26 21:59:05,597 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.109167 Max cpu: 0.380000 Avg input: 20000.000000, Avg process input: 19907.600000 Curr input: 18899, NumExecutor: 12
+ INFO 06-26 21:59:06,098 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2171.000000
+ INFO 06-26 21:59:06,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23880, input 19900.000000, avg cpu: 0.105000 , avg max cpu: 0.272000
+ INFO 06-26 21:59:06,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.109583 Max cpu: 0.350000 Avg input: 20000.000000, Avg process input: 19687.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:07,133 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2067.000000
+ INFO 06-26 21:59:07,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 24000, input 20000.000000, avg cpu: 0.106167 , avg max cpu: 0.278000
+ INFO 06-26 21:59:07,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.108333 Max cpu: 0.316667 Avg input: 20000.000000, Avg process input: 19500.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:08,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2113.000000
+ INFO 06-26 21:59:08,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23849, input 19874.600000, avg cpu: 0.109000 , avg max cpu: 0.286000
+ INFO 06-26 21:59:08,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.110625 Max cpu: 0.305000 Avg input: 19373.000000, Avg process input: 19557.200000 Curr input: 19373, NumExecutor: 12
+ INFO 06-26 21:59:09,154 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2072.000000
+ INFO 06-26 21:59:09,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23401, input 19501.000000, avg cpu: 0.110000 , avg max cpu: 0.288000
+ INFO 06-26 21:59:09,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.110000 Max cpu: 0.288000 Avg input: 18132.000000, Avg process input: 19502.400000 Curr input: 18132, NumExecutor: 12
+ INFO 06-26 21:59:10,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2000.000000
+ INFO 06-26 21:59:10,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23280, input 19400.000000, avg cpu: 0.108833 , avg max cpu: 0.254000
+ INFO 06-26 21:59:10,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.108833 Max cpu: 0.254000 Avg input: 19495.000000, Avg process input: 19292.400000 Curr input: 19495, NumExecutor: 12
+ INFO 06-26 21:59:11,154 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2030.000000
+ INFO 06-26 21:59:11,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23040, input 19200.000000, avg cpu: 0.107833 , avg max cpu: 0.230000
+ INFO 06-26 21:59:11,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.107833 Max cpu: 0.230000 Avg input: 19000.000000, Avg process input: 19512.600000 Curr input: 19000, NumExecutor: 12
+ INFO 06-26 21:59:12,157 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	4.000000	p95	4.000000	p99	4.000000	tail	2007.000000
+ INFO 06-26 21:59:12,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23040, input 19200.000000, avg cpu: 0.106667 , avg max cpu: 0.218000
+ INFO 06-26 21:59:12,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Avg cpu: 0.106667 Max cpu: 0.218000 Avg input: 20000.000000, Avg process input: 19700.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:13,195 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2124.000000
+ INFO 06-26 21:59:13,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23190, input 19325.400000, avg cpu: 0.103167 , avg max cpu: 0.202000
+ INFO 06-26 21:59:13,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Avg cpu: 0.103167 Max cpu: 0.202000 Avg input: 20000.000000, Avg process input: 19700.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:14,195 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2055.000000
+ INFO 06-26 21:59:14,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23638, input 19699.000000, avg cpu: 0.102500 , avg max cpu: 0.198000
+ INFO 06-26 21:59:14,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.102500 Max cpu: 0.198000 Avg input: 20000.000000, Avg process input: 19645.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:15,196 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2073.000000
+ INFO 06-26 21:59:15,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23760, input 19800.000000, avg cpu: 0.100833 , avg max cpu: 0.198000
+ INFO 06-26 21:59:15,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.100833 Max cpu: 0.198000 Avg input: 20000.000000, Avg process input: 19881.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:16,198 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	4.000000	p95	4.000000	p99	4.000000	tail	2128.000000
+ INFO 06-26 21:59:16,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23880, input 19900.000000, avg cpu: 0.097833 , avg max cpu: 0.216000
+ INFO 06-26 21:59:16,595 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.097833 Max cpu: 0.216000 Avg input: 19500.000000, Avg process input: 19726.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:17,200 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2026.000000
+ INFO 06-26 21:59:17,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23880, input 19900.000000, avg cpu: 0.095167 , avg max cpu: 0.228000
+ INFO 06-26 21:59:17,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.095167 Max cpu: 0.228000 Avg input: 20000.000000, Avg process input: 19500.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:18,200 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2096.000000
+ INFO 06-26 21:59:18,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23400, input 19500.000000, avg cpu: 0.093000 , avg max cpu: 0.250000
+ INFO 06-26 21:59:18,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.093000 Max cpu: 0.250000 Avg input: 18000.000000, Avg process input: 19355.000000 Curr input: 18000, NumExecutor: 12
+ INFO 06-26 21:59:19,200 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2001.000000
+ INFO 06-26 21:59:19,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23400, input 19500.000000, avg cpu: 0.091000 , avg max cpu: 0.260000
+ INFO 06-26 21:59:19,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.091000 Max cpu: 0.260000 Avg input: 20000.000000, Avg process input: 19354.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:20,201 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2009.000000
+ INFO 06-26 21:59:20,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23043, input 19203.000000, avg cpu: 0.092000 , avg max cpu: 0.262000
+ INFO 06-26 21:59:20,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.092000 Max cpu: 0.262000 Avg input: 18515.000000, Avg process input: 19318.200000 Curr input: 18515, NumExecutor: 12
+ INFO 06-26 21:59:21,202 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2056.000000
+ INFO 06-26 21:59:21,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23160, input 19300.000000, avg cpu: 0.095167 , avg max cpu: 0.258000
+ INFO 06-26 21:59:21,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.095167 Max cpu: 0.258000 Avg input: 19985.000000, Avg process input: 19474.000000 Curr input: 19985, NumExecutor: 12
+ INFO 06-26 21:59:22,273 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2117.000000
+ INFO 06-26 21:59:22,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23160, input 19300.000000, avg cpu: 0.098333 , avg max cpu: 0.258000
+ INFO 06-26 21:59:22,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Avg cpu: 0.098333 Max cpu: 0.258000 Avg input: 20000.000000, Avg process input: 19695.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:23,373 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2107.000000
+ INFO 06-26 21:59:23,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23640, input 19700.000000, avg cpu: 0.101167 , avg max cpu: 0.242000
+ INFO 06-26 21:59:23,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Avg cpu: 0.101167 Max cpu: 0.242000 Avg input: 20000.000000, Avg process input: 19778.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:24,413 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2085.000000
+ INFO 06-26 21:59:24,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23640, input 19700.000000, avg cpu: 0.101500 , avg max cpu: 0.238000
+ INFO 06-26 21:59:24,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.101500 Max cpu: 0.238000 Avg input: 20000.000000, Avg process input: 19773.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:25,495 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2048.000000
+ INFO 06-26 21:59:25,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23996, input 19997.000000, avg cpu: 0.102667 , avg max cpu: 0.242000
+ INFO 06-26 21:59:25,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.102667 Max cpu: 0.242000 Avg input: 20000.000000, Avg process input: 19843.200000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:26,511 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2029.000000
+ INFO 06-26 21:59:26,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23880, input 19900.000000, avg cpu: 0.101333 , avg max cpu: 0.226000
+ INFO 06-26 21:59:26,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.101333 Max cpu: 0.226000 Avg input: 19500.000000, Avg process input: 19687.200000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:27,535 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2115.000000
+ INFO 06-26 21:59:27,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23880, input 19900.000000, avg cpu: 0.101333 , avg max cpu: 0.214000
+ INFO 06-26 21:59:27,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.101333 Max cpu: 0.214000 Avg input: 20000.000000, Avg process input: 19504.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:28,559 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2095.000000
+ INFO 06-26 21:59:28,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23760, input 19800.000000, avg cpu: 0.103333 , avg max cpu: 0.226000
+ INFO 06-26 21:59:28,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.103333 Max cpu: 0.226000 Avg input: 19500.000000, Avg process input: 19555.400000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:29,580 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2072.000000
+ INFO 06-26 21:59:29,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23400, input 19500.000000, avg cpu: 0.102667 , avg max cpu: 0.232000
+ INFO 06-26 21:59:29,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.102667 Max cpu: 0.232000 Avg input: 18500.000000, Avg process input: 19426.200000 Curr input: 18500, NumExecutor: 12
+ INFO 06-26 21:59:30,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23196, input 19330.400000, avg cpu: 0.100500 , avg max cpu: 0.236000
+ INFO 06-26 21:59:30,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Avg cpu: 0.100500 Max cpu: 0.236000 Avg input: 19152.000000, Avg process input: 19356.800000 Curr input: 19152, NumExecutor: 12
+ INFO 06-26 21:59:30,599 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2032.000000
+ INFO 06-26 21:59:31,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23160, input 19300.000000, avg cpu: 0.099500 , avg max cpu: 0.242000
+ INFO 06-26 21:59:31,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.099500 Max cpu: 0.242000 Avg input: 19348.000000, Avg process input: 19512.800000 Curr input: 19348, NumExecutor: 12
+ INFO 06-26 21:59:31,633 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	1992.000000
+ INFO 06-26 21:59:32,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23160, input 19300.000000, avg cpu: 0.097167 , avg max cpu: 0.244000
+ INFO 06-26 21:59:32,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.097167 Max cpu: 0.244000 Avg input: 20000.000000, Avg process input: 19697.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:32,731 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2094.000000
+ INFO 06-26 21:59:33,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23280, input 19400.000000, avg cpu: 0.092667 , avg max cpu: 0.236000
+ INFO 06-26 21:59:33,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.092667 Max cpu: 0.236000 Avg input: 20000.000000, Avg process input: 19711.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:33,752 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2074.000000
+ INFO 06-26 21:59:34,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23640, input 19700.000000, avg cpu: 0.094833 , avg max cpu: 0.240000
+ INFO 06-26 21:59:34,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.094833 Max cpu: 0.240000 Avg input: 20000.000000, Avg process input: 19915.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:34,773 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2071.000000
+ INFO 06-26 21:59:35,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23843, input 19869.600000, avg cpu: 0.096167 , avg max cpu: 0.240000
+ INFO 06-26 21:59:35,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.096167 Max cpu: 0.240000 Avg input: 20000.000000, Avg process input: 19823.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:35,865 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2023.000000
+ INFO 06-26 21:59:36,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 24000, input 20000.000000, avg cpu: 0.096500 , avg max cpu: 0.242000
+ INFO 06-26 21:59:36,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.096500 Max cpu: 0.242000 Avg input: 20000.000000, Avg process input: 19804.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:36,888 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2042.000000
+ INFO 06-26 21:59:37,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23882, input 19902.200000, avg cpu: 0.099500 , avg max cpu: 0.256000
+ INFO 06-26 21:59:37,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.099500 Max cpu: 0.256000 Avg input: 19511.000000, Avg process input: 19753.800000 Curr input: 19511, NumExecutor: 12
+ INFO 06-26 21:59:37,907 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2038.000000
+ INFO 06-26 21:59:38,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23880, input 19900.000000, avg cpu: 0.103000 , avg max cpu: 0.264000
+ INFO 06-26 21:59:38,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.103000 Max cpu: 0.264000 Avg input: 19989.000000, Avg process input: 19711.000000 Curr input: 19989, NumExecutor: 12
+ INFO 06-26 21:59:38,925 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2140.000000
+ INFO 06-26 21:59:39,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23880, input 19900.000000, avg cpu: 0.103667 , avg max cpu: 0.264000
+ INFO 06-26 21:59:39,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Avg cpu: 0.103667 Max cpu: 0.264000 Avg input: 20000.000000, Avg process input: 19584.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:39,972 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2069.000000
+ INFO 06-26 21:59:40,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23746, input 19788.800000, avg cpu: 0.104667 , avg max cpu: 0.260000
+ INFO 06-26 21:59:40,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Avg cpu: 0.104667 Max cpu: 0.260000 Avg input: 19444.000000, Avg process input: 19476.200000 Curr input: 19444, NumExecutor: 12
+ INFO 06-26 21:59:40,992 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2073.000000
+ INFO 06-26 21:59:41,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23393, input 19494.800000, avg cpu: 0.106000 , avg max cpu: 0.266000
+ INFO 06-26 21:59:41,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.106000 Max cpu: 0.266000 Avg input: 18530.000000, Avg process input: 19395.400000 Curr input: 18530, NumExecutor: 12
+ INFO 06-26 21:59:42,013 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2010.000000
+ INFO 06-26 21:59:42,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23277, input 19397.800000, avg cpu: 0.104333 , avg max cpu: 0.268000
+ INFO 06-26 21:59:42,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.104333 Max cpu: 0.268000 Avg input: 19026.000000, Avg process input: 19448.400000 Curr input: 19026, NumExecutor: 12
+ INFO 06-26 21:59:43,032 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2032.000000
+ INFO 06-26 21:59:43,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23160, input 19300.000000, avg cpu: 0.104500 , avg max cpu: 0.260000
+ INFO 06-26 21:59:43,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.104500 Max cpu: 0.260000 Avg input: 19500.000000, Avg process input: 19481.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:44,052 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	1998.000000
+ INFO 06-26 21:59:44,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23160, input 19300.000000, avg cpu: 0.102167 , avg max cpu: 0.248000
+ INFO 06-26 21:59:44,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.102167 Max cpu: 0.248000 Avg input: 20000.000000, Avg process input: 19641.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:45,052 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2071.000000
+ INFO 06-26 21:59:45,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23293, input 19411.200000, avg cpu: 0.099833 , avg max cpu: 0.254000
+ INFO 06-26 21:59:45,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.099833 Max cpu: 0.254000 Avg input: 20000.000000, Avg process input: 19765.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:46,073 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2097.000000
+ INFO 06-26 21:59:46,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23646, input 19705.200000, avg cpu: 0.099667 , avg max cpu: 0.262000
+ INFO 06-26 21:59:46,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.099667 Max cpu: 0.262000 Avg input: 20000.000000, Avg process input: 19831.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:47,094 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2032.000000
+ INFO 06-26 21:59:47,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23880, input 19900.000000, avg cpu: 0.098167 , avg max cpu: 0.256000
+ INFO 06-26 21:59:47,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.098167 Max cpu: 0.256000 Avg input: 20000.000000, Avg process input: 19899.200000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:48,152 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2025.000000
+ INFO 06-26 21:59:48,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 24000, input 20000.000000, avg cpu: 0.095667 , avg max cpu: 0.250000
+ INFO 06-26 21:59:48,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.095667 Max cpu: 0.250000 Avg input: 20000.000000, Avg process input: 19851.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:49,152 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	1992.000000
+ INFO 06-26 21:59:49,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23880, input 19900.000000, avg cpu: 0.094500 , avg max cpu: 0.246000
+ INFO 06-26 21:59:49,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Avg cpu: 0.094500 Max cpu: 0.246000 Avg input: 19500.000000, Avg process input: 19841.600000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:50,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2045.000000
+ INFO 06-26 21:59:50,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23880, input 19900.000000, avg cpu: 0.095333 , avg max cpu: 0.234000
+ INFO 06-26 21:59:50,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Avg cpu: 0.095333 Max cpu: 0.234000 Avg input: 20000.000000, Avg process input: 20034.200000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:51,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2054.000000
+ INFO 06-26 21:59:51,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23880, input 19900.000000, avg cpu: 0.094000 , avg max cpu: 0.218000
+ INFO 06-26 21:59:51,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.094000 Max cpu: 0.218000 Avg input: 20000.000000, Avg process input: 19768.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:52,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2034.000000
+ INFO 06-26 21:59:52,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23880, input 19900.000000, avg cpu: 0.096000 , avg max cpu: 0.208000
+ INFO 06-26 21:59:52,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.096000 Max cpu: 0.208000 Avg input: 20000.000000, Avg process input: 19589.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 21:59:53,155 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2020.000000
+ INFO 06-26 21:59:53,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23640, input 19700.000000, avg cpu: 0.097833 , avg max cpu: 0.204000
+ INFO 06-26 21:59:53,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.097833 Max cpu: 0.204000 Avg input: 19000.000000, Avg process input: 19456.600000 Curr input: 19000, NumExecutor: 12
+ INFO 06-26 21:59:54,155 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2009.000000
+ INFO 06-26 21:59:54,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23640, input 19700.000000, avg cpu: 0.100167 , avg max cpu: 0.202000
+ INFO 06-26 21:59:54,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.100167 Max cpu: 0.202000 Avg input: 19500.000000, Avg process input: 19416.800000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:55,155 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2018.000000
+ INFO 06-26 21:59:55,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23436, input 19530.400000, avg cpu: 0.100500 , avg max cpu: 0.196000
+ INFO 06-26 21:59:55,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.100500 Max cpu: 0.196000 Avg input: 19152.000000, Avg process input: 19300.000000 Curr input: 19152, NumExecutor: 12
+ INFO 06-26 21:59:56,155 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2007.000000
+ INFO 06-26 21:59:56,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23400, input 19500.000000, avg cpu: 0.101667 , avg max cpu: 0.194000
+ INFO 06-26 21:59:56,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.101667 Max cpu: 0.194000 Avg input: 19848.000000, Avg process input: 19600.000000 Curr input: 19848, NumExecutor: 12
+ INFO 06-26 21:59:57,157 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2044.000000
+ INFO 06-26 21:59:57,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23280, input 19400.000000, avg cpu: 0.100667 , avg max cpu: 0.206000
+ INFO 06-26 21:59:57,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.100667 Max cpu: 0.206000 Avg input: 19500.000000, Avg process input: 19611.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:58,166 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2032.000000
+ INFO 06-26 21:59:58,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23400, input 19500.000000, avg cpu: 0.096833 , avg max cpu: 0.210000
+ INFO 06-26 21:59:58,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.096833 Max cpu: 0.210000 Avg input: 19500.000000, Avg process input: 19800.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 21:59:59,174 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2027.000000
+ INFO 06-26 21:59:59,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23520, input 19600.000000, avg cpu: 0.094667 , avg max cpu: 0.216000
+ INFO 06-26 21:59:59,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Avg cpu: 0.094667 Max cpu: 0.216000 Avg input: 20000.000000, Avg process input: 19891.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:00,195 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	2024.000000
+ INFO 06-26 22:00:00,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23723, input 19769.600000, avg cpu: 0.092667 , avg max cpu: 0.228000
+ INFO 06-26 22:00:00,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Avg cpu: 0.092667 Max cpu: 0.228000 Avg input: 20000.000000, Avg process input: 19900.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:01,197 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2021.000000
+ INFO 06-26 22:00:01,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23640, input 19700.000000, avg cpu: 0.092000 , avg max cpu: 0.232000
+ INFO 06-26 22:00:01,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.092000 Max cpu: 0.232000 Avg input: 19500.000000, Avg process input: 19900.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 22:00:02,197 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2105.000000
+ INFO 06-26 22:00:02,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23760, input 19800.000000, avg cpu: 0.092333 , avg max cpu: 0.232000
+ INFO 06-26 22:00:02,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.092333 Max cpu: 0.232000 Avg input: 20000.000000, Avg process input: 19912.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:03,196 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2157.000000
+ INFO 06-26 22:00:03,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23880, input 19900.000000, avg cpu: 0.097000 , avg max cpu: 0.250000
+ INFO 06-26 22:00:03,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.097000 Max cpu: 0.250000 Avg input: 20000.000000, Avg process input: 19798.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:04,197 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2101.000000
+ INFO 06-26 22:00:04,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23880, input 19900.000000, avg cpu: 0.097000 , avg max cpu: 0.248000
+ INFO 06-26 22:00:04,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.097000 Max cpu: 0.248000 Avg input: 20000.000000, Avg process input: 19608.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:05,196 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2042.000000
+ INFO 06-26 22:00:05,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23880, input 19900.000000, avg cpu: 0.098333 , avg max cpu: 0.246000
+ INFO 06-26 22:00:05,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.098333 Max cpu: 0.246000 Avg input: 20000.000000, Avg process input: 19500.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:06,198 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2035.000000
+ INFO 06-26 22:00:06,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23880, input 19900.000000, avg cpu: 0.099000 , avg max cpu: 0.240000
+ INFO 06-26 22:00:06,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.099000 Max cpu: 0.240000 Avg input: 19500.000000, Avg process input: 19400.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 22:00:07,198 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	10.000000	p95	10.000000	p99	10.000000	tail	2017.000000
+ INFO 06-26 22:00:07,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23520, input 19600.000000, avg cpu: 0.100667 , avg max cpu: 0.226000
+ INFO 06-26 22:00:07,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.100667 Max cpu: 0.226000 Avg input: 18500.000000, Avg process input: 19387.600000 Curr input: 18500, NumExecutor: 12
+ INFO 06-26 22:00:08,200 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	1997.000000
+ INFO 06-26 22:00:08,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23520, input 19600.000000, avg cpu: 0.099000 , avg max cpu: 0.204000
+ INFO 06-26 22:00:08,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.099000 Max cpu: 0.204000 Avg input: 20000.000000, Avg process input: 19502.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:09,200 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	1992.000000
+ INFO 06-26 22:00:09,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 23400, input 19500.000000, avg cpu: 0.102167 , avg max cpu: 0.202000
+ INFO 06-26 22:00:09,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Avg cpu: 0.102167 Max cpu: 0.202000 Avg input: 19500.000000, Avg process input: 19700.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 22:00:10,200 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	1979.000000
+ INFO 06-26 22:00:10,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Current backpressure 23280, input 19400.000000, avg cpu: 0.101833 , avg max cpu: 0.198000
+ INFO 06-26 22:00:10,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Avg cpu: 0.101833 Max cpu: 0.198000 Avg input: 19500.000000, Avg process input: 19700.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 22:00:11,201 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2039.000000
+ INFO 06-26 22:00:11,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23400, input 19500.000000, avg cpu: 0.100833 , avg max cpu: 0.212000
+ INFO 06-26 22:00:11,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.100833 Max cpu: 0.212000 Avg input: 20000.000000, Avg process input: 19800.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:12,201 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2005.000000
+ INFO 06-26 22:00:12,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 23640, input 19700.000000, avg cpu: 0.098000 , avg max cpu: 0.224000
+ INFO 06-26 22:00:12,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.098000 Max cpu: 0.224000 Avg input: 19500.000000, Avg process input: 19873.200000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 22:00:13,201 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	1997.000000
+ INFO 06-26 22:00:13,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 23640, input 19700.000000, avg cpu: 0.094833 , avg max cpu: 0.228000
+ INFO 06-26 22:00:13,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.094833 Max cpu: 0.228000 Avg input: 20000.000000, Avg process input: 19867.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:14,292 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	5.000000	p95	5.000000	p99	5.000000	tail	1973.000000
+ INFO 06-26 22:00:14,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 23640, input 19700.000000, avg cpu: 0.091167 , avg max cpu: 0.230000
+ INFO 06-26 22:00:14,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.091167 Max cpu: 0.230000 Avg input: 19500.000000, Avg process input: 19900.000000 Curr input: 19500, NumExecutor: 12
+ INFO 06-26 22:00:15,372 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2168.000000
+ INFO 06-26 22:00:15,593 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23760, input 19800.000000, avg cpu: 0.089500 , avg max cpu: 0.228000
+ INFO 06-26 22:00:15,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.089500 Max cpu: 0.228000 Avg input: 20000.000000, Avg process input: 19979.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:16,460 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2093.000000
+ INFO 06-26 22:00:16,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23760, input 19800.000000, avg cpu: 0.089500 , avg max cpu: 0.230000
+ INFO 06-26 22:00:16,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.089500 Max cpu: 0.230000 Avg input: 20000.000000, Avg process input: 19829.600000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:17,472 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2079.000000
+ INFO 06-26 22:00:17,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23880, input 19900.000000, avg cpu: 0.088667 , avg max cpu: 0.226000
+ INFO 06-26 22:00:17,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.088667 Max cpu: 0.226000 Avg input: 20000.000000, Avg process input: 19804.800000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:18,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Current backpressure 23880, input 19900.000000, avg cpu: 0.090000 , avg max cpu: 0.228000
+ INFO 06-26 22:00:18,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Avg cpu: 0.090000 Max cpu: 0.228000 Avg input: 20000.000000, Avg process input: 19633.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:18,633 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2078.000000
+ INFO 06-26 22:00:19,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Current backpressure 24000, input 20000.000000, avg cpu: 0.093500 , avg max cpu: 0.246000
+ INFO 06-26 22:00:19,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Avg cpu: 0.093500 Max cpu: 0.246000 Avg input: 20000.000000, Avg process input: 19600.000000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:19,697 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2011.000000
+ INFO 06-26 22:00:20,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 24000, input 20000.000000, avg cpu: 0.095833 , avg max cpu: 0.250000
+ INFO 06-26 22:00:20,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.095833 Max cpu: 0.250000 Avg input: 20000.000000, Avg process input: 19596.200000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:20,733 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2003.000000
+ INFO 06-26 22:00:21,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Current backpressure 24000, input 20000.000000, avg cpu: 0.096333 , avg max cpu: 0.244000
+ INFO 06-26 22:00:21,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - Avg cpu: 0.096333 Max cpu: 0.244000 Avg input: 20000.000000, Avg process input: 19570.400000 Curr input: 20000, NumExecutor: 12
+ INFO 06-26 22:00:21,815 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	2031.000000
+ INFO 06-26 22:00:22,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Current backpressure 23520, input 19600.800000, avg cpu: 0.100667 , avg max cpu: 0.258000
+ INFO 06-26 22:00:22,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - Avg cpu: 0.100667 Max cpu: 0.258000 Avg input: 18004.000000, Avg process input: 19522.000000 Curr input: 18004, NumExecutor: 12
+ INFO 06-26 22:00:22,872 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - COLLECT_LATENCY	median	6.000000	p95	6.000000	p99	6.000000	tail	1979.000000
+ INFO 06-26 22:00:23,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Current backpressure 23520, input 19600.000000, avg cpu: 0.102333 , avg max cpu: 0.250000
+ INFO 06-26 22:00:23,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Avg cpu: 0.102333 Max cpu: 0.250000 Avg input: 19996.000000, Avg process input: 19700.000000 Curr input: 19996, NumExecutor: 12
+ INFO 06-26 22:00:23,872 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	2047.000000
+ INFO 06-26 22:00:24,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 23400, input 19500.800000, avg cpu: 0.099167 , avg max cpu: 0.228000
+ INFO 06-26 22:00:24,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.099167 Max cpu: 0.228000 Avg input: 19504.000000, Avg process input: 19600.000000 Curr input: 19504, NumExecutor: 12
+ INFO 06-26 22:00:25,153 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-006] - COLLECT_LATENCY	median	7.000000	p95	7.000000	p99	7.000000	tail	1983.000000
+ INFO 06-26 22:00:25,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-007] - Current backpressure 23160, input 19300.000000, avg cpu: 0.097000 , avg max cpu: 0.226000
+ INFO 06-26 22:00:25,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-009] - Avg cpu: 0.097000 Max cpu: 0.226000 Avg input: 18996.000000, Avg process input: 19624.000000 Curr input: 18996, NumExecutor: 12
+ INFO 06-26 22:00:26,156 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-008] - COLLECT_LATENCY	median	1013.000000	p95	1013.000000	p99	1013.000000	tail	2048.000000
+ INFO 06-26 22:00:26,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-010] - Current backpressure 18360, input 15300.000000, avg cpu: 0.088833 , avg max cpu: 0.222000
+ INFO 06-26 22:00:26,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-001] - Avg cpu: 0.088833 Max cpu: 0.222000 Avg input: 0.000000, Avg process input: 16700.000000 Curr input: 0, NumExecutor: 12
+ INFO 06-26 22:00:27,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-002] - Current backpressure 18360, input 15300.000000, avg cpu: 0.071667 , avg max cpu: 0.170000
+ INFO 06-26 22:00:27,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-003] - Avg cpu: 0.071667 Max cpu: 0.170000 Avg input: 0.000000, Avg process input: 12800.000000 Curr input: 0, NumExecutor: 12
+ INFO 06-26 22:00:28,592 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-004] - Current backpressure 18360, input 15300.000000, avg cpu: 0.055500 , avg max cpu: 0.138000
+ INFO 06-26 22:00:28,594 JobLauncher:197 [org.apache.nemo.client.DriverRPCServer$ServerEventHandler:pool-01:thread-005] - Avg cpu: 0.055500 Max cpu: 0.138000 Avg input: 0.000000, Avg process input: 8800.000000 Curr input: 0, NumExecutor: 12
