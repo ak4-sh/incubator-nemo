@@ -327,7 +327,7 @@ def main() -> int:
     parser.add_argument("--results-topic", default="")
     parser.add_argument("--kafka-consumer-group", default="")
     parser.add_argument("--sink-type", default="KAFKA")
-    parser.add_argument("--executor-json", default="configs/cloudlab/nemo-yarn-kafka-1source-8slot-8compute.json")
+    parser.add_argument("--executor-json", default="configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json")
     parser.add_argument("--benchmark-script", default="scripts/cloudlab/run_sponge_q0_benchmark.sh")
     parser.add_argument("--total-events", type=int)
     parser.add_argument("--prefill-events", type=int)

@@ -42,7 +42,7 @@ TOPIC=nexmark-q8-bursty-100k scripts/cloudlab/run_q8_subscriber_yarn.sh
 For the known working 1-source/8-compute layout, use:
 
 ```bash
-EXECUTOR_JSON=configs/cloudlab/nemo-yarn-kafka-1source-8slot-8compute.json \
+EXECUTOR_JSON=configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json \
 TOPIC=nexmark-q8-bursty-100k \
 scripts/cloudlab/run_q8_subscriber_yarn.sh
 ```
