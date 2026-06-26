@@ -302,7 +302,7 @@ def main() -> int:
     parser.add_argument("--kafka-nodes", default=DEFAULT_KAFKA_NODES)
     parser.add_argument("--offload-nodes", default=DEFAULT_OFFLOAD_NODES)
     parser.add_argument("--worker-nodes", default=DEFAULT_WORKER_NODES)
-    parser.add_argument("--workers-per-offload-node", type=int, default=40)
+    parser.add_argument("--workers-per-offload-node", type=int, default=32)
     parser.add_argument("--first-port", type=int, default=25321)
     parser.add_argument("--java-home", default=os.environ.get("JAVA_HOME", DEFAULT_JAVA_HOME))
     parser.add_argument("--hadoop-home", default=os.environ.get("HADOOP_HOME", DEFAULT_HADOOP_HOME))
@@ -350,8 +350,6 @@ def main() -> int:
     all_nodes = validate_topology(args.control_node, kafka_nodes, offload_nodes, worker_nodes)
     nonworker_nodes = [args.control_node] + kafka_nodes + offload_nodes
 
-    if args.workers_per_offload_node * len(offload_nodes) != 200:
-        raise ValueError("This setup expects exactly 200 VMWorkers: 5 offload nodes * 40 workers")
 
     require_local_dir(args.repo_root, "Nemo repo root")
     require_local_file(str(SCRIPT_DIR / "start_warm_pool.sh"), "start_warm_pool.sh")

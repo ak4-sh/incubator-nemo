@@ -25,7 +25,7 @@ JOB_ID=${JOB_ID:-nx-q${QUERY}-${RUN_ID}}
 
 sum_topic_offsets() {
   local topic=$1
-  ssh -A "$KAFKA_NODE" \
+  ssh "$KAFKA_NODE" \
     "$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$topic' --time -1" \
     2>/dev/null | awk -F: '{sum += $3} END {print sum + 0}'
 }
@@ -88,9 +88,9 @@ mkdir -p "$WORK_DIR"
 rm -f "$LOG_FILE" "$WORK_DIR/source.log" "$WORK_DIR/producer_metrics.csv"
 
 echo "Creating Kafka topics"
-ssh -A "$KAFKA_NODE" \
+ssh "$KAFKA_NODE" \
   "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-ssh -A "$KAFKA_NODE" \
+ssh "$KAFKA_NODE" \
   "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$KAFKA_RESULTS_TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
 
 echo "Launching Nemo subscriber with OFFLOADING=0"

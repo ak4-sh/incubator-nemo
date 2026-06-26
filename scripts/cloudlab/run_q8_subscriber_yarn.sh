@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$SCRIPT_DIR/cloudlab_env.sh"
 
@@ -15,6 +14,7 @@ STREAM_TIMEOUT=${STREAM_TIMEOUT:-240}
 NUM_EVENTS=${NUM_EVENTS:-100000}
 CPU_DELAY_MS=${CPU_DELAY_MS:-0}
 OFFLOADING=${OFFLOADING:-0}
+LATENCY_LIMIT=${LATENCY_LIMIT:-300000}
 NUM_MAX_LAMBDA=${NUM_MAX_LAMBDA:-4}
 LOG_FILE=${LOG_FILE:-/tmp/${JOB_ID}.log}
 
@@ -24,6 +24,7 @@ if [[ "$OFFLOADING" == "1" ]]; then
     -enable_offloading true
     -offloading_type cloudlab-vm
     -num_max_lambda "$NUM_MAX_LAMBDA"
+    -latency_limit "$LATENCY_LIMIT"
   )
 fi
 

@@ -6,7 +6,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate vm_addresses.txt for CloudLab VM workers")
     parser.add_argument("--nodes", nargs="+", required=True)
     parser.add_argument("--first-port", type=int, default=25321)
-    parser.add_argument("--workers-per-node", type=int, default=31)
+    parser.add_argument("--workers-per-node", type=int, default=32)
     parser.add_argument("--output", default="vm_addresses.txt")
     args = parser.parse_args()
 

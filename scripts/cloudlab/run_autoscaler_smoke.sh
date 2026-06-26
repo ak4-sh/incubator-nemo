@@ -31,15 +31,17 @@ CPU_DELAY_MS=${CPU_DELAY_MS:-0}
 
 # Offloading nodes
 OFFLOAD_NODES=${OFFLOAD_NODES:-node4,node6,node7,node8,node13}
-WORKERS_PER_NODE=${WORKERS_PER_NODE:-40}
+WORKERS_PER_NODE=${WORKERS_PER_NODE:-32}
 FIRST_PORT=${FIRST_PORT:-25321}
+# Auto-compute max lambda executors from available VM workers (override via NUM_MAX_LAMBDA env var)
+_OFFLOAD_COUNT=$(echo "$OFFLOAD_NODES" | tr "," "\n" | wc -l | tr -d " ")
+NUM_MAX_LAMBDA=${NUM_MAX_LAMBDA:-$(( WORKERS_PER_NODE * _OFFLOAD_COUNT ))}
 
 # Baseline nodes
 BASELINE_NODES=${BASELINE_NODES:-node5 node9 node10 node11 node12}
 EXPECTED_NM_COUNT=${EXPECTED_NM_COUNT:-5}
 
 # Scaling parameters
-NUM_MAX_LAMBDA=${NUM_MAX_LAMBDA:-170}
 LAMBDA_CAPACITY=${LAMBDA_CAPACITY:-1}
 LAMBDA_SLOT=${LAMBDA_SLOT:-1}
 LAMBDA_MEMORY=${LAMBDA_MEMORY:-1024}
@@ -154,22 +156,22 @@ echo "Starting warm VMWorker pools"
 IFS=',' read -ra OFFLOAD_NODE_ARRAY <<< "$OFFLOAD_NODES"
 for node in "${OFFLOAD_NODE_ARRAY[@]}"; do
   echo "  Starting pool on $node"
-  ssh -A "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true; rm -f /tmp/vmworker-*.log /tmp/task_metrics.csv /tmp/source_task_metrics.csv" || true
-  ssh -A "$node" "mkdir -p /tmp/nemo-cloudlab-offload" || true
+  ssh "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true; rm -f /tmp/vmworker-*.log /tmp/task_metrics.csv /tmp/source_task_metrics.csv" || true
+  ssh "$node" "mkdir -p /tmp/nemo-cloudlab-offload" || true
   scp "$SCRIPT_DIR/start_warm_pool.sh" "$node:/tmp/nemo-cloudlab-offload/start_warm_pool.sh" >/dev/null
   scp "$VM_WORKER_JAR" "$node:/tmp/nemo-cloudlab-offload/offloading-vm.jar" >/dev/null
   scp "$REBUILT_NEMO" "$node:/tmp/nemo-cloudlab-offload/nemo-client.jar" >/dev/null
   scp "$REBUILT_NEXMARK" "$node:/tmp/nemo-cloudlab-offload/nexmark.jar" >/dev/null
   scp "$BEAM_GRPC_JAR" "$node:/tmp/nemo-cloudlab-offload/beam-grpc.jar" >/dev/null
   EXTRA_CP="/tmp/nemo-cloudlab-offload/nemo-client.jar:/tmp/nemo-cloudlab-offload/nexmark.jar:/tmp/nemo-cloudlab-offload/beam-grpc.jar"
-  ssh -A "$node" "bash /tmp/nemo-cloudlab-offload/start_warm_pool.sh '$FIRST_PORT' '$WORKERS_PER_NODE' '/tmp/nemo-cloudlab-offload/offloading-vm.jar' 10000000 '$EXTRA_CP' >/tmp/start-warm-pool-$node.log 2>&1" || true
+  ssh "$node" "bash /tmp/nemo-cloudlab-offload/start_warm_pool.sh '$FIRST_PORT' '$WORKERS_PER_NODE' '/tmp/nemo-cloudlab-offload/offloading-vm.jar' 10000000 '$EXTRA_CP' >/tmp/start-warm-pool-$node.log 2>&1" || true
   sleep 2
 done
 
 # 3. Create Kafka topic and prefill
 echo "Creating Kafka topic $TOPIC with $KAFKA_PARTITIONS partitions"
-ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1 || true"
 
 if [[ "$PREFILL_EVENTS" -gt 0 ]]; then
   echo "Prefilling $PREFILL_EVENTS records"
@@ -177,11 +179,33 @@ if [[ "$PREFILL_EVENTS" -gt 0 ]]; then
 fi
 
 # 4. Preflight check: YARN NMs must be up before we submit
+check_vm_workers() {
+  local vm_file=$1
+  local max_fail=${2:-5}
+  local fails=0
+  while IFS=: read -r host port; do
+    if ! timeout 2 bash -c "echo > /dev/tcp/$host/$port" 2>/dev/null; then
+      echo "  WARNING: VM worker $host:$port unreachable"
+      fails=$((fails + 1))
+    fi
+    if [[ "$fails" -ge "$max_fail" ]]; then
+      echo "  ERROR: $fails VM workers unreachable; aborting" >&2
+      return 1
+    fi
+  done < "$vm_file"
+  echo "  All VM workers reachable"
+}
+
+
+# Verify all VM workers are listening before launching the YARN app
+echo "Checking VM worker connectivity..."
+check_vm_workers "$NEMO_REPO_ROOT/vm_addresses.txt" "${VM_CONNECTIVITY_FAIL_LIMIT:-5}" || exit 1
+
 ensure_yarn_nodes
 
 echo "Cleaning stale baseline worker metrics"
 for node in $BASELINE_NODES; do
-  ssh -A "$node" "rm -f /tmp/source_task_metrics.csv /tmp/task_metrics.csv" || true
+  ssh "$node" "rm -f /tmp/source_task_metrics.csv /tmp/task_metrics.csv" || true
 done
 
 # 5. Launch subscriber with offloading enabled
@@ -208,7 +232,7 @@ echo "  AM Host: $AM_HOST"
 
 if [[ -n "$AM_HOST" && "$AM_HOST" != "N/A" ]]; then
   echo "Cleaning stale AM-side fallback metrics on $AM_HOST"
-  ssh -A "$AM_HOST" "rm -f /tmp/scaling_decisions.csv /tmp/scaler_metrics.csv /tmp/source_metrics.csv /tmp/source_aggregate_metrics.csv /tmp/source_task_metrics.csv /tmp/task_metrics.csv" || true
+  ssh "$AM_HOST" "rm -f /tmp/scaling_decisions.csv /tmp/scaler_metrics.csv /tmp/source_metrics.csv /tmp/source_aggregate_metrics.csv /tmp/source_task_metrics.csv /tmp/task_metrics.csv" || true
 else
   echo "WARNING: AM host unavailable; skipping AM-side metrics cleanup" >&2
 fi
@@ -268,7 +292,7 @@ echo "  kill $SUB_PID"
 echo "  kill $METRICS_PID"
 echo ""
 echo "To check Kafka offsets:"
-echo "  ssh -A $KAFKA_NODE \"$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$TOPIC' --time -1\""
+echo "  ssh $KAFKA_NODE \"$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$TOPIC' --time -1\""
 echo ""
 echo "To plot metrics after the test:"
 echo "  python3 $SCRIPT_DIR/plot_metrics.py $WORK_DIR"

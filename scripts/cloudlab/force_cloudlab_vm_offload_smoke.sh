@@ -16,16 +16,16 @@ REMOTE_WARM_DIR=${REMOTE_WARM_DIR:-/tmp/nemo-cloudlab-offload}
 mkdir -p "$WORK_DIR"
 python3 "$SCRIPT_DIR/generate_vm_addresses.py" --nodes "$WARM_NODE" --first-port "$FIRST_PORT" --workers-per-node "$WORKERS" --output "$NEMO_REPO_ROOT/vm_addresses.txt"
 
-ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --create --topic '$TOPIC' --partitions 1 --replication-factor 1 || true"
-ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --create --topic '$TOPIC' --partitions 1 --replication-factor 1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1"
 
 java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
   "$KAFKA_BOOTSTRAP" "$TOPIC" 100 1000 50000 5 false >/tmp/nx-cloudlab-vm-prefill-$TOPIC.log 2>&1
 
-ssh -A "$WARM_NODE" "mkdir -p '$REMOTE_WARM_DIR'"
+ssh "$WARM_NODE" "mkdir -p '$REMOTE_WARM_DIR'"
 scp "$SCRIPT_DIR/start_warm_pool.sh" "$WARM_NODE:$REMOTE_WARM_DIR/start_warm_pool.sh" >/dev/null
 scp "$VM_WORKER_JAR" "$WARM_NODE:$REMOTE_WARM_DIR/offloading-vm-0.2-SNAPSHOT-shaded.jar" >/dev/null
-ssh -A "$WARM_NODE" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true; rm -f /tmp/vmworker-2532*.log; bash '$REMOTE_WARM_DIR/start_warm_pool.sh' '$FIRST_PORT' '$WORKERS' '$REMOTE_WARM_DIR/offloading-vm-0.2-SNAPSHOT-shaded.jar' 10000000 >/tmp/start-warm-pool-smoke.log 2>&1"
+ssh "$WARM_NODE" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true; rm -f /tmp/vmworker-2532*.log; bash '$REMOTE_WARM_DIR/start_warm_pool.sh' '$FIRST_PORT' '$WORKERS' '$REMOTE_WARM_DIR/offloading-vm-0.2-SNAPSHOT-shaded.jar' 10000000 >/tmp/start-warm-pool-smoke.log 2>&1"
 
 echo "Launching subscriber and forcing add-lambda-executor through scaling.txt"
 NEMO_WORK_DIR="$WORK_DIR" java -cp "$NEMO_CLIENT_CP" org.apache.nemo.client.JobLauncher \
@@ -50,5 +50,5 @@ printf 'add-lambda-executor 1 1 1 1024\n' >> "$WORK_DIR/scaling.txt"
 echo "Wrote scaling decision to $WORK_DIR/scaling.txt"
 echo "Wait ~30s, then inspect:"
 echo "  $LOG_FILE"
-echo "  ssh -A $WARM_NODE 'tail -80 /tmp/vmworker-$FIRST_PORT.log'"
+echo "  ssh $WARM_NODE 'tail -80 /tmp/vmworker-$FIRST_PORT.log'"
 echo "Subscriber PID: $SUB_PID"

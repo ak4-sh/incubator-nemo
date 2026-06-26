@@ -32,8 +32,8 @@ if [[ "$BURST_MODE" == "legacy" && "$LIVE_EVENTS" -lt 1 ]]; then
 fi
 
 echo "Creating Kafka topic $TOPIC with $KAFKA_PARTITIONS partitions"
-ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1"
 
 echo "Prefilling $PREFILL_EVENTS records (parallelism=1)"
 if [[ "$BURST_MODE" == "custom" ]]; then
@@ -64,7 +64,7 @@ else
 fi
 
 echo "Final Kafka offset"
-ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$TOPIC' --time -1"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$TOPIC' --time -1"
 
 echo "Subscriber is still running as PID $SUB_PID. Kill the YARN app with yarn application -kill <APP_ID> when done."
 echo "Subscriber log: $SUB_LOG"

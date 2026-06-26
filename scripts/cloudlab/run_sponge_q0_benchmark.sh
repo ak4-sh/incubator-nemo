@@ -30,11 +30,11 @@ KAFKA_PARTITIONS=${KAFKA_PARTITIONS:-8}
 PRODUCER_PARALLELISM=${PRODUCER_PARALLELISM:-8}
 EXECUTOR_JSON=${EXECUTOR_JSON:-configs/cloudlab/nemo-yarn-kafka-1source-8slot-8compute.json}
 OFFLOAD_NODES=${OFFLOAD_NODES:-node4,node6,node7,node8,node13}
-WORKERS_PER_NODE=${WORKERS_PER_NODE:-40}
+WORKERS_PER_NODE=${WORKERS_PER_NODE:-32}
 FIRST_PORT=${FIRST_PORT:-25321}
 BASELINE_NODES=${BASELINE_NODES:-"node5 node9 node10 node11 node12"}
 EXPECTED_NM_COUNT=${EXPECTED_NM_COUNT:-5}
-NUM_MAX_LAMBDA=${NUM_MAX_LAMBDA:-170}
+NUM_MAX_LAMBDA=${NUM_MAX_LAMBDA:-160}
 STREAM_TIMEOUT=${STREAM_TIMEOUT:-1800}
 BENCHMARK_TIMEOUT_SEC=${BENCHMARK_TIMEOUT_SEC:-1800}
 KEEP_WARM_POOL=${KEEP_WARM_POOL:-1}
@@ -70,7 +70,7 @@ require_file() {
 
 sum_topic_offsets() {
   local topic=$1
-  ssh -A "$KAFKA_NODE" \
+  ssh "$KAFKA_NODE" \
     "$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$topic' --time -1" \
     | awk -F: '{sum += $3} END {print sum + 0}'
 }
@@ -81,7 +81,7 @@ get_source_count() {
     echo 0
     return
   fi
-  ssh -A "$AM_HOST" "if [ -f /tmp/source_aggregate_metrics.csv ]; then tail -n 50 /tmp/source_aggregate_metrics.csv | awk -F, -v max='$max_count' 'BEGIN {v=0} /^[0-9]/ {candidate=\$3 + 0; if (candidate >= 0 && (max <= 0 || candidate <= max)) v=candidate} END {print v + 0}'; else echo 0; fi" 2>/dev/null || echo 0
+  ssh "$AM_HOST" "if [ -f /tmp/source_aggregate_metrics.csv ]; then tail -n 50 /tmp/source_aggregate_metrics.csv | awk -F, -v max='$max_count' 'BEGIN {v=0} /^[0-9]/ {candidate=\$3 + 0; if (candidate >= 0 && (max <= 0 || candidate <= max)) v=candidate} END {print v + 0}'; else echo 0; fi" 2>/dev/null || echo 0
 }
 
 get_active_app_count() {
@@ -133,15 +133,15 @@ preflight() {
     exit 1
   fi
 
-  timeout 10 ssh -A "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-broker-api-versions.sh --bootstrap-server '$KAFKA_BOOTSTRAP' >/dev/null" \
+  timeout 10 ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-broker-api-versions.sh --bootstrap-server '$KAFKA_BOOTSTRAP' >/dev/null" \
     || { echo "WARNING: Kafka bootstrap SSH check timed out; continuing"; }
 }
 
 create_result_topic() {
   log "Creating Kafka result topic $KAFKA_RESULTS_TOPIC"
-  ssh -A "$KAFKA_NODE" \
+  ssh "$KAFKA_NODE" \
     "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '${KAFKA_ZOOKEEPER:-node1:2181,node2:2181,node3:2181}' --create --topic '$KAFKA_RESULTS_TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-  ssh -A "$KAFKA_NODE" \
+  ssh "$KAFKA_NODE" \
     "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '${KAFKA_ZOOKEEPER:-node1:2181,node2:2181,node3:2181}' --entity-type topics --entity-name '$KAFKA_RESULTS_TOPIC' --alter --add-config min.insync.replicas=1 || true"
 }
 
@@ -306,7 +306,7 @@ copy_remote_if_exists() {
   local node=$1
   local src=$2
   local dst=$3
-  ssh -A "$node" "test -f '$src'" 2>/dev/null && scp "$node:$src" "$dst" >/dev/null || true
+  ssh "$node" "test -f '$src'" 2>/dev/null && scp "$node:$src" "$dst" >/dev/null || true
 }
 
 save_artifacts() {
@@ -483,7 +483,7 @@ cleanup() {
   if [[ "$KEEP_WARM_POOL" == "0" ]]; then
     IFS=',' read -ra offload_array <<< "$OFFLOAD_NODES"
     for node in "${offload_array[@]}"; do
-      ssh -A "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true" || true
+      ssh "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true" || true
     done
   fi
 }

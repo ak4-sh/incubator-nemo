@@ -8,21 +8,27 @@ TIMEOUT=${4:-10000000}
 EXTRA_CP=${5:-}
 JAVA_HOME=${JAVA_HOME:-/usr/lib/jvm/java-11-openjdk-amd64}
 
+# Detect available CPUs and cap workers to fit
+CORES=$(nproc)
+if [[ "$NUM_WORKERS" -gt "$CORES" ]]; then
+  echo "WARNING: Requested $NUM_WORKERS workers but only $CORES cores available; capping to $CORES"
+  NUM_WORKERS=$CORES
+fi
+
 if [[ -n "$EXTRA_CP" ]]; then
-  # Put extra jars FIRST so they override older classes in the VM worker shaded jar
   CP="$EXTRA_CP:$VM_WORKER_JAR"
 else
   CP="$VM_WORKER_JAR"
 fi
 
-echo "Starting $NUM_WORKERS VMWorkers on $(hostname)"
+echo "Starting $NUM_WORKERS VMWorkers on $(hostname) ($CORES cores)"
 echo "  Port range: $FIRST_PORT-$((FIRST_PORT + NUM_WORKERS - 1))"
 echo "  Jar: $VM_WORKER_JAR"
 echo "  Extra CP: $EXTRA_CP"
 
 for i in $(seq 0 $((NUM_WORKERS - 1))); do
   PORT=$((FIRST_PORT + i))
-  CORE=$((i % 40))
+  CORE=$((i % CORES))
   LOGFILE="/tmp/vmworker-${PORT}.log"
   taskset -c "$CORE" "$JAVA_HOME/bin/java" -cp "$CP" \
     org.apache.nemo.offloading.workers.vm.VMWorker "$PORT" "$TIMEOUT" \
