@@ -233,9 +233,11 @@ def plot_scaling_events(df: pd.DataFrame, work_dir: str):
     dec = pd.read_csv(decisions, header=None)
     dec.columns = ["timestamp", "action", "avgCpu", "avgInput", "avgProcess", "queue", "queue2", "ratio", "numExecutors"]
     dec["timestamp"] = pd.to_datetime(dec["timestamp"], unit="ms")
-    t0 = df["timestamp"].min()
-    dec["rel_s"] = (dec["timestamp"] - t0).dt.total_seconds()
-    dec = dec[dec["rel_s"] >= WARMUP_MS / 1000]
+    # df is the warmed subset: its rel_s values are correct (relative to true run start)
+    # but df["timestamp"].min() is ~30s into the run, not the true t0.
+    # Recover true t0 so scaling events that fired early are not filtered out.
+    true_t0 = df["timestamp"].min() - pd.Timedelta(seconds=float(df["rel_s"].min()))
+    dec["rel_s"] = (dec["timestamp"] - true_t0).dt.total_seconds()
 
     plt.figure(figsize=(10, 5))
     # Plot source rate
