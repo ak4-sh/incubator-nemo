@@ -154,7 +154,17 @@ python3 "$SCRIPT_DIR/generate_vm_addresses.py" \
   --workers-per-node "$WORKERS_PER_NODE" \
   --output "$NEMO_REPO_ROOT/vm_addresses.txt"
 
-# 2. Start warm VMWorker pools on all offload nodes
+# 2. Create Kafka topic and prefill
+echo "Creating Kafka topic $TOPIC with $KAFKA_PARTITIONS partitions"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1 || true"
+
+if [[ "$PREFILL_EVENTS" -gt 0 ]]; then
+  echo "Prefilling $PREFILL_EVENTS records"
+  run_producer_with_source_log "$PREFILL_EVENTS" false
+fi
+
+# 3. Start warm VMWorker pools on all offload nodes
 echo "Starting warm VMWorker pools"
 IFS=',' read -ra OFFLOAD_NODE_ARRAY <<< "$OFFLOAD_NODES"
 for node in "${OFFLOAD_NODE_ARRAY[@]}"; do
@@ -170,16 +180,6 @@ for node in "${OFFLOAD_NODE_ARRAY[@]}"; do
   ssh "$node" "bash /tmp/nemo-cloudlab-offload/start_warm_pool.sh '$FIRST_PORT' '$WORKERS_PER_NODE' '/tmp/nemo-cloudlab-offload/offloading-vm.jar' 10000000 '$EXTRA_CP' >/tmp/start-warm-pool-$node.log 2>&1" || true
   sleep 2
 done
-
-# 3. Create Kafka topic and prefill
-echo "Creating Kafka topic $TOPIC with $KAFKA_PARTITIONS partitions"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1 || true"
-
-if [[ "$PREFILL_EVENTS" -gt 0 ]]; then
-  echo "Prefilling $PREFILL_EVENTS records"
-  run_producer_with_source_log "$PREFILL_EVENTS" false
-fi
 
 # 4. Preflight check: YARN NMs must be up before we submit
 check_vm_workers() {

@@ -494,6 +494,35 @@ cleanup() {
       ssh "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true" || true
     done
   fi
+  # NMs die when any YARN container is killed (process-group SIGTERM in DefaultContainerExecutor).
+  # Kill orphaned containers, then restart NMs. Verify liveness via pgrep, not stale YARN state.
+  log "Restarting NodeManagers after YARN app cleanup"
+  sleep 5
+  # Kill orphaned executor processes and any remaining NM instances in parallel
+  for node in $BASELINE_NODES; do
+    ssh "$node" "pkill -9 -f NodeManager 2>/dev/null; pkill -9 -f NemoExecutor 2>/dev/null; pkill -9 -f proc_default 2>/dev/null; true" >/dev/null 2>&1 || true &
+  done
+  wait || true
+  sleep 2
+  # Start fresh NMs in parallel
+  for node in $BASELINE_NODES; do
+    ssh "$node" "$HADOOP_HOME/sbin/yarn-daemon.sh start nodemanager" >/dev/null 2>&1 || true &
+  done
+  wait || true
+  sleep 5
+  # Verify NMs are actually alive (pgrep checks real process, not stale YARN state)
+  local live_count=0
+  for i in $(seq 1 30); do
+    live_count=0
+    for node in $BASELINE_NODES; do
+      if ssh "$node" "pgrep -f proc_nodemanager >/dev/null 2>&1" 2>/dev/null; then
+        ((live_count++)) || true
+      fi
+    done
+    if [[ "$live_count" -ge "$EXPECTED_NM_COUNT" ]]; then break; fi
+    sleep 3
+  done
+  log "NodeManagers alive after restart: $live_count/$EXPECTED_NM_COUNT"
 }
 
 maybe_plot() {

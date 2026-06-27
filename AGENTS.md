@@ -51,6 +51,8 @@ export YARN_NODEMANAGER_OPTS="-Dyarn.nodemanager.hostname=${NM_HOST} -DNM_HOST=$
   - `yarn.nodemanager.hostname` → `${NM_HOST}` (resolved from env var at startup; avoids circular reference that occurred with `${yarn.nodemanager.hostname}`).
   - Removed `yarn.nodemanager.admin-env` override (caused invalid `JAVA_HOME` expansion).
   - RM hostname set to `node0`.
+  - `yarn.nodemanager.vmem-check-enabled` → `false`: Q6 executors exceed the default 2.1× vmem ratio (using >2.9 GB vmem against a 1 GB physical limit), triggering NM container kills that cascade back to kill the NM itself (see NodeManager Kill Cascade below).
+  - `yarn.nodemanager.pmem-check-enabled` → `false`: Q6 executors also exceed physical memory limits (950 MB–1.2 GB against 1 GB container limit), triggering the same cascade. Distributed to all 5 baseline nodes via scp.
 
 - `/users/akash01/hadoop/etc/hadoop/slaves`: 5 baseline nodes only.
 
@@ -62,6 +64,7 @@ export YARN_NODEMANAGER_OPTS="-Dyarn.nodemanager.hostname=${NM_HOST} -DNM_HOST=$
   - `nemo-yarn-1source-5compute-small.json`: 1 Source + 5 Compute, `capacity: 1`.
   - `nemo-yarn-kafka-1source-8compute.json`: 1 Source + 8 Compute with Source `slot: 1` (insufficient for Q8 with 4 Kafka source tasks).
   - `nemo-yarn-kafka-1source-cap4-8compute.json`: 1 Source + 8 Compute with Source `slot: 4` (required for Q8 autoscaler runs).
+  - `nemo-yarn-kafka-1source-8slot-12compute.json`: 1 Source (8 slots) + 12 Compute (2048 MB each, up from 1024 MB); required for Q6 with JVM offloading.
   - `nemo-yarn-kafka-1source-5compute.json`, `nemo-yarn-kafka-1source-4compute.json`.
 
 Issues Found And Resolved
@@ -223,6 +226,18 @@ Current Nexmark Status
 - **Behavior:** If input/process rates are idle but `queue > 0`, scale-in is skipped and logs `Input and processing are idle, but queue remains ...; skipping scale-in`.
 - **Verification:** `mvn -pl runtime/master -am -DskipTests compile` passed after this change. The shaded client jar has not yet been rebuilt after the queue-guard fix.
 
+### NodeManager Kill Cascade (Q6 NM Failures Root Cause)
+- **Root cause:** Hadoop 2.7's `DefaultContainerExecutor` launches YARN containers as bash scripts **without** `setsid`. Containers therefore inherit the NodeManager's Linux process group (PGID). When the NM kills a container (for vmem/pmem violation, or CONTAINER_STOP from RM after `yarn application -kill`), bash propagates SIGTERM to its entire process group — which includes the NM itself. With 7–13 containers running per NM, 7–13 SIGTERMs arrive in rapid succession and the NM shuts down gracefully, taking all 5 baseline NMs down within milliseconds.
+- **Two cascade triggers:**
+  1. **Memory limit violations** — NM exceeds vmem (>2.1× ratio) or pmem (physical) limit → NM kills container → SIGTERM cascade kills NM.
+  2. **Explicit app kill** — `yarn application -kill` → RM sends CONTAINER_STOP to each NM → NM kills containers → SIGTERM cascade kills NM.
+- **Fixes applied:**
+  1. `yarn.nodemanager.vmem-check-enabled=false` and `yarn.nodemanager.pmem-check-enabled=false` in `yarn-site.xml` (distributed to all baseline nodes) — eliminates memory-violation triggers.
+  2. Compute executor memory 2048 MB in `nemo-yarn-kafka-1source-8slot-12compute.json` — prevents actual JVM OOM independent of YARN limits.
+  3. `cleanup()` in `run_sponge_q0_benchmark.sh` restarts NMs after every YARN app kill (both triggers kill NMs). NM liveness verified via `pgrep -f proc_nodemanager` over SSH, **not** `yarn node -list` (ghost NMs show RUNNING for ~10 min after actual NM death).
+  4. `wait || true` added to SSH NM-restart loops in `cleanup()` — without it, `set -e` exits the harness script if any SSH call returns non-zero (e.g., `yarn-daemon.sh start` on a node where the NM is already running or the SSH connection blinks).
+- **Permanent root fix (not yet applied):** Wrap container launch command with `setsid` in `DefaultContainerExecutor` (Hadoop source change) to put each container in its own process group, preventing SIGTERM propagation to the NM.
+
 ### Metrics Pipeline (Latest)
 - `StandaloneNexmarkKafkaProducer.java`: writes `producer_metrics.csv` every 5s with `timestamp,outputRate,totalSent,elapsedMs`.
 - `StandaloneNexmarkKafkaProducer.java`: source-log writes are cumulative and append-mode; the final write uses the final total.
@@ -297,6 +312,7 @@ Relevant Files
 
 ### Scripts
 - `scripts/cloudlab/run_autoscaler_smoke.sh`: autoscaler smoke test harness; exports `NEMO_WORK_DIR`, captures AM host for metrics, no longer syncs `source.log` to AM host
+- `scripts/cloudlab/run_q6_warmup_then_main.sh`: Q6 orchestration wrapper — runs warmup (2.5M events, unrate-limited) then main (23.85M events, rate-limited bursty) phases back-to-back with NM restart between phases
 - `scripts/cloudlab/run_q8_subscriber_yarn.sh`: subscriber launcher; passes `-Dnemo.work.dir`
 - `scripts/cloudlab/run_live_bursty_combined.sh`: live bursty producer pattern
 - `scripts/cloudlab/start_warm_pool.sh`: VMWorker pool starter (defaults to Java 11)
@@ -314,6 +330,7 @@ Relevant Files
 - `/users/akash01/hadoop/etc/hadoop/slaves` (distributed)
 - `configs/cloudlab/nemo-yarn-kafka-1source-8compute.json`
 - `configs/cloudlab/nemo-yarn-kafka-1source-cap4-8compute.json`: Q8 autoscaler benchmark config with Source `slot: 4`
+- `configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json`: Q6 benchmark config (Compute 2048 MB)
 - `configs/cloudlab/nemo-yarn-kafka-1source-4compute.json`
 - `configs/cloudlab/nemo-yarn-1source-5compute-small.json`
 
@@ -341,15 +358,12 @@ Key Decisions
 
 Next Steps
 ----------
-1. If future scale-out does not trigger, debug:
-   - Is `avgInputRate` populated correctly?
-   - Is `avgSrcProcessingRate` populated correctly?
-   - Are executor metrics arriving at `ExecutorMetricMap`?
-   - Is `scaleInOutManager.sendMigrationAllStages` called with correct ratio?
-2. Rerun Q8 sustained benchmark with the cap4 config to verify E2E latency also appears for multi-stage query.
-3. Investigate why Q8 source metrics plateaued at `7,684,016` of `8,000,000` in `nexmark-auto-134204` after VM migration.
-4. For the Pado scheduler deadlock, investigate `StreamingScheduler`/`TaskDispatcher` to prefer upstream tasks over downstream tasks.
-5. Consider additional benchmark harness improvements: collect YARN logs, aggregate METRICLOG counters, auto-kill stale processes.
+1. **Q6 with autoscaling enabled** (`AUTOSCALING=true`): now that the base Q6 pipeline runs end-to-end, test scale-out/scale-in behavior under Q6's heavier stateful load.
+2. **Permanent NM cascade fix:** Wrap container launch in `DefaultContainerExecutor` with `setsid` to put each container in its own process group, preventing SIGTERM propagation to the NM on any container kill.
+3. Rerun Q8 sustained benchmark with the cap4 config to verify E2E latency also appears for multi-stage query.
+4. Investigate why Q8 source metrics plateaued at `7,684,016` of `8,000,000` in `nexmark-auto-134204` after VM migration.
+5. For the Pado scheduler deadlock, investigate `StreamingScheduler`/`TaskDispatcher` to prefer upstream tasks over downstream tasks.
+6. If future scale-out does not trigger, debug `avgInputRate`, `avgSrcProcessingRate`, `ExecutorMetricMap` delivery, and `sendMigrationAllStages` call path.
 
 Critical Context Reminders
 -------------------------
@@ -372,7 +386,21 @@ Critical Context Reminders
 - Before the next benchmark, the workspace is clean for YARN runtime state: latest app was killed, local subscriber/producer/collector are stopped, warm VMWorker pools were killed, and YARN showed exactly five RUNNING baseline NMs with zero containers. The harness now removes AM-side fallback metric files automatically after it discovers the AM host.
 - Phase 1 metrics instrumentation complete. CSV schema contract: `source_task_metrics.csv` is 10-column (source-task level), `source_aggregate_metrics.csv` is 5-column (AM-side per-executor aggregates), `scaler_metrics.csv` is 10-column (periodic scaler state at 1s), `task_metrics.csv` is 12-column (per-task rates), `scaling_decisions.csv` is 8-column (decision events only).
 - Final Phase 1 full Q0 run `sponge-q0-test-20260619-230438` succeeded: 23.85M events in/out, 1 SCALE_OUT, 1 SCALE_IN, 589 VM rows, max queue-time p95=6141ms, no NaN/Infinity in any CSV.
+- **NM kill cascade:** `DefaultContainerExecutor` (Hadoop 2.7) places containers in the NM's process group. Any container kill (memory violation OR `yarn application -kill`) propagates SIGTERM to the NM. **Always disable vmem and pmem checks** (`yarn-site.xml`) and restart NMs after every YARN app termination. Use `pgrep -f proc_nodemanager` for liveness, not `yarn node -list` (ghost entries persist ~10 min).
+- **cleanup() robustness:** SSH NM restart loops in `cleanup()` use `wait || true` and `ssh ... || true` so that `set -e` does not abort the harness if any SSH call returns non-zero. Without this, the harness silently dies between warmup and main phases.
+- **Q6 executor memory:** Use `nemo-yarn-kafka-1source-8slot-12compute.json` (Compute 2048 MB). Q6's stateful operators (WinningBids CoGroupByKey, GBK windowing) use 950 MB–1.2 GB physical memory; 1024 MB containers trigger pmem cascade.
 - Full Sponge Q0 benchmark completed successfully: `sponge-q0-20260619-164645`, app `application_1781901266080_0002`, AM host `node9`. Input/source/result all reached `23,850,000`. Scale-out and scale-in fired exactly once each with no phantom loop. VM task metrics confirmed 132 rows. Artifacts saved to `results/cloudlab/sponge-q0-20260619-164645/`.
+
+### Kafka Q6 with JVM Offloading (autoscale7, Latest)
+- **Run:** `nexmark-q6-warmup-20260626-233401` (warmup) + `nexmark-q6-main-20260626-233401` (main).
+- **Config:** `nemo-yarn-kafka-1source-8slot-12compute.json` — 1 Source (8 slots) + 12 Compute (2048 MB each), offloading to 160 VMWorkers across node4/node6/node7/node8/node13.
+- **Warmup:** 2,500,000 events — `input=2500000 source=2500000 result=76568`. Success.
+- **Main:** 23,850,000 events — `input=23850000 source=23850000 result=732019`. **Success — first complete Q6 end-to-end run.**
+- **Fixes that enabled success (vs. repeated NM kill cascades in autoscale2–6):**
+  1. `yarn.nodemanager.vmem-check-enabled=false` — stopped vmem-violation cascade.
+  2. `yarn.nodemanager.pmem-check-enabled=false` + Compute 2048 MB — stopped pmem-violation cascade.
+  3. `wait || true` in `cleanup()` — stopped harness dying at warmup→main NM restart step.
+- **Artifacts:** `results/cloudlab/nexmark-q6-warmup-20260626-233401/` and `results/cloudlab/nexmark-q6-main-20260626-233401/` (plots: input_rate, kafka_source_lag, kafka_result_lag, source_kafka_queue_time, latency, cpu, task_rates).
 
 ### E2E Latency Fix (Commit `903ca46e5`)
 - **Root cause of empty latency plot:** Two latency mechanisms — `OperatorVertexOutputCollector.java:158-201` was inside `/* ... */` comment (dead code); `OperatorMetricCollector.processDone()` was only called from `SinkEmtter` (zero-output vertices), not from `ExternalMainEmitter` (Kafka sink path).

@@ -14,9 +14,12 @@ from pathlib import Path
 
 # ── configuration ─────────────────────────────────────────────────────────
 INTERVAL_S = 5
+KAFKA_HOME = os.environ.get("KAFKA_HOME", "/users/akash01/kafka")
+KAFKA_NODE = os.environ.get("KAFKA_NODE", "node1")
+KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP", "node1:9092,node2:9092,node3:9092")
 OFFSET_CMD = [
-    "ssh", "node1", "/opt/kafka/bin/kafka-run-class.sh", "kafka.tools.GetOffsetShell",
-    "--broker-list", "node1:9092,node2:9092,node3:9092",
+    "ssh", KAFKA_NODE, f"{KAFKA_HOME}/bin/kafka-run-class.sh", "kafka.tools.GetOffsetShell",
+    "--broker-list", KAFKA_BOOTSTRAP,
     "--topic", "{topic}", "--time", "-1"
 ]
 
