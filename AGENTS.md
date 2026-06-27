@@ -402,7 +402,15 @@ Critical Context Reminders
   3. `wait || true` in `cleanup()` — stopped harness dying at warmup→main NM restart step.
 - **Artifacts:** `results/cloudlab/nexmark-q6-warmup-20260626-233401/` and `results/cloudlab/nexmark-q6-main-20260626-233401/` (plots: input_rate, kafka_source_lag, kafka_result_lag, source_kafka_queue_time, latency, cpu, task_rates).
 
-### Kafka Q6 with JVM Offloading + Autoscaling (autoscale8, Latest)
+### Kafka Q6 No-Warmup Baseline (autoscale9, Latest)
+- **Run:** nexmark-q6-main-20260627-154638 (no warmup phase).
+- **Purpose:** Holostream comparison baseline -- mirrors no-warmup approach used in Holostream configs (IsWarmUp: false, LoadWarmUpData: false).
+- **Config:** nemo-yarn-kafka-1source-8slot-12compute.json, 160 VMWorkers, AUTOSCALING=true.
+- **Main:** 23,850,000 events at custom burst (50k/200k ev/s) -- input=23850000 source=23850000 result=75040. Success.
+- **Autoscaler:** SCALE_OUT fired once at t=173s (queue=62432, ratio=0.21, avgInput=50k ev/s). Same single scale-out as autoscale8.
+- **Artifacts:** results/cloudlab/nexmark-q6-main-20260627-154638/
+
+### Kafka Q6 with JVM Offloading + Autoscaling (autoscale8)
 - **Run:** `nexmark-q6-warmup-20260627-091117` (warmup) + `nexmark-q6-main-20260627-091117` (main).
 - **Config:** same as autoscale7 (`nemo-yarn-kafka-1source-8slot-12compute.json`, 160 VMWorkers) but with `AUTOSCALING=true`.
 - **Warmup:** 2,500,000 events — `input=2500000 source=2500000 result=76364`. Success.
