@@ -1,0 +1,3 @@
+add-lambda-executor 160 1 1 1024
+start-scaler
+start-backpressure

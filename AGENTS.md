@@ -358,7 +358,7 @@ Key Decisions
 
 Next Steps
 ----------
-1. **Q6 with autoscaling enabled** (`AUTOSCALING=true`): now that the base Q6 pipeline runs end-to-end, test scale-out/scale-in behavior under Q6's heavier stateful load.
+1. **Q6 scale-in investigation:** autoscale8 showed scale-out fires correctly but scale-in never triggered (backlog drained before idle conditions held). Investigate whether scale-in should be more aggressive or whether the run duration is simply too short for the idle-input timeout to expire after drain.
 2. **Permanent NM cascade fix:** Wrap container launch in `DefaultContainerExecutor` with `setsid` to put each container in its own process group, preventing SIGTERM propagation to the NM on any container kill.
 3. Rerun Q8 sustained benchmark with the cap4 config to verify E2E latency also appears for multi-stage query.
 4. Investigate why Q8 source metrics plateaued at `7,684,016` of `8,000,000` in `nexmark-auto-134204` after VM migration.
@@ -401,6 +401,17 @@ Critical Context Reminders
   2. `yarn.nodemanager.pmem-check-enabled=false` + Compute 2048 MB — stopped pmem-violation cascade.
   3. `wait || true` in `cleanup()` — stopped harness dying at warmup→main NM restart step.
 - **Artifacts:** `results/cloudlab/nexmark-q6-warmup-20260626-233401/` and `results/cloudlab/nexmark-q6-main-20260626-233401/` (plots: input_rate, kafka_source_lag, kafka_result_lag, source_kafka_queue_time, latency, cpu, task_rates).
+
+### Kafka Q6 with JVM Offloading + Autoscaling (autoscale8, Latest)
+- **Run:** `nexmark-q6-warmup-20260627-091117` (warmup) + `nexmark-q6-main-20260627-091117` (main).
+- **Config:** same as autoscale7 (`nemo-yarn-kafka-1source-8slot-12compute.json`, 160 VMWorkers) but with `AUTOSCALING=true`.
+- **Warmup:** 2,500,000 events — `input=2500000 source=2500000 result=76364`. Success.
+- **Main:** 23,850,000 events at 93,332 ev/s avg — `input=23850000 source=23850000 result=75875`. **Success.**
+- **Autoscaler behavior:**
+  - `SCALE_OUT` fired once: queue=78,678, avgInput=50,000 ev/s, ratio=0.33 (during first burst phase).
+  - Tasks migrated to VMWorkers on node7 (1,386 metric rows) and node8 (1,005 rows); node4/6/13 saw minimal activity.
+  - `SCALE_IN` did not fire — backlog drained to 0 and run completed before the idle-input + empty-queue + avgProcess≤0 conditions held long enough to trigger.
+- **Artifacts:** `results/cloudlab/nexmark-q6-{warmup,main}-20260627-091117/` (plots, CSVs, scaling decisions).
 
 ### E2E Latency Fix (Commit `903ca46e5`)
 - **Root cause of empty latency plot:** Two latency mechanisms — `OperatorVertexOutputCollector.java:158-201` was inside `/* ... */` comment (dead code); `OperatorMetricCollector.processDone()` was only called from `SinkEmtter` (zero-output vertices), not from `ExternalMainEmitter` (Kafka sink path).
