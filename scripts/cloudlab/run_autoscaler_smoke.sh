@@ -145,6 +145,30 @@ run_producer_with_source_log() {
   return "$status"
 }
 
+# Wait for Nemo source tasks to finish Kafka partition assignment.
+# Poll the subscriber log for stable "Curr input:" heartbeats (these appear once
+# all executor tasks including the Kafka source are running), then sleep a fixed
+# buffer so the consumer completes rebalancing before any events arrive.
+PARTITION_ASSIGN_BUFFER=${PARTITION_ASSIGN_BUFFER:-90}
+wait_for_nemo_source_ready() {
+  echo "Waiting for Nemo source tasks to report 'Curr input:' in $SUB_LOG ..."
+  local seen=0 i
+  for i in $(seq 1 300); do
+    if grep -q "Curr input:" "$SUB_LOG" 2>/dev/null; then
+      seen=$((seen + 1))
+      if [ "$seen" -ge 3 ]; then
+        echo "  Nemo source metrics stable after ~${i}s; sleeping ${PARTITION_ASSIGN_BUFFER}s for partition assignment"
+        sleep "$PARTITION_ASSIGN_BUFFER"
+        return 0
+      fi
+    else
+      seen=0
+    fi
+    sleep 1
+  done
+  echo "WARNING: Nemo source metrics did not stabilise within 300s; proceeding anyway" >&2
+}
+
 # 1. Generate vm_addresses.txt for all offload nodes
 echo "Generating vm_addresses.txt for offloading nodes: $OFFLOAD_NODES"
 IFS=',' read -ra NODE_LIST <<< "$OFFLOAD_NODES"
@@ -257,6 +281,9 @@ fi
 
 echo "Waiting ${SUBSCRIBER_WAIT}s before enabling autoscaler commands"
 sleep "$SUBSCRIBER_WAIT"
+
+# Wait for Nemo's Kafka source to finish partition assignment before producing
+wait_for_nemo_source_ready
 
 # 8. Write scaling commands after service is ready
 echo "Writing scaling commands to $WORK_DIR/scaling.txt"
