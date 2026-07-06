@@ -35,13 +35,15 @@ def load_combined(work_dir: str) -> pd.DataFrame:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
     if {"inputOffset", "sourceCount"}.issubset(df.columns):
-        # AM-side fallback metrics can contain stale rows from older runs.
-        invalid = df["sourceCount"] > df["inputOffset"]
-        df.loc[invalid, "sourceCount"] = pd.NA
-        df["sourceCount"] = df["sourceCount"].ffill().fillna(0)
-        df["inputLag"] = (df["inputOffset"] - df["sourceCount"]).clip(lower=0)
+        if (df["inputOffset"] > 0).any() or (df["sourceCount"] > 0).any():
+            # AM-side fallback metrics can contain stale rows from older runs.
+            invalid = df["sourceCount"] > df["inputOffset"]
+            df.loc[invalid, "sourceCount"] = pd.NA
+            df["sourceCount"] = df["sourceCount"].ffill().fillna(0)
+            df["inputLag"] = (df["inputOffset"] - df["sourceCount"]).clip(lower=0)
     if {"inputOffset", "resultOffset"}.issubset(df.columns):
-        df["resultLag"] = (df["inputOffset"] - df["resultOffset"]).clip(lower=0)
+        if (df["inputOffset"] > 0).any() or (df["resultOffset"] > 0).any():
+            df["resultLag"] = (df["inputOffset"] - df["resultOffset"]).clip(lower=0)
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
     # relative time in seconds
     t0 = df["timestamp"].min()
@@ -135,10 +137,19 @@ def plot_input_rate(df: pd.DataFrame, work_dir: str):
     if df.empty:
         return
     plt.figure(figsize=(10, 5))
-    plt.plot(df["rel_s"], df["sourceCount"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Source input rate")
-    plt.plot(df["rel_s"], df["inputOffset"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Kafka input offset rate")
-    if "resultOffset" in df.columns and df["resultOffset"].notna().any():
-        plt.plot(df["rel_s"], df["resultOffset"].diff().fillna(0) / df["rel_s"].diff().fillna(1), label="Kafka result offset rate")
+    dt = df["rel_s"].diff().replace(0, float("nan"))
+    if "sourceCount" in df.columns and (df["sourceCount"] > 0).any():
+        plt.plot(df["rel_s"], df["sourceCount"].diff() / dt, label="Source input rate")
+    elif "avgInput" in df.columns and (df["avgInput"] > 0).any():
+        plt.plot(df["rel_s"], df["avgInput"], label="Source input rate (avg)")
+    if "inputOffset" in df.columns and (df["inputOffset"] > 0).any():
+        raw = df["inputOffset"].diff() / dt
+        smoothed = raw.rolling(5, min_periods=1, center=True).mean()
+        plt.plot(df["rel_s"], smoothed, label="Kafka input offset rate")
+    if "resultOffset" in df.columns and (df["resultOffset"] > 0).any():
+        raw = df["resultOffset"].diff() / dt
+        smoothed = raw.rolling(5, min_periods=1, center=True).mean()
+        plt.plot(df["rel_s"], smoothed, label="Kafka result offset rate")
     plt.xlabel("Time (s)")
     plt.ylabel("Events / s")
     plt.title("Input Rate vs Kafka Offset Rate")
@@ -148,11 +159,22 @@ def plot_input_rate(df: pd.DataFrame, work_dir: str):
 
 
 def plot_kafka_lag(df: pd.DataFrame, work_dir: str):
-    if df.empty or "inputLag" not in df.columns:
+    if df.empty:
         return
     plt.figure(figsize=(10, 5))
-    valid = df["inputLag"] >= 0
-    plt.plot(df.loc[valid, "rel_s"], df.loc[valid, "inputLag"], label="Input offset - source count", color="red")
+    plotted = False
+    if "inputLag" in df.columns:
+        valid = df["inputLag"] >= 0
+        if valid.any():
+            plt.plot(df.loc[valid, "rel_s"], df.loc[valid, "inputLag"], label="Input offset - source count", color="red")
+            plotted = True
+    if not plotted and "queueSize" in df.columns and (df["queueSize"] >= 0).any():
+        valid = df["queueSize"] >= 0
+        plt.plot(df.loc[valid, "rel_s"], df.loc[valid, "queueSize"], label="Queue size (proxy)", color="red")
+        plotted = True
+    if not plotted:
+        plt.close()
+        return
     plt.xlabel("Time (s)")
     plt.ylabel("Events")
     plt.title("Kafka Source Lag")
@@ -198,10 +220,11 @@ def plot_latency(df: pd.DataFrame, work_dir: str):
     if df.empty:
         return
     plt.figure(figsize=(10, 5))
-    for col, label in [("latencyMedian", "p50"), ("latencyP95", "p95"), ("latencyP99", "p99")]:
+    styles = [("-", 2.0), ("--", 1.5), (":", 1.5)]
+    for (col, label), (ls, lw) in zip([("latencyMedian", "p50"), ("latencyP95", "p95"), ("latencyP99", "p99")], styles):
         if col in df.columns:
             valid = df[col] >= 0
-            plt.plot(df.loc[valid, "rel_s"], df.loc[valid, col], label=label)
+            plt.plot(df.loc[valid, "rel_s"], df.loc[valid, col], label=label, linestyle=ls, linewidth=lw)
     plt.xlabel("Time (s)")
     plt.ylabel("Latency (ms)")
     plt.title("End-to-End Latency")
@@ -240,9 +263,20 @@ def plot_scaling_events(df: pd.DataFrame, work_dir: str):
     dec["rel_s"] = (dec["timestamp"] - true_t0).dt.total_seconds()
 
     plt.figure(figsize=(10, 5))
-    # Plot source rate
-    y_col = "resultLag" if "resultLag" in df.columns and (df["resultLag"] >= 0).any() else "inputLag"
-    plt.plot(df["rel_s"], df[y_col], label=y_col)
+    # Choose best available background metric
+    if "resultLag" in df.columns and (df["resultLag"] >= 0).any():
+        y_col, y_label = "resultLag", "Result lag"
+    elif "inputLag" in df.columns and (df["inputLag"] >= 0).any():
+        y_col, y_label = "inputLag", "Input lag"
+    elif "queueSize" in df.columns and (df["queueSize"] >= 0).any():
+        y_col, y_label = "queueSize", "Queue size"
+    elif "avgInput" in df.columns and (df["avgInput"] >= 0).any():
+        y_col, y_label = "avgInput", "Avg input rate"
+    else:
+        plt.close()
+        return
+    valid = df[y_col] >= 0
+    plt.plot(df.loc[valid, "rel_s"], df.loc[valid, y_col], label=y_label)
 
     # Overlay scaling events
     for _, row in dec.iterrows():
