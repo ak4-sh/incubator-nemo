@@ -222,17 +222,15 @@ def plot_latency(df: pd.DataFrame, work_dir: str):
     if df.empty:
         return
     plt.figure(figsize=(10, 5))
-    styles = [("-", 2.0), ("--", 1.5), (":", 1.5)]
-    any_plotted = False
-    for (col, label), (ls, lw) in zip([("latencyMedian", "p50"), ("latencyP95", "p95"), ("latencyP99", "p99")], styles):
-        if col in df.columns:
-            valid = df[col] >= 0
-            if valid.any():
-                plt.plot(df.loc[valid, "rel_s"], df.loc[valid, col], label=label, linestyle=ls, linewidth=lw)
-                any_plotted = True
-    if not any_plotted:
+    col = "latencyMedian"
+    if col not in df.columns:
         plt.close()
         return
+    valid = df[col] >= 0
+    if not valid.any():
+        plt.close()
+        return
+    plt.plot(df.loc[valid, "rel_s"], df.loc[valid, col], label="Latency (median)")
     plt.xlabel("Time (s)")
     plt.ylabel("Latency (ms)")
     plt.title("End-to-End Latency")
