@@ -144,7 +144,7 @@ def plot_input_rate(df: pd.DataFrame, work_dir: str):
         plt.plot(df["rel_s"], df["avgInput"], label="Source input rate (avg)")
     if "inputOffset" in df.columns and (df["inputOffset"] > 0).any():
         raw = df["inputOffset"].diff() / dt
-        smoothed = raw.rolling(5, min_periods=1, center=True).mean()
+        smoothed = raw.rolling(10, min_periods=1, center=True).mean()
         plt.plot(df["rel_s"], smoothed, label="Kafka input offset rate")
     if "resultOffset" in df.columns and (df["resultOffset"] > 0).any():
         raw = df["resultOffset"].diff() / dt
@@ -171,13 +171,15 @@ def plot_kafka_lag(df: pd.DataFrame, work_dir: str):
     if not plotted and "queueSize" in df.columns and (df["queueSize"] >= 0).any():
         valid = df["queueSize"] >= 0
         plt.plot(df.loc[valid, "rel_s"], df.loc[valid, "queueSize"], label="Queue size (proxy)", color="red")
+        plt.ylim(bottom=0)
         plotted = True
     if not plotted:
         plt.close()
         return
     plt.xlabel("Time (s)")
     plt.ylabel("Events")
-    plt.title("Kafka Source Lag")
+    title = "Kafka Source Lag" if plotted and "inputLag" in df.columns and (df["inputLag"] > 0).any() else "Lambda Queue Size (proxy for lag)"
+    plt.title(title)
     plt.legend()
     plt.grid(True)
     save_plot(work_dir, "kafka_source_lag")
@@ -221,10 +223,16 @@ def plot_latency(df: pd.DataFrame, work_dir: str):
         return
     plt.figure(figsize=(10, 5))
     styles = [("-", 2.0), ("--", 1.5), (":", 1.5)]
+    any_plotted = False
     for (col, label), (ls, lw) in zip([("latencyMedian", "p50"), ("latencyP95", "p95"), ("latencyP99", "p99")], styles):
         if col in df.columns:
             valid = df[col] >= 0
-            plt.plot(df.loc[valid, "rel_s"], df.loc[valid, col], label=label, linestyle=ls, linewidth=lw)
+            if valid.any():
+                plt.plot(df.loc[valid, "rel_s"], df.loc[valid, col], label=label, linestyle=ls, linewidth=lw)
+                any_plotted = True
+    if not any_plotted:
+        plt.close()
+        return
     plt.xlabel("Time (s)")
     plt.ylabel("Latency (ms)")
     plt.title("End-to-End Latency")
