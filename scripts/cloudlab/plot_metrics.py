@@ -283,6 +283,8 @@ def plot_scaling_events(df: pd.DataFrame, work_dir: str):
         return
     valid = df[y_col] >= 0
     plt.plot(df.loc[valid, "rel_s"], df.loc[valid, y_col], label=y_label)
+    if y_col in ("queueSize", "avgInput"):
+        plt.ylim(bottom=0)
 
     # Overlay scaling events
     for _, row in dec.iterrows():
