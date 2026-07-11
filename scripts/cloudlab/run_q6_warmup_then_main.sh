@@ -32,6 +32,8 @@ MAIN_RUN_ID=${MAIN_RUN_ID:-${RUN_PREFIX}-main-${TIMESTAMP}}
 EXECUTOR_JSON=${EXECUTOR_JSON:-configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json}
 COMPLETION_MODE=${COMPLETION_MODE:-source_plus_some_output}
 AUTOSCALING=${AUTOSCALING:-false}
+WARMUP_COMPLETION_MODE=${WARMUP_COMPLETION_MODE:-source_only}
+WARMUP_AUTOSCALING=${WARMUP_AUTOSCALING:-false}
 PREFILL_EVENTS=${PREFILL_EVENTS:-0}
 CPU_DELAY_MS=${CPU_DELAY_MS:-2}
 KEEP_WARM_POOL=${KEEP_WARM_POOL:-1}
@@ -47,6 +49,8 @@ run_phase() {
   local producer_rate_limited=$8
   local burst_mode=$9
   local plot=${10}
+  local phase_completion_mode=${11:-$COMPLETION_MODE}
+  local phase_autoscaling=${12:-$AUTOSCALING}
 
   echo "== Running $benchmark_name =="
   echo "  run_id=$run_id"
@@ -69,9 +73,9 @@ run_phase() {
   RAMP_UP_SEC="$MAIN_RAMP_UP_SEC" \
   PRODUCER_RATE_LIMITED="$producer_rate_limited" \
   BURST_MODE="$burst_mode" \
-  COMPLETION_MODE="$COMPLETION_MODE" \
+  COMPLETION_MODE="$phase_completion_mode" \
   EXECUTOR_JSON="$EXECUTOR_JSON" \
-  AUTOSCALING="$AUTOSCALING" \
+  AUTOSCALING="$phase_autoscaling" \
   CPU_DELAY_MS="$CPU_DELAY_MS" \
   BENCHMARK_TIMEOUT_SEC="$timeout_sec" \
   STREAM_TIMEOUT="$timeout_sec" \
@@ -82,11 +86,11 @@ run_phase() {
 
 run_phase "$WARMUP_RUN_ID" "nexmark-q6-warmup" "$WARMUP_EVENTS" \
   "$WARMUP_FIRST_RATE" "$WARMUP_NEXT_RATE" "$WARMUP_RATE_PERIOD_SEC" \
-  "$WARMUP_TIMEOUT_SEC" false "$WARMUP_BURST_MODE" 0
+  "$WARMUP_TIMEOUT_SEC" false "$WARMUP_BURST_MODE" 0 "$WARMUP_COMPLETION_MODE" "$WARMUP_AUTOSCALING"
 
 run_phase "$MAIN_RUN_ID" "nexmark-q6-main" "$MAIN_EVENTS" \
   "$MAIN_FIRST_RATE" "$MAIN_NEXT_RATE" "$MAIN_RATE_PERIOD_SEC" \
-  "$MAIN_TIMEOUT_SEC" true "$MAIN_BURST_MODE" 1
+  "$MAIN_TIMEOUT_SEC" true "$MAIN_BURST_MODE" 1 "$COMPLETION_MODE" "$AUTOSCALING"
 
 echo "Q6 warmup and main run completed."
 echo "  Warmup artifacts: $NEMO_REPO_ROOT/results/cloudlab/$WARMUP_RUN_ID"

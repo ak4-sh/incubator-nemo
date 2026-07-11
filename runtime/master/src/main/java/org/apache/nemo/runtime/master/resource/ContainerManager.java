@@ -210,7 +210,12 @@ public final class ContainerManager {
       .addOption("-XX:-OmitStackTraceInFastThrow")
       .addOption("-XX:NewRatio=1")
       .addOption("-XX:InitialHeapSize=" + (resourceSpecification.getMemory() - 100) + "m")
-      .addOption("-XX:MaxHeapSize=" + (resourceSpecification.getMemory() - 100) + "m");
+      .addOption("-XX:MaxHeapSize=" + (resourceSpecification.getMemory() - 100) + "m")
+      .addOption("-XX:+HeapDumpOnOutOfMemoryError")
+      .addOption("-XX:HeapDumpPath=/tmp/")
+      .addOption("-Xlog:gc*:file=/tmp/nemo-gc-%p.log:time,uptime,level,tags")
+      .addOption("-Dio.netty.allocator.numHeapArenas=2")
+      .addOption("-Dio.netty.allocator.numDirectArenas=2");
       //.addOption("-XX:+UseG1GC")
       //.addOption("-XX:ParallelGCThreads=20")
       //.addOption("-XX:InitiatingHeapOccupancyPercent=70")

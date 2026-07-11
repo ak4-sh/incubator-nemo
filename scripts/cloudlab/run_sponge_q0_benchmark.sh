@@ -74,7 +74,7 @@ require_file() {
 sum_topic_offsets() {
   local topic=$1
   ssh "$KAFKA_NODE" \
-    "$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$topic' --time -1" \
+    "$KAFKA_HOME/bin/kafka-get-offsets.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --topic '$topic' --time -1" \
     | awk -F: '{sum += $3} END {print sum + 0}'
 }
 
@@ -85,6 +85,17 @@ get_source_count() {
     return
   fi
   ssh "$AM_HOST" "if [ -f /tmp/source_aggregate_metrics.csv ]; then tail -n 50 /tmp/source_aggregate_metrics.csv | awk -F, -v max='$max_count' 'BEGIN {v=0} /^[0-9]/ {candidate=\$3 + 0; if (candidate >= 0 && (max <= 0 || candidate <= max)) v=candidate} END {print v + 0}'; else echo 0; fi" 2>/dev/null || echo 0
+}
+
+get_queue_size() {
+  if [[ -z "$AM_HOST" || "$AM_HOST" == "N/A" ]]; then
+    echo -1
+    return
+  fi
+  # scaler_metrics.csv columns: timestamp,jobId,avgCpu,avgInput,avgProcess,queue,...
+  # Filter by JOB_ID to ignore stale entries from previous runs sharing the same file.
+  local jid="$JOB_ID"
+  ssh "$AM_HOST" "if [ -f /tmp/scaler_metrics.csv ]; then awk -F, -v jid='$jid' '/^[0-9]/ && NF>=6 && \$2==jid {v=\$6} END {print (v==\"\") ? -1 : int(v+0)}' /tmp/scaler_metrics.csv; else echo -1; fi" 2>/dev/null || echo -1
 }
 
 get_active_app_count() {
@@ -143,9 +154,9 @@ preflight() {
 create_result_topic() {
   log "Creating Kafka result topic $KAFKA_RESULTS_TOPIC"
   ssh "$KAFKA_NODE" \
-    "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '${KAFKA_ZOOKEEPER:-node1:2181,node2:2181,node3:2181}' --create --topic '$KAFKA_RESULTS_TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
+    "$KAFKA_HOME/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --create --topic '$KAFKA_RESULTS_TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
   ssh "$KAFKA_NODE" \
-    "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '${KAFKA_ZOOKEEPER:-node1:2181,node2:2181,node3:2181}' --entity-type topics --entity-name '$KAFKA_RESULTS_TOPIC' --alter --add-config min.insync.replicas=1 || true"
+    "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --entity-type topics --entity-name '$KAFKA_RESULTS_TOPIC' --alter --add-config min.insync.replicas=1 || true"
 }
 
 run_harness() {
@@ -208,6 +219,8 @@ monitor_completion() {
   local last_valid_source_count=0
   local last_source_count=-1
   local last_result_total=-1
+  local queue_size=-1
+  local last_queue_size=-1
   local stalled_checks=0
   local app_state
   local app_am_host
@@ -217,6 +230,7 @@ monitor_completion() {
     input_total=$(sum_topic_offsets "$TOPIC")
     result_total=$(sum_topic_offsets "$KAFKA_RESULTS_TOPIC")
     source_count=$(get_source_count "$input_total")
+    queue_size=$(get_queue_size)
 
     if [[ "$source_count" -gt "$TOTAL_EVENTS" ]]; then
       log "warning ignoring impossible source_count=$source_count greater than TOTAL_EVENTS=$TOTAL_EVENTS"
@@ -225,7 +239,7 @@ monitor_completion() {
       last_valid_source_count=$source_count
     fi
 
-    log "progress input=$input_total source=$source_count result=$result_total"
+    log "progress input=$input_total source=$source_count result=$result_total queue=$queue_size"
 
     case "$COMPLETION_MODE" in
       exact_output)
@@ -246,6 +260,13 @@ monitor_completion() {
         if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -ge "$TOTAL_EVENTS" && "$result_total" -gt 0 ]]; then
           RUN_END_MS=$(date +%s%3N)
           log "Success: input/source reached $TOTAL_EVENTS and result output was observed"
+          return 0
+        fi
+        ;;
+      queue_drained)
+        if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -ge "$TOTAL_EVENTS" && "$queue_size" -ge 0 && "$queue_size" -le 1000 ]]; then
+          RUN_END_MS=$(date +%s%3N)
+          log "Success: input/source reached $TOTAL_EVENTS and VM queue drained (queue=$queue_size)"
           return 0
         fi
         ;;
@@ -277,12 +298,13 @@ monitor_completion() {
       return 1
     fi
 
-    if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -eq "$last_source_count" && "$result_total" -eq "$last_result_total" ]]; then
+    if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$source_count" -eq "$last_source_count" && "$result_total" -eq "$last_result_total" && ( "$COMPLETION_MODE" != "queue_drained" || "$queue_size" -eq "$last_queue_size" ) ]]; then
       stalled_checks=$((stalled_checks + 1))
     else
       stalled_checks=0
       last_source_count=$source_count
       last_result_total=$result_total
+      last_queue_size=$queue_size
     fi
 
     if [[ "$input_total" -ge "$TOTAL_EVENTS" && "$stalled_checks" -ge "$PROGRESS_STALL_LIMIT" ]]; then

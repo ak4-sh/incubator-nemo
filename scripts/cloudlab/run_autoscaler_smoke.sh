@@ -180,8 +180,8 @@ python3 "$SCRIPT_DIR/generate_vm_addresses.py" \
 
 # 2. Create Kafka topic and prefill
 echo "Creating Kafka topic $TOPIC with $KAFKA_PARTITIONS partitions"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --bootstrap-server node1:9092 --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server node1:9092 --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1 || true"
 
 if [[ "$PREFILL_EVENTS" -gt 0 ]]; then
   echo "Prefilling $PREFILL_EVENTS records"
@@ -288,8 +288,10 @@ wait_for_nemo_source_ready
 # 8. Write scaling commands after service is ready
 echo "Writing scaling commands to $WORK_DIR/scaling.txt"
 printf 'add-lambda-executor %d %d %d %d\n' "$NUM_MAX_LAMBDA" "$LAMBDA_CAPACITY" "$LAMBDA_SLOT" "$LAMBDA_MEMORY" >> "$WORK_DIR/scaling.txt"
-printf 'start-scaler\n' >> "$WORK_DIR/scaling.txt"
-printf 'start-backpressure\n' >> "$WORK_DIR/scaling.txt"
+if [[ "${AUTOSCALING:-false}" == "true" ]]; then
+  printf 'start-scaler\n' >> "$WORK_DIR/scaling.txt"
+  printf 'start-backpressure\n' >> "$WORK_DIR/scaling.txt"
+fi
 
 # 9. Start metrics collector in background (pass AM host for driver-side CSV polling)
 echo "Starting metrics collector (AM host: $AM_HOST)"

@@ -27,6 +27,7 @@ import org.apache.nemo.runtime.executor.common.ByteTransportChannelInitializer;
 import org.apache.nemo.runtime.executor.common.ExecutorChannelMap;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.ChannelGroupFuture;
@@ -106,6 +107,32 @@ public final class DefaultByteTransportImpl implements ByteTransport {
     // org.apache.log4j.Logger.getLogger(org.apache.kafka.clients.consumer.internals.Fetcher.class).setLevel(Level.WARN);
    //  org.apache.log4j.Logger.getLogger(org.apache.kafka.clients.consumer.ConsumerConfig.class).setLevel(Level.WARN);
 
+    // Netty allocator diagnostics — use reflection for 4.1.x-only APIs so 4.0.x runtime doesn't crash
+    LOG.info("[NETTY-DIAG] availableProcessors={} maxHeap={}MB",
+        Runtime.getRuntime().availableProcessors(),
+        Runtime.getRuntime().maxMemory() / (1024 * 1024));
+    try {
+      java.lang.reflect.Method numHeap = PooledByteBufAllocator.class.getMethod("defaultNumHeapArena");
+      java.lang.reflect.Method numDirect = PooledByteBufAllocator.class.getMethod("defaultNumDirectArena");
+      java.lang.reflect.Method pageSize = PooledByteBufAllocator.class.getMethod("defaultPageSize");
+      java.lang.reflect.Method maxOrder = PooledByteBufAllocator.class.getMethod("defaultMaxOrder");
+      int ps = (int) pageSize.invoke(null);
+      int mo = (int) maxOrder.invoke(null);
+      LOG.info("[NETTY-DIAG] heapArenas={} directArenas={} pageSize={} maxOrder={} chunkSize={}MB",
+          numHeap.invoke(null), numDirect.invoke(null), ps, mo, (ps << mo) / (1024 * 1024));
+    } catch (Exception e) {
+      LOG.info("[NETTY-DIAG] allocator static methods unavailable (Netty 4.0.x?): {}", e.getMessage());
+    }
+    try {
+      java.lang.reflect.Method identify = Class.forName("io.netty.util.Version").getMethod("identify");
+      java.util.Map<?, ?> versions = (java.util.Map<?, ?>) identify.invoke(null);
+      LOG.info("[NETTY-DIAG] netty version map: {}", versions);
+    } catch (Exception e) {
+      LOG.info("[NETTY-DIAG] Version.identify() unavailable: {}", e.getMessage());
+      LOG.info("[NETTY-DIAG] netty jar on classpath: {}",
+          PooledByteBufAllocator.class.getProtectionDomain().getCodeSource().getLocation());
+    }
+
     this.nameResolver = nameResolver;
     this.localExecutorId = localExecutorId;
     this.executorChannelMap = executorChannelMap;
@@ -148,6 +175,41 @@ public final class DefaultByteTransportImpl implements ByteTransport {
 
     this.serverLocalListeningChannel = localChannelPort.left();
     this.localBindingPort = localChannelPort.right();
+
+    // Periodic allocator state dump every 30s — uses reflection for 4.1.x-only metric() and dumpStats()
+    final PooledByteBufAllocator diagAllocator = PooledByteBufAllocator.DEFAULT;
+    final Thread diagThread = new Thread(() -> {
+      while (!Thread.currentThread().isInterrupted()) {
+        try {
+          Thread.sleep(30_000);
+          LOG.info("[NETTY-DIAG] jvmFreeHeap={}MB jvmTotalHeap={}MB jvmMaxHeap={}MB",
+              Runtime.getRuntime().freeMemory() / (1024 * 1024),
+              Runtime.getRuntime().totalMemory() / (1024 * 1024),
+              Runtime.getRuntime().maxMemory() / (1024 * 1024));
+          try {
+            java.lang.reflect.Method metric = diagAllocator.getClass().getMethod("metric");
+            Object m = metric.invoke(diagAllocator);
+            long usedHeap = (long) m.getClass().getMethod("usedHeapMemory").invoke(m);
+            long usedDirect = (long) m.getClass().getMethod("usedDirectMemory").invoke(m);
+            LOG.info("[NETTY-DIAG] usedHeapMemory={}MB usedDirectMemory={}MB",
+                usedHeap / (1024 * 1024), usedDirect / (1024 * 1024));
+          } catch (Exception e) {
+            LOG.info("[NETTY-DIAG] metric() unavailable: {}", e.getMessage());
+          }
+          try {
+            java.lang.reflect.Method dump = diagAllocator.getClass().getMethod("dumpStats");
+            LOG.info("[NETTY-DIAG] allocatorStats:\n{}", dump.invoke(diagAllocator));
+          } catch (Exception e) {
+            LOG.info("[NETTY-DIAG] dumpStats() unavailable: {}", e.getMessage());
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      }
+    });
+    diagThread.setName("netty-diag");
+    diagThread.setDaemon(true);
+    diagThread.start();
 
     /*
     if (ec2) {
