@@ -6,15 +6,65 @@ Latest Sponge/Q6 State (2026-07-15 UTC)
 
 - Current Git status:
   - Branch: `cloudlab-build-fixes-wip`.
-  - Local branch is in sync with `origin/cloudlab-build-fixes-wip`.
-  - Worktree is clean after the latest commits.
-  - Latest commits pushed to origin:
+  - Local branch is ahead of `origin/cloudlab-build-fixes-wip` by 1 commit.
+  - Latest local commit:
 
 ```text
+c92f1e418 Archive delayed-gate Sponge Q6 run
+```
+
+  - Remaining uncommitted/untracked item:
+    `results/cloudlab/q6-formal-delayed-20260715T223600Z/`.
+    This is a partial failed wrapper launch stub containing only
+    `workdir/formal_command.env`; it is not the successful run archive.
+  - Recent baseline commits:
+
+```text
+3d33000c7 Update CloudLab Q6 handoff status
 01351c80a Add CloudLab executor placement controls
 67ebf6934 Add CloudLab Q6 formal run artifacts
 7c843a3c5 Document committed Q6 run results artifact
 ```
+
+- Latest delayed-gate CloudLab Sponge/Nemo Q6 run status:
+  - Run ID: `q6-formal-delayed-20260715T224242Z`.
+  - Topic: `q6-formal-delayed-20260715T224242Z-topic`.
+  - YARN application: `application_1784154419515_0001`.
+  - AM host: `node11`.
+  - Archive committed under:
+    `results/cloudlab/q6-formal-delayed-20260715T224242Z`.
+  - Commit: `c92f1e418 Archive delayed-gate Sponge Q6 run`.
+  - Configuration matched the formal topology:
+    Source on `node5-link-1`, Computes on
+    `node9-link-1,node10-link-1,node11-link-1,node12-link-1`,
+    executor JSON
+    `configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json`,
+    160 prestarted VMWorkers across `node4,node6,node7,node8,node13`.
+  - Scaler gate:
+    `SCALER_START_MODE=after_phase_delay`,
+    `SCALER_START_PHASE=2`,
+    `SCALER_START_PHASE_DELAY_SEC=60`.
+  - Outcome: strict placement passed before production; producer completed
+    `47,000,000` live events; final committed Kafka lag was `0` on all
+    8 partitions.
+  - Phase timestamps:
+    phase 2 / 100k start `1784155728260`;
+    scaler enable `1784155789272` (`61.012s` after phase 2 start);
+    phase 3 / 200k start `1784155878284`;
+    first `SCALE_OUT` `1784155879289` (`1.005s` after phase 3 start).
+  - Interpretation: no `SCALE_OUT` occurred during the active 100k window;
+    first scale-out occurred after the 200k burst began. This run is the
+    archived Sponge timestamp for HoloStream comparison.
+  - `scripts/cloudlab/metrics_collector.py` was fixed in the same commit to
+    use `kafka-run-class.sh kafka.tools.GetOffsetShell` instead of the
+    missing `kafka-get-offsets.sh`, and to append committed consumer lag
+    fields to `combined_metrics.csv`.
+  - Operational note: the post-run wrapper was manually interrupted after
+    producer completion and after committed consumer lag had reached zero
+    because the wrapper drain loop summed the consumer-group
+    `LOG-END-OFFSET` column instead of `LAG`. Cleanup/archive snapshots were
+    refreshed manually afterward; final YARN state shows zero active apps,
+    five RUNNING NodeManagers, zero containers, and HDFS safe mode OFF.
 
 - Formal CloudLab Sponge/Nemo Q6 run status:
   - Run ID: `q6-formal-20260715T174017Z`.
