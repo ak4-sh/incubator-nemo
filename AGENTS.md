@@ -221,7 +221,29 @@ KAFKA_PRODUCER_DONE topic=nexmark-auto-213939 totalSent=47000000 elapsedMs=40072
   - Interpretation: trigger `QUEUE`; avg CPU `0.5565`; avg input `200000`; avg process `108331.8`; queue `243277`; queue delay `2.2457s`; threshold `2.0s`; ratio `0.5583`; 160 offload workers available.
   - Post-scale behavior was healthy: processing recovered to roughly `198k-228k ev/s` and the queue drained instead of collapsing to zero processing.
   - No `OutOfMemoryError` or `FailedRuntime` was found in the subscriber log for this run. The previous 2048 MB Source run failed after scale-out with Source heap OOM; this 4096 MB Source run avoided that failure.
-  - App was killed after producer completion and post-scale observation. Artifacts:
+  - App was killed after producer completion and post-scale observation.
+  - Permanent committed result artifact:
+    `results/cloudlab/nexmark-q6-warmup-steady-burst-20260715-213939/`.
+  - Results commit:
+    `87ebf42ec Add Q6 warmup steady burst successful run results`.
+  - The committed result directory contains:
+    - `combined_metrics.csv`
+    - `producer_metrics.csv`
+    - `producer_phases.csv`
+    - `scaler_enable.csv`
+    - `scaling_decisions.csv`
+    - `scaler_metrics.csv`
+    - `source_aggregate_metrics.csv`
+    - `source_task_metrics.csv`
+    - `task_metrics.csv`
+    - raw AM-side metrics under `am-node11/`
+    - raw offload-node task metrics under `offload-task-metrics/`
+    - `logs/subscriber.log`
+    - compressed YARN log `logs/yarn-application_1784073595628_0007.log.gz`
+    - `README.md` and `SHA256SUMS`
+  - Root-level metrics in that result directory are filtered to the run window/job where appropriate. Raw offload-node files may contain stale warm-pool rows from previous jobs; use root `task_metrics.csv` for filtered analysis.
+  - Plot PNGs are not included because the local Python environment did not have `pandas` when the artifact was archived.
+  - Original scratch artifacts were:
     - `/tmp/app_1784073595628_0007.log`
     - `/tmp/nx-auto-sub-nexmark-auto-213939.log`
     - `/tmp/nx-auto-nexmark-auto-213939/`
