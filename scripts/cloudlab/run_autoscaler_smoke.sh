@@ -11,6 +11,12 @@ TOPIC=${TOPIC:-nexmark-auto-$(date +%H%M%S)}
 BURST_MODE=${BURST_MODE:-custom}
 FIRST_RATE=${FIRST_RATE:-50000}
 NEXT_RATE=${NEXT_RATE:-200000}
+STEP_START_RATE=${STEP_START_RATE:-5000}
+STEP_RATE=${STEP_RATE:-5000}
+STEP_DURATION_SEC=${STEP_DURATION_SEC:-20}
+STEP_NUM_STEPS=${STEP_NUM_STEPS:-20}
+PHASE_RATES=${PHASE_RATES:-20000,100000,200000}
+PHASE_DURATIONS_SEC=${PHASE_DURATIONS_SEC:-100,150,150}
 STEADY_DURATION_SEC=${STEADY_DURATION_SEC:-60}
 BURST_DURATION_SEC=${BURST_DURATION_SEC:-45}
 NUM_BURSTS=${NUM_BURSTS:-3}
@@ -30,6 +36,11 @@ STREAM_TIMEOUT=${STREAM_TIMEOUT:-900}
 NUM_EVENTS=${NUM_EVENTS:-$TOTAL_EVENTS}
 CPU_DELAY_MS=${CPU_DELAY_MS:-0}
 AUTOSCALING=${AUTOSCALING:-false}
+SCALER_START_MODE=${SCALER_START_MODE:-immediate}
+SCALER_START_PHASE=${SCALER_START_PHASE:-2}
+SCALER_START_PHASE_DELAY_SEC=${SCALER_START_PHASE_DELAY_SEC:-60}
+SCALER_START_WAIT_TIMEOUT_SEC=${SCALER_START_WAIT_TIMEOUT_SEC:-900}
+KAFKA_RESULTS_TOPIC=${KAFKA_RESULTS_TOPIC:-}
 JOB_ID=${JOB_ID:-nx-q${QUERY}-${TOPIC}}
 
 # Offloading nodes
@@ -61,6 +72,16 @@ SOURCE_LOG=$WORK_DIR/source.log
 
 mkdir -p "$WORK_DIR"
 : > "$SOURCE_LOG"
+SCALER_ENABLE_LOG=$WORK_DIR/scaler_enable.csv
+: > "$WORK_DIR/producer_phases.csv"
+: > "$SCALER_ENABLE_LOG"
+PRODUCER_PID=""
+SCALER_STARTED=false
+
+if [[ "$SCALER_START_MODE" == "after_phase_delay" && "$BURST_MODE" != "phases" ]]; then
+  echo "ERROR: SCALER_START_MODE=after_phase_delay requires BURST_MODE=phases" >&2
+  exit 1
+fi
 
 # Preflight: ensure YARN NodeManagers are running
 ensure_yarn_nodes() {
@@ -118,13 +139,38 @@ wait_for_yarn_app_running() {
   return 1
 }
 
-run_producer_with_source_log() {
+start_producer_with_source_log() {
   local events=$1
   local live=$2
   local parallelism=${3:-$PRODUCER_PARALLELISM}
-  local producer_pid status
 
-  if [[ "$BURST_MODE" == "custom" ]]; then
+  if [[ "$BURST_MODE" == "step" && "$live" == "true" ]]; then
+    local maxEvents=0
+    if [[ "$events" -gt 0 ]]; then
+      maxEvents="$events"
+    fi
+    java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
+      "$KAFKA_BOOTSTRAP" "$TOPIC" STEP "$STEP_START_RATE" "$STEP_RATE" "$STEP_DURATION_SEC" \
+      "$STEP_NUM_STEPS" "$PRODUCER_RATE_LIMITED" "$parallelism" "$maxEvents" &
+  elif [[ "$BURST_MODE" == "phases" && "$live" == "true" ]]; then
+    local maxEvents=0
+    if [[ "$events" -gt 0 ]]; then
+      maxEvents="$events"
+    fi
+    java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
+      "$KAFKA_BOOTSTRAP" "$TOPIC" PHASES "$PHASE_RATES" "$PHASE_DURATIONS_SEC" \
+      "$PRODUCER_RATE_LIMITED" "$parallelism" "$maxEvents" &
+  elif [[ "$BURST_MODE" == "phases" ]]; then
+    # Keep prefill minimal and fixed-rate. The live phase performs the explicit schedule.
+    local prefill_rate
+    prefill_rate=${PHASE_PREFILL_RATE:-20000}
+    java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
+      "$KAFKA_BOOTSTRAP" "$TOPIC" "$events" "$prefill_rate" "$prefill_rate" "1" "$PRODUCER_RATE_LIMITED" &
+  elif [[ "$BURST_MODE" == "step" ]]; then
+    # Keep prefill minimal and fixed-rate. The live phase performs the step sweep.
+    java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
+      "$KAFKA_BOOTSTRAP" "$TOPIC" "$events" "$STEP_START_RATE" "$STEP_START_RATE" "$STEP_DURATION_SEC" "$PRODUCER_RATE_LIMITED" &
+  elif [[ "$BURST_MODE" == "custom" ]]; then
     # Custom burst mode: steadyRate burstRate steadySec burstSec numBursts isRateLimited numGenerators rampUpSec maxEvents
     # maxEvents=0 means use the full burst pattern
     local maxEvents=0
@@ -138,11 +184,76 @@ run_producer_with_source_log() {
     java -cp "$STANDALONE_PRODUCER_CP" StandaloneNexmarkKafkaProducer \
       "$KAFKA_BOOTSTRAP" "$TOPIC" "$events" "$FIRST_RATE" "$NEXT_RATE" "$RATE_PERIOD_SEC" "$PRODUCER_RATE_LIMITED" "$parallelism" &
   fi
-  producer_pid=$!
+  PRODUCER_PID=$!
+}
 
+run_producer_with_source_log() {
+  local events=$1
+  local live=$2
+  local parallelism=${3:-$PRODUCER_PARALLELISM}
+  local status
+
+  start_producer_with_source_log "$events" "$live" "$parallelism"
   status=0
-  wait "$producer_pid" || status=$?
+  wait "$PRODUCER_PID" || status=$?
   return "$status"
+}
+
+write_lambda_executor_command() {
+  printf 'add-lambda-executor %d %d %d %d\n' "$NUM_MAX_LAMBDA" "$LAMBDA_CAPACITY" "$LAMBDA_SLOT" "$LAMBDA_MEMORY" >> "$WORK_DIR/scaling.txt"
+}
+
+start_autoscaler_commands() {
+  local reason=${1:-manual}
+  local phase=${2:-}
+  local target_rate=${3:-}
+  local delay_sec=${4:-0}
+  local now
+
+  if [[ "${AUTOSCALING:-false}" != "true" ]]; then
+    return 0
+  fi
+  if [[ "$SCALER_STARTED" == "true" ]]; then
+    return 0
+  fi
+
+  now=$(date +%s%3N)
+  printf 'start-scaler\n' >> "$WORK_DIR/scaling.txt"
+  printf 'start-backpressure\n' >> "$WORK_DIR/scaling.txt"
+  if [[ ! -s "$SCALER_ENABLE_LOG" ]]; then
+    printf 'timestamp,reason,phase,targetRate,delaySec\n' > "$SCALER_ENABLE_LOG"
+  fi
+  printf '%s,%s,%s,%s,%s\n' "$now" "$reason" "$phase" "$target_rate" "$delay_sec" >> "$SCALER_ENABLE_LOG"
+  SCALER_STARTED=true
+}
+
+wait_for_phase_start() {
+  local phase=$1
+  local timeout_sec=$2
+  local phase_file=$WORK_DIR/producer_phases.csv
+  local started_at
+  local line
+  local waited
+
+  echo "Waiting for producer phase $phase to start in $phase_file" >&2
+  for waited in $(seq 0 "$timeout_sec"); do
+    if [[ -s "$phase_file" ]]; then
+      line=$(awk -F, -v phase="$phase" '$2 == "start" && $3 == phase {print; exit}' "$phase_file")
+      if [[ -n "$line" ]]; then
+        started_at=$(printf '%s\n' "$line" | awk -F, '{print $1}')
+        echo "  Producer phase $phase started at $started_at: $line" >&2
+        printf '%s\n' "$line"
+        return 0
+      fi
+    fi
+    if [[ -n "$PRODUCER_PID" ]] && ! kill -0 "$PRODUCER_PID" 2>/dev/null; then
+      echo "ERROR: producer exited before phase $phase started" >&2
+      return 1
+    fi
+    sleep 1
+  done
+  echo "ERROR: phase $phase did not start within ${timeout_sec}s" >&2
+  return 1
 }
 
 # Wait for Nemo source tasks to finish Kafka partition assignment.
@@ -287,10 +398,14 @@ wait_for_nemo_source_ready
 
 # 8. Write scaling commands after service is ready
 echo "Writing scaling commands to $WORK_DIR/scaling.txt"
-printf 'add-lambda-executor %d %d %d %d\n' "$NUM_MAX_LAMBDA" "$LAMBDA_CAPACITY" "$LAMBDA_SLOT" "$LAMBDA_MEMORY" >> "$WORK_DIR/scaling.txt"
-if [[ "${AUTOSCALING:-false}" == "true" ]]; then
-  printf 'start-scaler\n' >> "$WORK_DIR/scaling.txt"
-  printf 'start-backpressure\n' >> "$WORK_DIR/scaling.txt"
+write_lambda_executor_command
+if [[ "$SCALER_START_MODE" == "immediate" ]]; then
+  start_autoscaler_commands "immediate" "" "" 0
+elif [[ "$SCALER_START_MODE" == "after_phase_delay" ]]; then
+  echo "Delaying scaler start until phase $SCALER_START_PHASE has run for ${SCALER_START_PHASE_DELAY_SEC}s"
+else
+  echo "ERROR: unsupported SCALER_START_MODE=$SCALER_START_MODE" >&2
+  exit 1
 fi
 
 # 9. Start metrics collector in background (pass AM host for driver-side CSV polling)
@@ -302,7 +417,27 @@ echo "Metrics collector PID: $METRICS_PID"
 # 10. Produce live bursty records if configured
 if [[ "$LIVE_EVENTS" -gt 0 ]]; then
   echo "Producing $LIVE_EVENTS live bursty records"
-  run_producer_with_source_log "$LIVE_EVENTS" true
+  if [[ "$SCALER_START_MODE" == "after_phase_delay" ]]; then
+    start_producer_with_source_log "$LIVE_EVENTS" true
+    if ! phase_line=$(wait_for_phase_start "$SCALER_START_PHASE" "$SCALER_START_WAIT_TIMEOUT_SEC"); then
+      if [[ -n "$PRODUCER_PID" ]]; then
+        kill "$PRODUCER_PID" >/dev/null 2>&1 || true
+      fi
+      exit 1
+    fi
+    phase_target_rate=$(printf '%s\n' "$phase_line" | awk -F, 'END {print $4}')
+    echo "Sleeping ${SCALER_START_PHASE_DELAY_SEC}s before starting scaler/backpressure"
+    sleep "$SCALER_START_PHASE_DELAY_SEC"
+    echo "Starting scaler/backpressure after delayed phase gate"
+    start_autoscaler_commands "after_phase_delay" "$SCALER_START_PHASE" "$phase_target_rate" "$SCALER_START_PHASE_DELAY_SEC"
+    producer_status=0
+    wait "$PRODUCER_PID" || producer_status=$?
+    if [[ "$producer_status" -ne 0 ]]; then
+      exit "$producer_status"
+    fi
+  else
+    run_producer_with_source_log "$LIVE_EVENTS" true
+  fi
 fi
 
 # 11. Report status
@@ -312,6 +447,7 @@ echo "  Subscriber PID: $SUB_PID"
 echo "  Subscriber log: $SUB_LOG"
 echo "  Work dir: $WORK_DIR"
 echo "  Scaling commands: $WORK_DIR/scaling.txt"
+echo "  Scaler enable log: $SCALER_ENABLE_LOG"
 echo "  Metrics collector PID: $METRICS_PID"
 echo "  Metrics collector log: $WORK_DIR/metrics_collector.log"
 echo ""

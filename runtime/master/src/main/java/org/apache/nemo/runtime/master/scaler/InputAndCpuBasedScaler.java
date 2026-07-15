@@ -74,6 +74,62 @@ public final class InputAndCpuBasedScaler implements Scaler {
   private final ClientRPC clientRPC;
   private final String jobId;
 
+  private static final class ScalingDecisionSnapshot {
+    private final String action;
+    private final String trigger;
+    private final double avgCpu;
+    private final double cpuThreshold;
+    private final double expectedCpu;
+    private final double upperCpuThreshold;
+    private final double targetCpu;
+    private final double avgInput;
+    private final double avgProcess;
+    private final long queue;
+    private final double queueDelay;
+    private final double queueThreshold;
+    private final double relayOverhead;
+    private final double ratio;
+    private final int numExecutors;
+    private final int numComputeExecutors;
+    private final int numLambdaExecutors;
+
+    private ScalingDecisionSnapshot(final String action,
+                                    final String trigger,
+                                    final double avgCpu,
+                                    final double cpuThreshold,
+                                    final double expectedCpu,
+                                    final double upperCpuThreshold,
+                                    final double targetCpu,
+                                    final double avgInput,
+                                    final double avgProcess,
+                                    final long queue,
+                                    final double queueDelay,
+                                    final double queueThreshold,
+                                    final double relayOverhead,
+                                    final double ratio,
+                                    final int numExecutors,
+                                    final int numComputeExecutors,
+                                    final int numLambdaExecutors) {
+      this.action = action;
+      this.trigger = trigger;
+      this.avgCpu = avgCpu;
+      this.cpuThreshold = cpuThreshold;
+      this.expectedCpu = expectedCpu;
+      this.upperCpuThreshold = upperCpuThreshold;
+      this.targetCpu = targetCpu;
+      this.avgInput = avgInput;
+      this.avgProcess = avgProcess;
+      this.queue = queue;
+      this.queueDelay = queueDelay;
+      this.queueThreshold = queueThreshold;
+      this.relayOverhead = relayOverhead;
+      this.ratio = ratio;
+      this.numExecutors = numExecutors;
+      this.numComputeExecutors = numComputeExecutors;
+      this.numLambdaExecutors = numLambdaExecutors;
+    }
+  }
+
   @Inject
   private InputAndCpuBasedScaler(final ExecutorMetricMap executorMetricMap,
                                  final ScaleInOutManager scaleInOutManager,
@@ -182,10 +238,11 @@ public final class InputAndCpuBasedScaler implements Scaler {
         synchronized (this) {
           boolean scaled = false;
 
-          final Optional<Double> queueRatio = queueSizeBasedScalingRatio(info.numExecutor);
-          if (queueRatio.isPresent() && queueRatio.get() > 0.1) {
+          final Optional<ScalingDecisionSnapshot> queueDecision =
+            queueSizeBasedScalingDecision(avgCpu, avgExpectedCpuVal, info.numExecutor);
+          if (queueDecision.isPresent() && queueDecision.get().ratio > 0.1) {
             if (hasEligibleTasksToMigrate()) {
-              scalingWithRatio(queueRatio.get());
+              scalingWithDecision(queueDecision.get());
               scaled = true;
             } else {
               LOG.info("No eligible tasks on compute executors to migrate; skipping scale-out");
@@ -193,9 +250,10 @@ public final class InputAndCpuBasedScaler implements Scaler {
           }
 
           if (!scaled) {
-            final Optional<Double> cpuRatio = cpuBasedScalingRatio(avgCpu, avgExpectedCpuVal);
-            if (cpuRatio.isPresent() && cpuRatio.get() > 0.1) {
-              scalingWithRatio(cpuRatio.get());
+            final Optional<ScalingDecisionSnapshot> cpuDecision =
+              cpuBasedScalingDecision(avgCpu, avgExpectedCpuVal, info.numExecutor);
+            if (cpuDecision.isPresent() && cpuDecision.get().ratio > 0.1) {
+              scalingWithDecision(cpuDecision.get());
               scaled = true;
             }
           }
@@ -219,14 +277,17 @@ public final class InputAndCpuBasedScaler implements Scaler {
         .anyMatch(task -> !task.isCrTask()));
   }
 
-  private Optional<Double> queueSizeBasedScalingRatio(final int numExecutors) {
+  private Optional<ScalingDecisionSnapshot> queueSizeBasedScalingDecision(final double avgCpu,
+                                                                          final double expectedCpu,
+                                                                          final int numExecutors) {
     final long queue = aggInput.get() - currSourceEvent;
     final double processingRate = avgSrcProcessingRate.getMean();
     final double avgInput = avgInputRate.getMean();
+    final double queueDelay = processingRate > 0 ? queue / processingRate : -1.0;
 
     if (processingRate > 0) {
       LOG.info("Scaler queue: {}, processingRate: {}, avgInputRate: {}, delay: {}",
-        queue, processingRate, avgInput, queue / processingRate);
+        queue, processingRate, avgInput, queueDelay);
     } else {
       LOG.info("Scaler queue: {}, processingRate: {}, avgInputRate: {}, delay: N/A",
         queue, processingRate, avgInput);
@@ -237,7 +298,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
     }
 
     if (processingRate > 0) {
-      if (queue / processingRate > policyConf.scalerTriggerQueueDelay) {
+      if (queueDelay > policyConf.scalerTriggerQueueDelay) {
         if (avgInput <= 0) {
           LOG.warn("avgInputRate is zero or negative; cannot compute ratio");
           return Optional.empty();
@@ -246,20 +307,24 @@ public final class InputAndCpuBasedScaler implements Scaler {
         final double rawRatio = 1 - (processingRate / avgInput) + policyConf.scalerRelayOverhead;
         final double ratioToScaleout = Math.max(0.0, Math.min(0.95, rawRatio));
 
-        return Optional.of(ratioToScaleout);
+        return Optional.of(newDecision("SCALE_OUT", "QUEUE", avgCpu, expectedCpu, avgInput,
+          processingRate, queue, queueDelay, ratioToScaleout, numExecutors));
       }
     } else if (queue > 0) {
       // Source is stalled (processingRate = 0) but queue is positive;
       // scale out with a conservative queue-based ratio.
       LOG.info("Source stalled with queue={}, triggering queue-based scale-out", queue);
       final double rawRatio = Math.min(0.95, queue / (double) Math.max(aggInput.get(), 1));
-      return Optional.of(Math.max(0.1, rawRatio));
+      return Optional.of(newDecision("SCALE_OUT", "QUEUE_STALLED", avgCpu, expectedCpu, avgInput,
+        processingRate, queue, queueDelay, Math.max(0.1, rawRatio), numExecutors));
     }
 
     return Optional.empty();
   }
 
-  private Optional<Double> cpuBasedScalingRatio(final double avgCpu, final double avgExpectedCpuVal) {
+  private Optional<ScalingDecisionSnapshot> cpuBasedScalingDecision(final double avgCpu,
+                                                                    final double avgExpectedCpuVal,
+                                                                    final int numExecutors) {
     if (avgCpu > policyConf.scalerScaleoutTriggerCPU
       && avgExpectedCpuVal > policyConf.scalerUpperCpu) {
       // Scale out !!
@@ -269,16 +334,39 @@ public final class InputAndCpuBasedScaler implements Scaler {
       final double rawRatio = 1 - policyConf.scalerTargetCpu / avgExpectedCpuVal;
       final double ratioToScaleout = Math.max(0.0, Math.min(0.95, rawRatio));
       // move ratioToScaleout % of computations to Lambda
-      return Optional.of(ratioToScaleout);
+      final long queue = aggInput.get() - currSourceEvent;
+      final double processingRate = avgSrcProcessingRate.getMean();
+      final double avgInput = avgInputRate.getMean();
+      final double queueDelay = processingRate > 0 ? queue / processingRate : -1.0;
+      return Optional.of(newDecision("SCALE_OUT", "CPU", avgCpu, avgExpectedCpuVal, avgInput,
+        processingRate, queue, queueDelay, ratioToScaleout, numExecutors));
     }
 
     return Optional.empty();
   }
 
-  private void scalingWithRatio(final double ratioToScaleout) {
+  private ScalingDecisionSnapshot newDecision(final String action,
+                                              final String trigger,
+                                              final double avgCpu,
+                                              final double expectedCpu,
+                                              final double avgInput,
+                                              final double avgProcess,
+                                              final long queue,
+                                              final double queueDelay,
+                                              final double ratio,
+                                              final int numExecutors) {
+    return new ScalingDecisionSnapshot(action, trigger, avgCpu, policyConf.scalerScaleoutTriggerCPU,
+      expectedCpu, policyConf.scalerUpperCpu, policyConf.scalerTargetCpu, avgInput, avgProcess,
+      queue, queueDelay, policyConf.scalerTriggerQueueDelay, policyConf.scalerRelayOverhead, ratio,
+      numExecutors, executorRegistry.getVMComputeExecutors().size(),
+      executorRegistry.getLambdaExecutors().size());
+  }
+
+  private void scalingWithDecision(final ScalingDecisionSnapshot decision) {
     // move ratioToScaleout % of computations to Lambda
-    LOG.info("Move {} percent of tasks in all vm executors", ratioToScaleout);
-    writeScalingDecision("SCALE_OUT", ratioToScaleout);
+    LOG.info("Move {} percent of tasks in all vm executors", decision.ratio);
+    emitDecisionLog(decision);
+    writeScalingDecision(decision);
 
     prevFutureCompleted.set(false);
 
@@ -286,7 +374,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
       final long st = System.currentTimeMillis();
       LOG.info("Waiting for scale out decision");
       scaleInOutManager.sendMigrationAllStages(
-        ratioToScaleout,
+        decision.ratio,
         executorRegistry.getVMComputeExecutors(),
         ResourcePriorityProperty.LAMBDA).forEach(future -> {
         try {
@@ -304,7 +392,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
       lastActionWasScaleOut = true;
 
       // send hints to the backpressure
-      backpressure.setHintForScaling(ratioToScaleout);
+      backpressure.setHintForScaling(decision.ratio);
 
       LOG.info("End of waiting for scale out decision {}", et - st);
     });
@@ -386,7 +474,14 @@ public final class InputAndCpuBasedScaler implements Scaler {
         return;
       }
 
-      writeScalingDecision("SCALE_IN", 1.0);
+      final ScalingDecisionSnapshot decision = newDecision("SCALE_IN", "IDLE", avgCpuUse.getMean(),
+        avgExpectedCpu.getMean(), avgInputRate.getMean(), avgSrcProcessingRate.getMean(),
+        aggInput.get() - currSourceEvent,
+        avgSrcProcessingRate.getMean() > 0
+          ? (aggInput.get() - currSourceEvent) / avgSrcProcessingRate.getMean() : -1.0,
+        1.0, executorRegistry.getRunningExecutors().size());
+      emitDecisionLog(decision);
+      writeScalingDecision(decision);
 
       final List<String> slist = new ArrayList<>(stages);
       final List<Double> ratios = slist.stream().map(s -> 1.0).collect(Collectors.toList());
@@ -444,7 +539,22 @@ public final class InputAndCpuBasedScaler implements Scaler {
     aggInput.getAndAdd(delta);
   }
 
-  private void writeScalingDecision(final String action, final double ratio) {
+  private void emitDecisionLog(final ScalingDecisionSnapshot decision) {
+    final String msg = String.format("Scale decision action=%s trigger=%s avgCpu=%.4f "
+        + "cpuThreshold=%.4f expectedCpu=%.4f upperCpuThreshold=%.4f avgInput=%.4f "
+        + "avgProcess=%.4f queue=%d queueDelay=%.4f queueThreshold=%.4f ratio=%.4f "
+        + "numExecutors=%d numComputeExecutors=%d numLambdaExecutors=%d",
+      decision.action, decision.trigger, decision.avgCpu, decision.cpuThreshold,
+      decision.expectedCpu, decision.upperCpuThreshold, decision.avgInput, decision.avgProcess,
+      decision.queue, decision.queueDelay, decision.queueThreshold, decision.ratio,
+      decision.numExecutors, decision.numComputeExecutors, decision.numLambdaExecutors);
+    LOG.info(msg);
+    clientRPC.send(ControlMessage.DriverToClientMessage.newBuilder()
+      .setType(ControlMessage.DriverToClientMessageType.PrintLog)
+      .setPrintStr(msg).build());
+  }
+
+  private void writeScalingDecision(final ScalingDecisionSnapshot decision) {
     final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
     final String outDir = workDir != null ? workDir : "/tmp";
     final File outFile = new File(outDir, "scaling_decisions.csv");
@@ -454,16 +564,22 @@ public final class InputAndCpuBasedScaler implements Scaler {
     }
     try (PrintWriter writer = new PrintWriter(new FileWriter(outFile, true))) {
       final long now = System.currentTimeMillis();
-      final double avgCpu = avgCpuUse.getMean();
-      final double avgInput = avgInputRate.getMean();
-      final double avgProcess = avgSrcProcessingRate.getMean();
-      final long queue = aggInput.get() - currSourceEvent;
-      final int numExecutors = executorRegistry.getRunningExecutors().size();
-      writer.printf("%d,%s,%.4f,%.4f,%.4f,%.4f,%d,%.4f,%d%n",
-        now, action, avgCpu, avgInput, avgProcess, (double) queue, queue, ratio, numExecutors);
+      writer.printf("%d,%s,%.4f,%.4f,%.4f,%.4f,%d,%.4f,%d,"
+          + "%s,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%d%n",
+        now, decision.action, safeMetric(decision.avgCpu), safeMetric(decision.avgInput),
+        safeMetric(decision.avgProcess), (double) decision.queue, decision.queue,
+        safeMetric(decision.ratio), decision.numExecutors, decision.trigger,
+        safeMetric(decision.cpuThreshold), safeMetric(decision.expectedCpu),
+        safeMetric(decision.upperCpuThreshold), safeMetric(decision.targetCpu),
+        safeMetric(decision.queueDelay), safeMetric(decision.queueThreshold),
+        decision.numComputeExecutors, decision.numLambdaExecutors);
     } catch (IOException e) {
       LOG.warn("Failed to write scaling decision", e);
     }
+  }
+
+  private double safeMetric(final double value) {
+    return Double.isFinite(value) ? value : -1.0;
   }
 
   private void writeScalerMetrics(final double avgCpu,

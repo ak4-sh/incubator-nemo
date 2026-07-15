@@ -100,6 +100,7 @@ under the License.
               <goal>shade</goal>
             </goals>
             <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
               <outputFile>
                 ${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar
               </outputFile>
@@ -123,6 +124,14 @@ under the License.
                 <relocation>
                   <pattern>io.netty</pattern>
                   <shadedPattern>org.apache.nemo.shaded.io.netty</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.http</pattern>
+                  <shadedPattern>org.apache.nemo.shaded.apache.http</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.commons.codec</pattern>
+                  <shadedPattern>org.apache.nemo.shaded.apache.commons.codec</shadedPattern>
                 </relocation>
               </relocations>
 

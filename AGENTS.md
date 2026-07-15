@@ -1,6 +1,205 @@
 Current Cluster Context
 =======================
 
+Latest Sponge/Q6 State (2026-07-15 UTC)
+---------------------------------------
+
+- Current branch context is Sponge/Q6 on the 14-node CloudLab cluster.
+- Use **node0** as the control/submission node and YARN ResourceManager host.
+- Baseline YARN NodeManagers should run only on **node5, node9, node10, node11, node12**.
+- Offload JVM worker nodes are **node4, node6, node7, node8, node13**. Do not start YARN NodeManagers there.
+- Live Hadoop worker file must contain only the five baseline nodes:
+  `/users/akash01/hadoop/etc/hadoop/slaves`.
+- Runtime split for the current branch:
+  - ResourceManager: Java 8 (`/usr/lib/jvm/java-8-openjdk-amd64`)
+  - NodeManagers / YARN executor containers: Java 11 (`/usr/lib/jvm/java-11-openjdk-amd64`)
+- `scripts/cloudlab/cloudlab_env.sh` currently defaults to Java 11 for Nemo runs.
+- If `start-yarn.sh` starts NMs but RM is not reachable on `node0:8032`, explicitly start RM on node0 with Java 8:
+
+```bash
+ssh -o BatchMode=yes node0 \
+  "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64; \
+   export PATH=\$JAVA_HOME/bin:\$PATH; \
+   /users/akash01/hadoop/sbin/yarn-daemon.sh start resourcemanager"
+```
+
+- Healthy YARN state before starting a test:
+
+```text
+yarn node -list
+Total Nodes: 5
+RUNNING: node5, node9, node10, node11, node12
+
+yarn application -list
+Running applications: 0
+```
+
+- Verify offload nodes are clean before baseline tests:
+
+```bash
+for n in node4 node6 node7 node8 node13; do
+  echo "===$n==="
+  ssh -o BatchMode=yes "$n" "jps -lv | grep NodeManager || true"
+done
+```
+
+- Current Q6 executor config to use:
+  `configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json`.
+- That config means:
+  - 1 Source executor, 8 slots
+  - 4 Compute executors, each 8192 MB, `capacity=3`, `slot=3`
+  - 12 total compute logical slots
+- Exact executor/memory JSON used for the 8 GB Q6 threshold run:
+
+```json
+[
+  { "type": "Transient", "memory_mb": 768,  "capacity": 1, "slot": 1, "num": 0 },
+  { "type": "Reserved",  "memory_mb": 768,  "capacity": 1, "slot": 1, "num": 0 },
+  { "type": "Source",    "memory_mb": 2048, "capacity": 8, "slot": 8, "num": 1 },
+  { "type": "Compute",   "memory_mb": 8192, "capacity": 3, "slot": 3, "num": 4 }
+]
+```
+
+- Keep `capacity=3,slot=3` for Q6. The older `capacity=1,slot=1` compute config can starve Stage2/Stage3 because streaming tasks are long-lived.
+- The relevant scheduler history is commit `3f663b918 Fix Pado streaming scheduler deadlock: upstream stages first`; the fix is present, but enough logical slots are still required.
+- Latest Q6 scale-out threshold run:
+  - Date/time: 2026-07-15 UTC.
+  - Script: `scripts/cloudlab/run_q6_step_rate_sweep.sh`.
+  - Overrides: `STEP_START_RATE=80000`, `STEP_RATE=5000`, `STEP_DURATION_SEC=20`, `STEP_NUM_STEPS=45`, `PREFILL_EVENTS=100`, `AUTOSCALING=true`.
+  - Topic: `nexmark-auto-190851`.
+  - App: `application_1784073595628_0002`.
+  - Topology/config: node0 RM/submission, node1-node3 Kafka, node5/node9/node10/node11/node12 baseline YARN workers, node4/node6/node7/node8/node13 offload JVM workers, executor JSON `nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json`.
+  - Memory: Source executor 2048 MB (`-Xmx` about 1948 MB), four Compute executors 8192 MB each (`-Xmx` about 8092 MB). Total Nemo executor containers: 5 (1 Source + 4 Compute); YARN containers including driver: 6.
+  - Scale-out occurred at about **135k ev/s**. AM-side decision row from `node5:/tmp/scaling_decisions.csv`:
+
+```text
+1784078208373,SCALE_OUT,0.6250,135000.0000,123177.8000,153024.0000,153024,0.1613,165
+```
+
+  - Interpretation: avg CPU `0.625`, avg input `135000`, avg process `123177.8`, queue `153024`, scale-out ratio `0.1613`.
+  - Confirmed migration future completed in `node5:/tmp/scaler_metrics.csv` with `lastActionWasScaleOut=true` and `prevFutureCompleted=true`.
+  - The app was killed immediately after confirming successful scale-out. Post-kill state: `yarn application -list` showed 0 running apps; `yarn node -list` showed 5 RUNNING baseline nodes and 0 containers.
+- Latest delayed-scaler Q6 validation run:
+  - Date/time: 2026-07-15 UTC.
+  - Script: `scripts/cloudlab/run_q6_warmup_steady_burst.sh`.
+  - Topic: `nexmark-auto-202953`.
+  - App: `application_1784073595628_0005`.
+  - AM host: `node12`.
+  - Executor config: `configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json`.
+  - Memory/topology: 1 Source executor at 2048 MB, 4 Compute executors at 8192 MB each, `capacity=3`, `slot=3`, 12 compute scheduling slots, 5 Nemo executor containers, 6 YARN containers including AM.
+  - Harness timeline:
+
+```text
+prefill:       100 events
+phase 1:       20k ev/s for 100s
+phase 2:      100k ev/s for 150s
+scaler start: phase 2 + 60s
+phase 3:      200k ev/s for 150s
+```
+
+  - Phase markers from `/tmp/nx-auto-nexmark-auto-202953/producer_phases.csv`:
+
+```text
+1784082839401,start,1,20000,100,0,673
+1784082939414,end,1,20000,100,2001319,100686
+1784082939414,start,2,100000,150,2001389,100686
+1784083089432,end,2,100000,150,17003405,250704
+1784083089432,start,3,200000,150,17003480,250704
+```
+
+  - Scaler enable marker from `/tmp/nx-auto-nexmark-auto-202953/scaler_enable.csv`:
+
+```text
+1784083000414,after_phase_delay,2,100000,60
+```
+
+  - Result: no false scale-out during warmup or the stabilized 100k phase. At 100k after scaler enable, AM-side metrics were stable around CPU `0.52-0.54`, avg process `99k-101k`, queue `30k-40k`, 4 executors, and no decision rows.
+  - Scale-out fired shortly after the 200k phase began. AM-side decision row from `node12:/tmp/scaling_decisions.csv`:
+
+```text
+1784083091956,SCALE_OUT,0.4980,200000.0000,101195.2000,229582.0000,229582,0.5940,4,QUEUE,0.8000,0.7399,1.2000,0.6000,2.2687,2.0000,4,160
+```
+
+  - Interpretation: trigger `QUEUE`; avg CPU `0.498`, avg input `200000`, avg process `101195.2`, queue `229582`, queue delay `2.2687s`, queue threshold `2.0s`, 4 baseline executors, 160 offload workers available.
+  - The app was killed after confirming scale-out. Cleanup state: `yarn application -list` showed 0 running apps, no local producer/subscriber/collector processes remained for `nexmark-auto-202953`, and offload VMWorker pools on node4/node6/node7/node8/node13 were stopped. The run files were preserved under `/tmp/nx-auto-nexmark-auto-202953/` and `/tmp/nx-auto-sub-nexmark-auto-202953.log`.
+  - Methodology note: the delayed scaler start is harness-only. It does not change Sponge's default scaler logic; it avoids letting prefill/readiness and low-rate warmup samples arm or bias the scaler before the measured 100k phase.
+- Latest successful Q6 full warmup/steady/burst run with 4 GB Source:
+  - Date/time: 2026-07-15 UTC.
+  - Script: `scripts/cloudlab/run_q6_warmup_steady_burst.sh`.
+  - Topic: `nexmark-auto-213939`.
+  - App: `application_1784073595628_0007`.
+  - AM host: `node11`.
+  - Executor config: `configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json`.
+  - Memory/topology:
+    - 1 Source executor at 4096 MB; launch log confirmed `-XX:MaxHeapSize=3996m`.
+    - 4 Compute executors at 8192 MB each.
+    - Compute `capacity=3`, `slot=3`, for 12 resident compute scheduling slots.
+    - 5 Nemo executor containers, 6 YARN containers including the AM.
+  - Harness timeline:
+
+```text
+prefill:       100 events
+phase 1:       20k ev/s for 100s
+phase 2:      100k ev/s for 150s
+scaler start: phase 2 + 60s
+phase 3:      200k ev/s for 150s
+```
+
+  - Producer completed the full live workload:
+
+```text
+KAFKA_PRODUCER_DONE topic=nexmark-auto-213939 totalSent=47000000 elapsedMs=400726 avgRate=117287.12
+```
+
+  - Phase markers from `/tmp/nx-auto-nexmark-auto-213939/producer_phases.csv`:
+
+```text
+1784087026149,start,1,20000,100,0,659
+1784087126170,end,1,20000,100,2012308,100680
+1784087126170,start,2,100000,150,2012683,100680
+1784087276187,end,2,100000,150,17014701,250697
+1784087276187,start,3,200000,150,17014836,250697
+1784087426208,end,3,200000,150,47000000,400718
+```
+
+  - Scaler enable marker from `/tmp/nx-auto-nexmark-auto-213939/scaler_enable.csv`:
+
+```text
+1784087187173,after_phase_delay,2,100000,60
+```
+
+  - Result: no false scale-out during the 100k phase after scaler enable. Metrics stayed stable around CPU `0.53-0.55`, avg process `99k-101k`, and 4 baseline executors.
+  - Scale-out fired correctly during the 200k phase via queue delay:
+
+```text
+1784087280308,SCALE_OUT,0.5565,200000.0000,108331.8000,243277.0000,243277,0.5583,4,QUEUE,0.8000,0.8392,1.2000,0.6000,2.2457,2.0000,4,160
+```
+
+  - Interpretation: trigger `QUEUE`; avg CPU `0.5565`; avg input `200000`; avg process `108331.8`; queue `243277`; queue delay `2.2457s`; threshold `2.0s`; ratio `0.5583`; 160 offload workers available.
+  - Post-scale behavior was healthy: processing recovered to roughly `198k-228k ev/s` and the queue drained instead of collapsing to zero processing.
+  - No `OutOfMemoryError` or `FailedRuntime` was found in the subscriber log for this run. The previous 2048 MB Source run failed after scale-out with Source heap OOM; this 4096 MB Source run avoided that failure.
+  - App was killed after producer completion and post-scale observation. Artifacts:
+    - `/tmp/app_1784073595628_0007.log`
+    - `/tmp/nx-auto-sub-nexmark-auto-213939.log`
+    - `/tmp/nx-auto-nexmark-auto-213939/`
+- Known working Q6 smoke command:
+
+```bash
+QUERY=6 \
+EXECUTOR_JSON=/users/akash01/incubator-nemo/configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json \
+AUTOSCALING=true \
+TOTAL_EVENTS=100000 \
+PREFILL_EVENTS=0 \
+FIRST_RATE=5000 \
+NEXT_RATE=5000 \
+RATE_PERIOD_SEC=20 \
+PRODUCER_RATE_LIMITED=true \
+scripts/cloudlab/run_autoscaler_smoke.sh
+```
+
+- Streaming jobs do not naturally exit when the producer reaches `TOTAL_EVENTS`; kill the YARN app after confirming metrics.
+- More detailed runbook: `scripts/cloudlab/README.md`, section `Sponge/Q6 CloudLab Runbook`.
+
 Topology
 --------
 
@@ -19,8 +218,9 @@ Current YARN State
 ------------------
 - 5 NodeManager registrations on baseline workers: node5, node9, node10, node11, node12.
 - NMs now register with **internal hostnames** (`node5-link-1` → `10.10.1.6`) instead of external FQDNs (`c220g2-011125.wisc.cloudlab.us` → `128.105.145.128`).
-- NMs killed and restarted fresh with distributed config files.
-- RM also restarted fresh.
+- Current 2026-07-15 restart: RM active on node0, five baseline NMs RUNNING, no active YARN applications, offload nodes have no NodeManager JVMs.
+- NMs restarted with Java 11; RM restarted separately with Java 8 after `start-yarn.sh` did not leave RM reachable on `8032`.
+- Older notes below may mention prior application IDs or all-Java-11 YARN configuration; prefer the `Latest Sponge/Q6 State` section above for current operations.
 - Latest clean restart after `application_1781926211327_0002` (sponge-q0-test): app killed, local subscriber/producer/collector stopped, warm VMWorker pools killed, orphan REEFLauncher processes cleaned up, RM and all five baseline NMs restarted; YARN shows all five baseline NMs `RUNNING` with `0` containers and no active applications; HDFS safemode OFF, 10 live datanodes.
 - `/users/akash01/hadoop/etc/hadoop/slaves` on all nodes contains only: `node5`, `node9`, `node10`, `node11`, `node12`.
 
@@ -29,7 +229,7 @@ Configuration Changes Applied
 
 ### Hadoop/YARN Config (distributed to all baseline nodes via scp)
 
-- `/users/akash01/hadoop/etc/hadoop/hadoop-env.sh`: Java 11, explicit Hadoop component homes:
+- `/users/akash01/hadoop/etc/hadoop/hadoop-env.sh`: Java 11 for NodeManagers/executor containers, explicit Hadoop component homes. Start ResourceManager with Java 8 manually when needed:
 
 ```bash
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
@@ -71,7 +271,7 @@ Issues Found And Resolved
 -------------------------
 
 ### Java Mismatch
-- YARN containers used Java 8 while Nemo jars compiled for Java 11. Fixed by switching Hadoop/YARN env to Java 11.
+- YARN containers used Java 8 while Nemo jars compiled for Java 11. Current operational fix is a split runtime: NodeManagers/executor containers use Java 11, while the ResourceManager is started with Java 8 for Hadoop 2.7 compatibility.
 
 ### Missing Beam gRPC Class
 - `org.apache.beam.vendor.grpc.v1p21p0.com.google.protobuf.ProtocolMessageEnum` missing from classpath. Fixed by adding Beam vendor gRPC jar to launcher classpath.

@@ -29,6 +29,10 @@ public final class StandaloneNexmarkKafkaProducer {
     if (args.length < 6) {
       System.err.println("Usage custom burst (default):");
       System.err.println("  StandaloneNexmarkKafkaProducer <bootstrap> <topic> <steadyRate> <burstRate> <steadySec> <burstSec> <numBursts> <isRateLimited> [numGenerators] [rampUpSec] [maxEvents]");
+      System.err.println("Usage step sweep:");
+      System.err.println("  StandaloneNexmarkKafkaProducer <bootstrap> <topic> STEP <startRate> <stepRate> <stepSec> <numSteps> <isRateLimited> [numGenerators] [maxEvents]");
+      System.err.println("Usage explicit phases:");
+      System.err.println("  StandaloneNexmarkKafkaProducer <bootstrap> <topic> PHASES <ratesCsv> <durationsCsv> <isRateLimited> [numGenerators] [maxEvents]");
       System.err.println("Usage legacy BURSTY:");
       System.err.println("  StandaloneNexmarkKafkaProducer <bootstrap> <topic> <numEvents> <firstRate> <nextRate> <periodSec> <isRateLimited> [numGenerators]");
       System.err.println("Usage two-phase:");
@@ -38,6 +42,61 @@ public final class StandaloneNexmarkKafkaProducer {
 
     final String bootstrapServers = args[0];
     final String topic = args[1];
+
+    if ("STEP".equalsIgnoreCase(args[2])) {
+      if (args.length < 8) {
+        throw new IllegalArgumentException("STEP mode requires at least 8 arguments");
+      }
+      final int startRate = Integer.parseInt(args[3]);
+      final int stepRate = Integer.parseInt(args[4]);
+      final int stepDurationSec = Integer.parseInt(args[5]);
+      final int numSteps = Integer.parseInt(args[6]);
+      final boolean isRateLimited = Boolean.parseBoolean(args[7]);
+      final int numGenerators = args.length >= 9 ? Integer.parseInt(args[8]) : 8;
+      final long maxEvents = args.length >= 10 ? Long.parseLong(args[9]) : 0L;
+
+      System.out.println("=== NEXMark Step Sweep Mode ===");
+      System.out.println("  startRate: " + startRate + " ev/s");
+      System.out.println("  stepRate: " + stepRate + " ev/s");
+      System.out.println("  stepDuration: " + stepDurationSec + "s");
+      System.out.println("  numSteps: " + numSteps);
+      System.out.println("  generators: " + numGenerators);
+      if (maxEvents > 0) {
+        System.out.println("  maxEvents: " + maxEvents);
+      }
+
+      runStepSweepPhase(bootstrapServers, topic, startRate, stepRate,
+        stepDurationSec, numSteps, isRateLimited, numGenerators, maxEvents);
+      return;
+    }
+
+    if ("PHASES".equalsIgnoreCase(args[2])) {
+      if (args.length < 6) {
+        throw new IllegalArgumentException("PHASES mode requires at least 6 arguments");
+      }
+      final int[] rates = parsePositiveIntCsv(args[3], "ratesCsv");
+      final int[] durationsSec = parsePositiveIntCsv(args[4], "durationsCsv");
+      if (rates.length != durationsSec.length) {
+        throw new IllegalArgumentException("ratesCsv and durationsCsv must have the same length");
+      }
+      final boolean isRateLimited = Boolean.parseBoolean(args[5]);
+      final int numGenerators = args.length >= 7 ? Integer.parseInt(args[6]) : 8;
+      final long maxEvents = args.length >= 8 ? Long.parseLong(args[7]) : 0L;
+
+      System.out.println("=== NEXMark Explicit Phases Mode ===");
+      for (int i = 0; i < rates.length; i++) {
+        System.out.println("  phase " + (i + 1) + ": " + durationsSec[i]
+          + "s at " + rates[i] + " ev/s");
+      }
+      System.out.println("  generators: " + numGenerators);
+      if (maxEvents > 0) {
+        System.out.println("  maxEvents: " + maxEvents);
+      }
+
+      runPhasesPhase(bootstrapServers, topic, rates, durationsSec, isRateLimited,
+        numGenerators, maxEvents);
+      return;
+    }
 
     // Detect mode: custom burst if args[6] (numBursts) is an integer > 0 and args[5] (burstSec) is also an integer
     // Distinguish from legacy BURSTY (7-8 args) where args[6] is boolean string
@@ -123,6 +182,462 @@ public final class StandaloneNexmarkKafkaProducer {
       }
       System.out.println("Done! Sent " + ((long) steadyEvents + burstEvents) + " events.");
     }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Step Sweep Phase
+  // ─────────────────────────────────────────────────────────────
+  private static int[] parsePositiveIntCsv(final String csv, final String name) {
+    final String[] parts = csv.split(",");
+    final int[] values = new int[parts.length];
+    for (int i = 0; i < parts.length; i++) {
+      values[i] = Integer.parseInt(parts[i].trim());
+      if (values[i] <= 0) {
+        throw new IllegalArgumentException(name + " must contain positive integers");
+      }
+    }
+    return values;
+  }
+
+  private static void runStepSweepPhase(final String bootstrapServers,
+                                         final String topic,
+                                         final int startRate,
+                                         final int stepRate,
+                                         final int stepDurationSec,
+                                         final int numSteps,
+                                         final boolean isRateLimited,
+                                         final int numGenerators,
+                                         final long maxEvents) throws Exception {
+    if (startRate <= 0 || stepRate < 0 || stepDurationSec <= 0 || numSteps <= 0) {
+      throw new IllegalArgumentException("Invalid step sweep parameters");
+    }
+
+    final int clampedGenerators = Math.max(1, Math.min(numGenerators, 64));
+    final long startTime = System.currentTimeMillis();
+    long plannedEvents = 0;
+    for (int step = 0; step < numSteps; step++) {
+      plannedEvents += (long) (startRate + step * stepRate) * stepDurationSec;
+    }
+    final long totalEvents = maxEvents > 0 ? Math.min(plannedEvents, maxEvents) : plannedEvents;
+
+    final AtomicLong totalSent = new AtomicLong(0);
+    final AtomicBoolean anyFailed = new AtomicBoolean(false);
+    final CountDownLatch latch = new CountDownLatch(clampedGenerators);
+
+    final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    final String outDir = workDir != null ? workDir : "/tmp";
+    final PrintWriter metricsWriter = new PrintWriter(new FileWriter(outDir + "/producer_metrics.csv", true));
+    metricsWriter.println("timestamp,outputRate,totalSent,elapsedMs,targetRate");
+    final PrintWriter sourceLogWriter = new PrintWriter(new FileWriter(outDir + "/source.log", true));
+
+    final long baseEventsPerGen = totalEvents / clampedGenerators;
+    final int remainder = (int) (totalEvents % clampedGenerators);
+    System.out.println("  plannedEvents: " + plannedEvents);
+    System.out.println("  totalEvents: " + totalEvents + " (~" + baseEventsPerGen + " per gen)");
+
+    for (int i = 0; i < clampedGenerators; i++) {
+      final long eventsForThisGen = (i < remainder) ? baseEventsPerGen + 1 : baseEventsPerGen;
+      final long firstEventId = (long) i * baseEventsPerGen + Math.min(i, remainder);
+      final int genIndex = i;
+      final Thread worker = new Thread(() -> {
+        try {
+          runStepSweepWorker(bootstrapServers, topic, eventsForThisGen,
+            startRate, stepRate, stepDurationSec, numSteps, clampedGenerators,
+            isRateLimited, firstEventId, totalSent, genIndex);
+        } catch (Exception e) {
+          anyFailed.set(true);
+          System.err.println("Generator " + genIndex + " failed: " + e.getMessage());
+          e.printStackTrace();
+        } finally {
+          latch.countDown();
+        }
+      });
+      worker.setName("step-gen-" + i);
+      worker.start();
+    }
+
+    final Thread metricsReporter = new Thread(() -> {
+      long lastMetricsWrite = startTime;
+      long lastSourceLogWrite = startTime;
+      while (true) {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          break;
+        }
+        final long now = System.currentTimeMillis();
+        final long sent = totalSent.get();
+        final long elapsed = now - startTime;
+        if (elapsed <= 0) {
+          continue;
+        }
+
+        if (now - lastMetricsWrite >= 5000) {
+          final double rate = sent * 1000.0 / elapsed;
+          final long elapsedSec = elapsed / 1000;
+          final int stepIndex = (int) Math.min(numSteps - 1, elapsedSec / stepDurationSec);
+          final int targetRate = startRate + stepIndex * stepRate;
+          synchronized (metricsWriter) {
+            metricsWriter.printf("%d,%.2f,%d,%d,%d%n", now, rate, sent, elapsed, targetRate);
+            metricsWriter.flush();
+          }
+          lastMetricsWrite = now;
+        }
+
+        if (now - lastSourceLogWrite >= 1000) {
+          synchronized (sourceLogWriter) {
+            sourceLogWriter.printf("%d events%n", sent);
+            sourceLogWriter.flush();
+          }
+          lastSourceLogWrite = now;
+        }
+
+        if (latch.getCount() == 0) {
+          break;
+        }
+      }
+    });
+    metricsReporter.setDaemon(true);
+    metricsReporter.start();
+
+    latch.await();
+
+    metricsReporter.interrupt();
+    try { metricsReporter.join(2000); } catch (InterruptedException ignored) {}
+
+    final long total = totalSent.get();
+    final long elapsed = System.currentTimeMillis() - startTime;
+    final double avgRate = total * 1000.0 / Math.max(1, elapsed);
+    System.out.printf("  Step sweep done: %d events in %d ms (%.1f ev/s avg)%n",
+      total, elapsed, avgRate);
+    System.out.printf("KAFKA_PRODUCER_DONE topic=%s totalSent=%d elapsedMs=%d avgRate=%.2f%n",
+      topic, total, elapsed, avgRate);
+    synchronized (metricsWriter) {
+      metricsWriter.printf("%d,%.2f,%d,%d,%d%n", System.currentTimeMillis(), avgRate,
+        total, elapsed, startRate + (numSteps - 1) * stepRate);
+      metricsWriter.flush();
+      metricsWriter.close();
+    }
+    synchronized (sourceLogWriter) {
+      sourceLogWriter.printf("%d events%n", total);
+      sourceLogWriter.flush();
+      sourceLogWriter.close();
+    }
+
+    if (anyFailed.get()) {
+      throw new RuntimeException("One or more generators failed");
+    }
+  }
+
+  private static void runStepSweepWorker(final String bootstrapServers,
+                                          final String topic,
+                                          final long numEvents,
+                                          final int startRate,
+                                          final int stepRate,
+                                          final int stepDurationSec,
+                                          final int numSteps,
+                                          final int numGenerators,
+                                          final boolean isRateLimited,
+                                          final long firstEventId,
+                                          final AtomicLong totalSent,
+                                          final int genIndex) throws Exception {
+    final NexmarkConfiguration config = new NexmarkConfiguration();
+    config.numEvents = (int) Math.min(numEvents, Integer.MAX_VALUE);
+    config.rateShape = RateShape.SQUARE;
+    config.firstEventRate = Math.max(startRate + (numSteps - 1) * stepRate, 1);
+    config.nextEventRate = config.firstEventRate;
+    config.rateUnit = RateUnit.PER_SECOND;
+    config.ratePeriodSec = 1;
+    config.isRateLimited = false;
+    config.numEventGenerators = 1;
+
+    final Generator generator = new Generator(new GeneratorConfig(
+      config, System.currentTimeMillis(), firstEventId, config.numEvents, firstEventId));
+
+    final Properties props = new Properties();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
+    props.put(ProducerConfig.ACKS_CONFIG, "1");
+    props.put(ProducerConfig.LINGER_MS_CONFIG, "5");
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG, "131072");
+    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, "134217728");
+    props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4");
+    props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+
+    final KafkaProducer<byte[], byte[]> producer = new KafkaProducer<>(props);
+    long localSent = 0;
+    final long workerStart = System.currentTimeMillis();
+
+    for (int step = 0; step < numSteps && generator.hasNext(); step++) {
+      final int targetRate = startRate + step * stepRate;
+      final int ratePerGen = targetRate / numGenerators
+        + (genIndex < targetRate % numGenerators ? 1 : 0);
+      System.out.printf("  [gen-%d] step %d/%d %ds at %d ev/s%n",
+        genIndex, step + 1, numSteps, stepDurationSec, ratePerGen);
+      for (int sec = 0; sec < stepDurationSec && generator.hasNext(); sec++) {
+        final long batchStart = System.currentTimeMillis();
+        long sentThisSec = 0;
+        while (sentThisSec < ratePerGen && generator.hasNext()) {
+          final TimestampedValue<Event> tv = generator.next();
+          final byte[] bytes = CoderUtils.encodeToByteArray(Event.CODER, tv.getValue());
+          producer.send(new ProducerRecord<>(topic, bytes));
+          sentThisSec++;
+          localSent++;
+          totalSent.incrementAndGet();
+        }
+        if (isRateLimited) {
+          final long elapsed = System.currentTimeMillis() - batchStart;
+          if (elapsed < 1000) {
+            Thread.sleep(1000 - elapsed);
+          }
+        }
+      }
+    }
+
+    producer.flush();
+    producer.close();
+
+    final long elapsed = System.currentTimeMillis() - workerStart;
+    System.out.printf("  [gen-%d] done: %d events in %d ms%n", genIndex, localSent, elapsed);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Explicit Phases Mode
+  // ─────────────────────────────────────────────────────────────
+  private static void runPhasesPhase(final String bootstrapServers,
+                                      final String topic,
+                                      final int[] rates,
+                                      final int[] durationsSec,
+                                      final boolean isRateLimited,
+                                      final int numGenerators,
+                                      final long maxEvents) throws Exception {
+    final int clampedGenerators = Math.max(1, Math.min(numGenerators, 64));
+    final long startTime = System.currentTimeMillis();
+    long plannedEvents = 0;
+    for (int i = 0; i < rates.length; i++) {
+      plannedEvents += (long) rates[i] * durationsSec[i];
+    }
+    final long totalEvents = maxEvents > 0 ? Math.min(plannedEvents, maxEvents) : plannedEvents;
+
+    final AtomicLong totalSent = new AtomicLong(0);
+    final AtomicBoolean anyFailed = new AtomicBoolean(false);
+    final CountDownLatch latch = new CountDownLatch(clampedGenerators);
+
+    final String workDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    final String outDir = workDir != null ? workDir : "/tmp";
+    final PrintWriter metricsWriter = new PrintWriter(new FileWriter(outDir + "/producer_metrics.csv", true));
+    metricsWriter.println("timestamp,outputRate,totalSent,elapsedMs,targetRate,phase");
+    final PrintWriter sourceLogWriter = new PrintWriter(new FileWriter(outDir + "/source.log", true));
+    final PrintWriter phaseWriter = new PrintWriter(new FileWriter(outDir + "/producer_phases.csv", true));
+    phaseWriter.println("timestamp,event,phase,targetRate,durationSec,totalSent,elapsedMs");
+
+    final long baseEventsPerGen = totalEvents / clampedGenerators;
+    final int remainder = (int) (totalEvents % clampedGenerators);
+    System.out.println("  plannedEvents: " + plannedEvents);
+    System.out.println("  totalEvents: " + totalEvents + " (~" + baseEventsPerGen + " per gen)");
+
+    for (int i = 0; i < clampedGenerators; i++) {
+      final long eventsForThisGen = (i < remainder) ? baseEventsPerGen + 1 : baseEventsPerGen;
+      final long firstEventId = (long) i * baseEventsPerGen + Math.min(i, remainder);
+      final int genIndex = i;
+      final Thread worker = new Thread(() -> {
+        try {
+          runPhasesWorker(bootstrapServers, topic, eventsForThisGen, rates, durationsSec,
+            clampedGenerators, isRateLimited, firstEventId, totalSent, genIndex, phaseWriter,
+            startTime);
+        } catch (Exception e) {
+          anyFailed.set(true);
+          System.err.println("Generator " + genIndex + " failed: " + e.getMessage());
+          e.printStackTrace();
+        } finally {
+          latch.countDown();
+        }
+      });
+      worker.setName("phase-gen-" + i);
+      worker.start();
+    }
+
+    final Thread metricsReporter = new Thread(() -> {
+      long lastMetricsWrite = startTime;
+      long lastSourceLogWrite = startTime;
+      while (true) {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          break;
+        }
+        final long now = System.currentTimeMillis();
+        final long sent = totalSent.get();
+        final long elapsed = now - startTime;
+        if (elapsed <= 0) {
+          continue;
+        }
+
+        if (now - lastMetricsWrite >= 5000) {
+          final double rate = sent * 1000.0 / elapsed;
+          final int phaseIndex = phaseIndexForElapsedMs(elapsed, durationsSec);
+          synchronized (metricsWriter) {
+            metricsWriter.printf("%d,%.2f,%d,%d,%d,%d%n", now, rate, sent, elapsed,
+              rates[phaseIndex], phaseIndex + 1);
+            metricsWriter.flush();
+          }
+          lastMetricsWrite = now;
+        }
+
+        if (now - lastSourceLogWrite >= 1000) {
+          synchronized (sourceLogWriter) {
+            sourceLogWriter.printf("%d events%n", sent);
+            sourceLogWriter.flush();
+          }
+          lastSourceLogWrite = now;
+        }
+
+        if (latch.getCount() == 0) {
+          break;
+        }
+      }
+    });
+    metricsReporter.setDaemon(true);
+    metricsReporter.start();
+
+    latch.await();
+
+    metricsReporter.interrupt();
+    try { metricsReporter.join(2000); } catch (InterruptedException ignored) {}
+
+    final long total = totalSent.get();
+    final long elapsed = System.currentTimeMillis() - startTime;
+    final double avgRate = total * 1000.0 / Math.max(1, elapsed);
+    System.out.printf("  Phases done: %d events in %d ms (%.1f ev/s avg)%n",
+      total, elapsed, avgRate);
+    System.out.printf("KAFKA_PRODUCER_DONE topic=%s totalSent=%d elapsedMs=%d avgRate=%.2f%n",
+      topic, total, elapsed, avgRate);
+    synchronized (metricsWriter) {
+      final int phaseIndex = phaseIndexForElapsedMs(elapsed, durationsSec);
+      metricsWriter.printf("%d,%.2f,%d,%d,%d,%d%n", System.currentTimeMillis(), avgRate,
+        total, elapsed, rates[phaseIndex], phaseIndex + 1);
+      metricsWriter.flush();
+      metricsWriter.close();
+    }
+    synchronized (sourceLogWriter) {
+      sourceLogWriter.printf("%d events%n", total);
+      sourceLogWriter.flush();
+      sourceLogWriter.close();
+    }
+    synchronized (phaseWriter) {
+      phaseWriter.flush();
+      phaseWriter.close();
+    }
+
+    if (anyFailed.get()) {
+      throw new RuntimeException("One or more generators failed");
+    }
+  }
+
+  private static int phaseIndexForElapsedMs(final long elapsedMs, final int[] durationsSec) {
+    long elapsedSec = elapsedMs / 1000;
+    for (int i = 0; i < durationsSec.length; i++) {
+      if (elapsedSec < durationsSec[i]) {
+        return i;
+      }
+      elapsedSec -= durationsSec[i];
+    }
+    return durationsSec.length - 1;
+  }
+
+  private static void runPhasesWorker(final String bootstrapServers,
+                                       final String topic,
+                                       final long numEvents,
+                                       final int[] rates,
+                                       final int[] durationsSec,
+                                       final int numGenerators,
+                                       final boolean isRateLimited,
+                                       final long firstEventId,
+                                       final AtomicLong totalSent,
+                                       final int genIndex,
+                                       final PrintWriter phaseWriter,
+                                       final long globalStartTime) throws Exception {
+    final NexmarkConfiguration config = new NexmarkConfiguration();
+    config.numEvents = (int) Math.min(numEvents, Integer.MAX_VALUE);
+    config.rateShape = RateShape.SQUARE;
+    config.firstEventRate = 1;
+    for (final int rate : rates) {
+      config.firstEventRate = Math.max(config.firstEventRate, rate);
+    }
+    config.nextEventRate = config.firstEventRate;
+    config.rateUnit = RateUnit.PER_SECOND;
+    config.ratePeriodSec = 1;
+    config.isRateLimited = false;
+    config.numEventGenerators = 1;
+
+    final Generator generator = new Generator(new GeneratorConfig(
+      config, System.currentTimeMillis(), firstEventId, config.numEvents, firstEventId));
+
+    final Properties props = new Properties();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
+    props.put(ProducerConfig.ACKS_CONFIG, "1");
+    props.put(ProducerConfig.LINGER_MS_CONFIG, "5");
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG, "131072");
+    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, "134217728");
+    props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4");
+    props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+
+    final KafkaProducer<byte[], byte[]> producer = new KafkaProducer<>(props);
+    long localSent = 0;
+    final long workerStart = System.currentTimeMillis();
+
+    for (int phase = 0; phase < rates.length && generator.hasNext(); phase++) {
+      final int targetRate = rates[phase];
+      final int ratePerGen = targetRate / numGenerators
+        + (genIndex < targetRate % numGenerators ? 1 : 0);
+      final long phaseStart = System.currentTimeMillis();
+      if (genIndex == 0) {
+        synchronized (phaseWriter) {
+          phaseWriter.printf("%d,start,%d,%d,%d,%d,%d%n", phaseStart, phase + 1,
+            targetRate, durationsSec[phase], totalSent.get(), phaseStart - globalStartTime);
+          phaseWriter.flush();
+        }
+      }
+      System.out.printf("  [gen-%d] phase %d/%d %ds at %d ev/s%n",
+        genIndex, phase + 1, rates.length, durationsSec[phase], ratePerGen);
+      for (int sec = 0; sec < durationsSec[phase] && generator.hasNext(); sec++) {
+        final long batchStart = System.currentTimeMillis();
+        long sentThisSec = 0;
+        while (sentThisSec < ratePerGen && generator.hasNext()) {
+          final TimestampedValue<Event> tv = generator.next();
+          final byte[] bytes = CoderUtils.encodeToByteArray(Event.CODER, tv.getValue());
+          producer.send(new ProducerRecord<>(topic, bytes));
+          sentThisSec++;
+          localSent++;
+          totalSent.incrementAndGet();
+        }
+        if (isRateLimited) {
+          final long elapsed = System.currentTimeMillis() - batchStart;
+          if (elapsed < 1000) {
+            Thread.sleep(1000 - elapsed);
+          }
+        }
+      }
+      final long phaseEnd = System.currentTimeMillis();
+      if (genIndex == 0) {
+        synchronized (phaseWriter) {
+          phaseWriter.printf("%d,end,%d,%d,%d,%d,%d%n", phaseEnd, phase + 1,
+            targetRate, durationsSec[phase], totalSent.get(), phaseEnd - globalStartTime);
+          phaseWriter.flush();
+        }
+      }
+    }
+
+    producer.flush();
+    producer.close();
+
+    final long elapsed = System.currentTimeMillis() - workerStart;
+    System.out.printf("  [gen-%d] done: %d events in %d ms%n", genIndex, localSent, elapsed);
   }
 
   // ─────────────────────────────────────────────────────────────

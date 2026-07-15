@@ -259,7 +259,7 @@ def plot_scaling_events(df: pd.DataFrame, work_dir: str):
     if not decisions.exists() or df.empty:
         return
 
-    dec = pd.read_csv(decisions, header=None)
+    dec = pd.read_csv(decisions, header=None, usecols=range(9))
     dec.columns = ["timestamp", "action", "avgCpu", "avgInput", "avgProcess", "queue", "queue2", "ratio", "numExecutors"]
     dec["timestamp"] = pd.to_datetime(dec["timestamp"], unit="ms")
     # df is the warmed subset: its rel_s values are correct (relative to true run start)
