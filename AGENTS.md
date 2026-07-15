@@ -4,6 +4,52 @@ Current Cluster Context
 Latest Sponge/Q6 State (2026-07-15 UTC)
 ---------------------------------------
 
+- Current Git status:
+  - Branch: `cloudlab-build-fixes-wip`.
+  - Local branch is in sync with `origin/cloudlab-build-fixes-wip`.
+  - Worktree is clean after the latest commits.
+  - Latest commits pushed to origin:
+
+```text
+01351c80a Add CloudLab executor placement controls
+67ebf6934 Add CloudLab Q6 formal run artifacts
+7c843a3c5 Document committed Q6 run results artifact
+```
+
+- Formal CloudLab Sponge/Nemo Q6 run status:
+  - Run ID: `q6-formal-20260715T174017Z`.
+  - Topic: `q6-formal-20260715T174017Z-topic`.
+  - YARN application: `application_1784096431599_0002`.
+  - AM host: `node5`.
+  - Archive committed under:
+    `results/cloudlab/q6-formal-20260715T174017Z`.
+  - Archive includes README, exact command/env, git diff, executor JSON, JAR checksums, placement CSV/JSON, producer phase logs, Kafka offset snapshots, all 14 node-system metrics, direct NodeManager userlogs, curated formal scaler/source metrics, cleanup verification, and SHA-256 manifest.
+  - Outcome: strict placement passed before production; Source ran on `node5-link-1`; Computes ran one each on `node9-link-1`, `node10-link-1`, `node11-link-1`, and `node12-link-1`.
+  - Producer completed `47,000,000` live events; topic total including prefill is `47,000,100`.
+  - Final Kafka consumer-group lag was `0` on all 8 partitions.
+  - Subscriber drained after producer completion (`Curr input: 0`, `Avg process input: 0`).
+  - Cleanup verification showed zero active YARN apps, five RUNNING NodeManagers with zero containers, HDFS safe mode OFF, and one DataNode on `node0-link-1`.
+
+- Placement implementation status:
+  - Implemented and pushed in commit `01351c80a`.
+  - Uses Nemo/REEF executor host placement through `SOURCE_HOSTS`, `COMPUTE_HOSTS`, `STRICT_EXECUTOR_PLACEMENT`, and `EXECUTOR_PLACEMENT_REPORT`; it does not require YARN node labels.
+  - Strict harness verification waits for AM-side `executor_placement.csv` and aborts before live producer phases on placement failure.
+  - Focused validation passed before commit:
+
+```bash
+python3 -m unittest scripts/cloudlab/test_verify_executor_placement.py
+mvn -pl runtime/master -Dtest=ExecutorPlacementPolicyTest test
+mvn -pl conf,client,runtime/master -am -DskipTests compile
+```
+
+- Plotting note:
+  - Plot script is `scripts/cloudlab/plot_metrics.py`.
+  - It expects `pandas` and `matplotlib`; default `/usr/bin/python3` on node0 did not have `pandas` installed during the formal-run handoff.
+  - For the formal archive, the natural work directory is:
+    `results/cloudlab/q6-formal-20260715T174017Z/workdir`.
+  - Curated formal scaler/source/task metrics are also available under:
+    `results/cloudlab/q6-formal-20260715T174017Z/formal_metrics`.
+
 - Current branch context is Sponge/Q6 on the 14-node CloudLab cluster.
 - Use **node0** as the control/submission node and YARN ResourceManager host.
 - Baseline YARN NodeManagers should run only on **node5, node9, node10, node11, node12**.
