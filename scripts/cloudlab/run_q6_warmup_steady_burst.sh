@@ -19,17 +19,23 @@ STEADY_DURATION_SEC=${STEADY_DURATION_SEC:-150}
 BURST_RATE=${BURST_RATE:-200000}
 BURST_DURATION_SEC=${BURST_DURATION_SEC:-150}
 
+SCALER_START_MODE=${SCALER_START_MODE:-after_phase_delay}
 SCALER_START_PHASE=${SCALER_START_PHASE:-2}
 SCALER_START_PHASE_DELAY_SEC=${SCALER_START_PHASE_DELAY_SEC:-60}
-if [[ "$SCALER_START_PHASE_DELAY_SEC" -ge "$STEADY_DURATION_SEC" ]]; then
+if [[ "$SCALER_START_MODE" == "after_phase_delay" && "$SCALER_START_PHASE_DELAY_SEC" -ge "$STEADY_DURATION_SEC" ]]; then
   echo "ERROR: SCALER_START_PHASE_DELAY_SEC must be less than STEADY_DURATION_SEC" >&2
   exit 1
 fi
 
 warmup_events=$((WARMUP_RATE * WARMUP_DURATION_SEC))
 steady_events=$((STEADY_RATE * STEADY_DURATION_SEC))
-steady_settling_events=$((STEADY_RATE * SCALER_START_PHASE_DELAY_SEC))
-steady_measured_duration_sec=$((STEADY_DURATION_SEC - SCALER_START_PHASE_DELAY_SEC))
+if [[ "$SCALER_START_MODE" == "after_phase_delay" ]]; then
+  steady_settling_events=$((STEADY_RATE * SCALER_START_PHASE_DELAY_SEC))
+  steady_measured_duration_sec=$((STEADY_DURATION_SEC - SCALER_START_PHASE_DELAY_SEC))
+else
+  steady_settling_events=0
+  steady_measured_duration_sec=$STEADY_DURATION_SEC
+fi
 steady_measured_events=$((STEADY_RATE * steady_measured_duration_sec))
 burst_events=$((BURST_RATE * BURST_DURATION_SEC))
 measured_events=$((steady_measured_events + burst_events))
@@ -50,7 +56,10 @@ echo "  live events:      $live_events"
 echo "  total events:     $total_events"
 echo "  phase rates:      $phase_rates"
 echo "  phase durations:  $phase_durations"
-echo "  scaler start:     phase ${SCALER_START_PHASE} + ${SCALER_START_PHASE_DELAY_SEC}s"
+echo "  scaler start:     $SCALER_START_MODE"
+if [[ "$SCALER_START_MODE" == "after_phase_delay" ]]; then
+  echo "                    phase ${SCALER_START_PHASE} + ${SCALER_START_PHASE_DELAY_SEC}s"
+fi
 
 QUERY=6 \
 EXECUTOR_JSON=${EXECUTOR_JSON:-"$PWD/configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json"} \
@@ -60,7 +69,7 @@ PREFILL_EVENTS=$PREFILL_EVENTS \
 BURST_MODE=phases \
 PHASE_RATES=$phase_rates \
 PHASE_DURATIONS_SEC=$phase_durations \
-SCALER_START_MODE=after_phase_delay \
+SCALER_START_MODE=$SCALER_START_MODE \
 SCALER_START_PHASE=$SCALER_START_PHASE \
 SCALER_START_PHASE_DELAY_SEC=$SCALER_START_PHASE_DELAY_SEC \
 PRODUCER_RATE_LIMITED=${PRODUCER_RATE_LIMITED:-true} \

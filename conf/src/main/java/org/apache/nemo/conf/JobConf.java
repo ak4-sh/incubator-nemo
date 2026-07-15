@@ -238,6 +238,38 @@ public final class JobConf extends ConfigurationModuleBuilder {
   public final class ExecutorJSONContents implements Name<String> {
   }
 
+  /**
+   * Optional comma-separated host list for Source executor placement.
+   */
+  @NamedParameter(doc = "Comma-separated hosts for Source executor placement",
+      short_name = "source_hosts", default_value = "")
+  public final class SourceHosts implements Name<String> {
+  }
+
+  /**
+   * Optional comma-separated host list for Compute executor placement.
+   */
+  @NamedParameter(doc = "Comma-separated hosts for Compute executor placement",
+      short_name = "compute_hosts", default_value = "")
+  public final class ComputeHosts implements Name<String> {
+  }
+
+  /**
+   * Whether executor placement must be verified before live input begins.
+   */
+  @NamedParameter(doc = "Fail executor placement checks when Source/Compute hosts do not match",
+      short_name = "strict_executor_placement", default_value = "false")
+  public final class StrictExecutorPlacement implements Name<Boolean> {
+  }
+
+  /**
+   * CSV file path for AM-side executor placement records.
+   */
+  @NamedParameter(doc = "CSV path for executor placement records",
+      short_name = "executor_placement_report", default_value = "")
+  public final class ExecutorPlacementReportPath implements Name<String> {
+  }
+
   //////////////////////////////// Runtime Data Plane Configurations
 
   /**

@@ -12,7 +12,7 @@
   <property><name>yarn.nodemanager.hostname</name><value>${NM_HOST}</value></property>
   <property><name>yarn.nodemanager.local-dirs</name><value>/data/hadoop/yarn/local</value></property>
   <property><name>yarn.nodemanager.log-dirs</name><value>/data/hadoop/yarn/logs</value></property>
-  <property><name>yarn.log-aggregation-enable</name><value>true</value></property>
+  <property><name>yarn.log-aggregation-enable</name><value>false</value></property>
   <property><name>yarn.nodemanager.vmem-check-enabled</name><value>false</value></property>
   <property><name>yarn.scheduler.minimum-allocation-mb</name><value>512</value></property>
   <property><name>yarn.scheduler.maximum-allocation-mb</name><value>176128</value></property>

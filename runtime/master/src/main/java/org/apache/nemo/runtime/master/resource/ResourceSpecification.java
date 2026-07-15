@@ -34,6 +34,7 @@ public final class ResourceSpecification {
   private final int slot;
   private final int memory;
   private final int poisonSec; // -1 if this resources is not poisoned
+  private final String preferredHost;
 
   public ResourceSpecification(final String containerType,
                                final int capacity,
@@ -53,17 +54,33 @@ public final class ResourceSpecification {
                                final int slot,
                                final int memory,
                                final int poisonSec) {
-    this.resourceSpecId = RuntimeIdManager.generateResourceSpecId();
+    this(RuntimeIdManager.generateResourceSpecId(), containerType, capacity, slot, memory, poisonSec, "");
+  }
+
+  private ResourceSpecification(final String resourceSpecId,
+                                final String containerType,
+                                final int capacity,
+                                final int slot,
+                                final int memory,
+                                final int poisonSec,
+                                final String preferredHost) {
+    this.resourceSpecId = resourceSpecId;
     this.containerType = containerType;
     this.slot = slot;
     this.capacity = capacity;
     this.memory = memory;
     this.poisonSec = poisonSec;
+    this.preferredHost = preferredHost == null ? "" : preferredHost;
+  }
+
+  public ResourceSpecification withPreferredHost(final String host) {
+    return new ResourceSpecification(resourceSpecId, containerType, capacity, slot, memory, poisonSec, host);
   }
 
   @Override
   public String toString() {
-    return "[" + containerType + ", capa: " + capacity + ", slot: " + slot + ", mem: " + memory + "]";
+    return "[" + containerType + ", capa: " + capacity + ", slot: " + slot + ", mem: " + memory
+      + (preferredHost.isEmpty() ? "" : ", host: " + preferredHost) + "]";
   }
 
   /**
@@ -101,5 +118,9 @@ public final class ResourceSpecification {
    */
   public int getPoisonSec() {
     return poisonSec;
+  }
+
+  public String getPreferredHost() {
+    return preferredHost;
   }
 }

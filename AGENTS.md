@@ -49,6 +49,31 @@ done
   - 1 Source executor, 4096 MB, 8 slots
   - 4 Compute executors, each 8192 MB, `capacity=3`, `slot=3`
   - 12 total compute logical slots
+- Formal CloudLab Q6 placement run must use Nemo/REEF executor host placement, not YARN labels:
+
+```bash
+QUERY=6 \
+EXECUTOR_JSON=/users/akash01/incubator-nemo/configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json \
+BASELINE_NODES="node5 node9 node10 node11 node12" \
+EXPECTED_NM_COUNT=5 \
+SOURCE_HOSTS=node5-link-1 \
+COMPUTE_HOSTS=node9-link-1,node10-link-1,node11-link-1,node12-link-1 \
+STRICT_EXECUTOR_PLACEMENT=true \
+SCALER_START_MODE=immediate \
+AUTOSCALING=true \
+BURST_MODE=phases \
+PREFILL_EVENTS=100 \
+TOTAL_EVENTS=47000100 \
+PHASE_RATES=20000,100000,200000 \
+PHASE_DURATIONS_SEC=100,150,150 \
+PRODUCER_PARALLELISM=8 \
+OFFLOAD_NODES=node4,node6,node7,node8,node13 \
+WORKERS_PER_NODE=32 \
+scripts/cloudlab/run_q6_warmup_steady_burst.sh
+```
+
+  - The AM may run on any of the five NodeManager hosts.
+  - The harness waits for the AM-side `executor_placement.csv` report and fails before live producer phases if Source is not on node5, any Compute is on node5, two Computes share a node, any of node9-node12 lacks a Compute, or a Source/Compute lands outside the allowed baseline nodes.
 - Exact current executor/memory JSON:
 
 ```json

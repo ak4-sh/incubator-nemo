@@ -801,6 +801,10 @@ public final class JobLauncher {
     cl.registerShortNameOfClass(JobConf.ExecutorMem.class);
     cl.registerShortNameOfClass(JobConf.ExecutorYarnCore.class);
     cl.registerShortNameOfClass(JobConf.NumExecutor.class);
+    cl.registerShortNameOfClass(JobConf.SourceHosts.class);
+    cl.registerShortNameOfClass(JobConf.ComputeHosts.class);
+    cl.registerShortNameOfClass(JobConf.StrictExecutorPlacement.class);
+    cl.registerShortNameOfClass(JobConf.ExecutorPlacementReportPath.class);
 
     EvalConf.registerCommandLineArgument(cl);
 

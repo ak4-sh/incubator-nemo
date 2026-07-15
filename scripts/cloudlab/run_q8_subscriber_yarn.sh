@@ -18,6 +18,10 @@ AUTOSCALING=${AUTOSCALING:-false}
 LATENCY_LIMIT=${LATENCY_LIMIT:-300000}
 NUM_MAX_LAMBDA=${NUM_MAX_LAMBDA:-4}
 LOG_FILE=${LOG_FILE:-/tmp/${JOB_ID}.log}
+SOURCE_HOSTS=${SOURCE_HOSTS:-}
+COMPUTE_HOSTS=${COMPUTE_HOSTS:-}
+STRICT_EXECUTOR_PLACEMENT=${STRICT_EXECUTOR_PLACEMENT:-false}
+EXECUTOR_PLACEMENT_REPORT=${EXECUTOR_PLACEMENT_REPORT:-${NEMO_WORK_DIR:-/tmp}/executor_placement.csv}
 
 EXTRA_ARGS=()
 if [[ "$OFFLOADING" == "1" ]]; then
@@ -38,6 +42,10 @@ echo "  kafka_consumer_group=$KAFKA_CONSUMER_GROUP"
 echo "  executor_json=$EXECUTOR_JSON"
 echo "  offloading=$OFFLOADING"
 echo "  autoscaling=$AUTOSCALING"
+echo "  source_hosts=${SOURCE_HOSTS:-<unset>}"
+echo "  compute_hosts=${COMPUTE_HOSTS:-<unset>}"
+echo "  strict_executor_placement=$STRICT_EXECUTOR_PLACEMENT"
+echo "  executor_placement_report=$EXECUTOR_PLACEMENT_REPORT"
 echo "  log=$LOG_FILE"
 
 SINK_ARGS="--sinkType=${SINK_TYPE}"
@@ -50,6 +58,10 @@ nohup java -Dnemo.work.dir="${NEMO_WORK_DIR:-/tmp}" -Dnemo.job.id="$JOB_ID" -cp 
   -user_main org.apache.beam.sdk.nexmark.Main \
   -deploy_mode yarn \
   -executor_json "$EXECUTOR_JSON" \
+  -source_hosts "$SOURCE_HOSTS" \
+  -compute_hosts "$COMPUTE_HOSTS" \
+  -strict_executor_placement "$STRICT_EXECUTOR_PLACEMENT" \
+  -executor_placement_report "$EXECUTOR_PLACEMENT_REPORT" \
   -optimization_policy org.apache.nemo.compiler.optimizer.policy.StreamingPolicy \
   -scheduler_impl_class_name org.apache.nemo.runtime.master.scheduler.StreamingScheduler \
   "${EXTRA_ARGS[@]}" \

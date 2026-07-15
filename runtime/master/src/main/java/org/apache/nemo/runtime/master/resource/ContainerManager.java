@@ -38,6 +38,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.*;
@@ -74,18 +81,23 @@ public final class ContainerManager {
    * Keeps track of evaluator and context requests.
    */
   private final Map<String, ResourceSpecification> pendingContextIdToResourceSpec;
+  private final Map<String, String> pendingContextIdToContainerId;
   private final Map<String, List<ResourceSpecification>> pendingContainerRequestsByContainerType;
 
   /**
    * Remember the resource spec for each evaluator.
    */
   private final Map<AllocatedEvaluator, ResourceSpecification> evaluatorIdToResourceSpec;
+  private final Map<String, String> evaluatorIdToExecutorId;
 
   private final JVMProcessFactory jvmProcessFactory;
 
   private final SerializedTaskMap serializedTaskMap;
 
   private final String optPolicy;
+  private final String jobId;
+  private final ExecutorPlacementPolicy placementPolicy;
+  private final String placementReportPath;
 
   @Inject
   private ContainerManager(@Parameter(JobConf.ScheduleSerThread.class) final int scheduleSerThread,
@@ -93,18 +105,30 @@ public final class ContainerManager {
                            final MessageEnvironment messageEnvironment,
                            final JVMProcessFactory jvmProcessFactory,
                            @Parameter(JobConf.OptimizationPolicy.class) final String optPolicy,
+                           @Parameter(JobConf.JobId.class) final String jobId,
+                           @Parameter(JobConf.SourceHosts.class) final String sourceHosts,
+                           @Parameter(JobConf.ComputeHosts.class) final String computeHosts,
+                           @Parameter(JobConf.StrictExecutorPlacement.class) final boolean strictPlacement,
+                           @Parameter(JobConf.ExecutorPlacementReportPath.class) final String placementReportPath,
                            final SerializedTaskMap serializedTaskMap) {
     this.isTerminated = false;
     this.serializedTaskMap = serializedTaskMap;
     this.evaluatorRequestor = evaluatorRequestor;
     this.messageEnvironment = messageEnvironment;
     this.pendingContextIdToResourceSpec = new ConcurrentHashMap<>();
+    this.pendingContextIdToContainerId = new ConcurrentHashMap<>();
     this.pendingContainerRequestsByContainerType = new ConcurrentHashMap<>();
     this.evaluatorIdToResourceSpec = new ConcurrentHashMap<>();
+    this.evaluatorIdToExecutorId = new ConcurrentHashMap<>();
     this.requestLatchByResourceSpecId = new ConcurrentHashMap<>();
     this.serializationExecutorService = Executors.newFixedThreadPool(scheduleSerThread);
     this.jvmProcessFactory = jvmProcessFactory;
     this.optPolicy = optPolicy;
+    this.jobId = jobId;
+    this.placementPolicy = new ExecutorPlacementPolicy(sourceHosts, computeHosts, strictPlacement);
+    this.placementReportPath = placementReportPath == null || placementReportPath.trim().isEmpty()
+      ? defaultPlacementReportPath(jobId) : placementReportPath.trim();
+    initializePlacementReport();
   }
 
   public void requestContainer(final int numToRequest,
@@ -127,9 +151,11 @@ public final class ContainerManager {
 
     if (numToRequest > 0) {
       // Create a list of executor specifications to be used when containers are allocated.
+      final List<String> targetHosts = getTargetHosts(resourceSpecification, numToRequest);
       final List<ResourceSpecification> resourceSpecificationList = new ArrayList<>(numToRequest);
       for (int i = 0; i < numToRequest; i++) {
-        resourceSpecificationList.add(resourceSpecification);
+        final String targetHost = targetHosts.isEmpty() ? "" : targetHosts.get(i);
+        resourceSpecificationList.add(resourceSpecification.withPreferredHost(targetHost));
       }
 
       // Mark the request as pending with the given specifications.
@@ -145,12 +171,26 @@ public final class ContainerManager {
       final int currContainer = getCurrContainer();
 
       LOG.info("Request container: {}", resourceSpecification);
-      // Request the evaluators
-      evaluatorRequestor.submit(EvaluatorRequest.newBuilder()
-        .setNumber(numToRequest)
-        .setMemory(resourceSpecification.getMemory())
-        .setNumberOfCores(resourceSpecification.getCapacity())
-        .build());
+      // Request the evaluators. Host-specific requests are split one-by-one so YARN can preserve
+      // the intended one Compute executor per physical node layout.
+      if (targetHosts.isEmpty()) {
+        evaluatorRequestor.submit(EvaluatorRequest.newBuilder()
+          .setNumber(numToRequest)
+          .setMemory(resourceSpecification.getMemory())
+          .setNumberOfCores(resourceSpecification.getCapacity())
+          .setRuntimeName(runtimeName)
+          .build());
+      } else {
+        for (final String targetHost : targetHosts) {
+          evaluatorRequestor.submit(EvaluatorRequest.newBuilder()
+            .setNumber(1)
+            .setMemory(resourceSpecification.getMemory())
+            .setNumberOfCores(resourceSpecification.getCapacity())
+            .setRuntimeName(runtimeName)
+            .addNodeName(targetHost)
+            .build());
+        }
+      }
 
       // Wait for request container
       LOG.info("Waiting for container allocation");
@@ -205,6 +245,8 @@ public final class ContainerManager {
       allocatedContainer.getEvaluatorDescriptor().getNodeDescriptor().getName());
 
     pendingContextIdToResourceSpec.put(executorId, resourceSpecification);
+    pendingContextIdToContainerId.put(executorId, allocatedContainer.getId());
+    evaluatorIdToExecutorId.put(allocatedContainer.getId(), executorId);
 
     final JVMProcess jvmProcess = jvmProcessFactory.newEvaluatorProcess()
       .addOption("-XX:-OmitStackTraceInFastThrow")
@@ -261,6 +303,7 @@ public final class ContainerManager {
     // We set contextId = executorId in NemoDriver when we generate executor configuration.
     final String executorId = activeContext.getId();
     final ResourceSpecification resourceSpec = pendingContextIdToResourceSpec.remove(executorId);
+    final String containerId = pendingContextIdToContainerId.remove(executorId);
 
     // Connect to the executor and initiate Master side's executor representation.
     MessageSender messageSender;
@@ -280,6 +323,9 @@ public final class ContainerManager {
             activeContext.getEvaluatorDescriptor().getNodeDescriptor().getName(),
           serializedTaskMap,
           optPolicy);
+
+    recordPlacement(executorId, containerId, activeContext.getEvaluatorDescriptor().getNodeDescriptor().getName(),
+      resourceSpec);
 
     requestLatchByResourceSpecId.get(resourceSpec.getResourceSpecId()).countDown();
 
@@ -301,6 +347,11 @@ public final class ContainerManager {
 
     if (resourceSpecification == null) {
       throw new IllegalStateException(failedEvaluatorId + " not in " + evaluatorIdToResourceSpec);
+    }
+    final String executorId = evaluatorIdToExecutorId.remove(failedEvaluatorId);
+    if (executorId != null) {
+      pendingContextIdToResourceSpec.remove(executorId);
+      pendingContextIdToContainerId.remove(executorId);
     }
     requestContainer(1, resourceSpecification);
     return resourceSpecification;
@@ -330,6 +381,7 @@ public final class ContainerManager {
     final AllocatedEvaluator allocatedEvaluator) {
     synchronized (pendingContainerRequestsByContainerType) {
       ResourceSpecification selectedResourceSpec = null;
+      final String actualHost = allocatedEvaluator.getEvaluatorDescriptor().getNodeDescriptor().getName();
 
       if (RuntimeIdManager.isLambdaExecutorId(executorId) &&
         pendingContainerRequestsByContainerType.containsKey(ResourcePriorityProperty.LAMBDA)
@@ -345,8 +397,10 @@ public final class ContainerManager {
               while (iterator.hasNext()) {
                 final ResourceSpecification spec = iterator.next();
                 LOG.info("Entry memory: {}, allocated memory: {}", spec.getMemory(), allocatedEvaluator.getEvaluatorDescriptor().getMemory());
-                iterator.remove();
-                return spec;
+                if (placementPolicy.allows(spec.getContainerType(), spec.getPreferredHost(), actualHost)) {
+                  iterator.remove();
+                  return spec;
+                }
               }
             }
           }
@@ -357,5 +411,70 @@ public final class ContainerManager {
     }
 
     // throw new ContainerException(new Throwable("We never requested for an extra container"));
+  }
+
+  private String defaultPlacementReportPath(final String configuredJobId) {
+    final String safeJobId = configuredJobId == null || configuredJobId.trim().isEmpty()
+      ? "unknown" : configuredJobId.trim().replaceAll("[^A-Za-z0-9_.-]", "_");
+    return "/tmp/nemo-executor-placement-" + safeJobId + ".csv";
+  }
+
+  private void initializePlacementReport() {
+    try {
+      final Path reportPath = Paths.get(placementReportPath);
+      final Path parentPath = reportPath.getParent();
+      if (parentPath != null) {
+        Files.createDirectories(parentPath);
+      }
+      try (BufferedWriter writer = Files.newBufferedWriter(reportPath, StandardCharsets.UTF_8,
+        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+        writer.write("timestamp,jobId,executorId,executorType,containerId,requestedHost,physicalHost,placementPassed");
+        writer.newLine();
+      }
+    } catch (final IOException e) {
+      LOG.warn("Failed to initialize executor placement report {}", placementReportPath, e);
+    }
+  }
+
+  private void recordPlacement(final String executorId,
+                               final String containerId,
+                               final String physicalHost,
+                               final ResourceSpecification resourceSpecification) {
+    final boolean placementPassed = placementPolicy.isPlacementSatisfied(resourceSpecification.getContainerType(),
+      resourceSpecification.getPreferredHost(), physicalHost);
+    try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(placementReportPath), StandardCharsets.UTF_8,
+      StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE)) {
+      writer.write(String.format(Locale.US, "%d,%s,%s,%s,%s,%s,%s,%s",
+        System.currentTimeMillis(),
+        csv(jobId),
+        csv(executorId),
+        csv(resourceSpecification.getContainerType()),
+        csv(containerId),
+        csv(resourceSpecification.getPreferredHost()),
+        csv(physicalHost),
+        placementPassed));
+      writer.newLine();
+    } catch (final IOException e) {
+      LOG.warn("Failed to append executor placement report {}", placementReportPath, e);
+    }
+  }
+
+  private String csv(final String value) {
+    if (value == null) {
+      return "";
+    }
+    return value.replace(",", "_").replace("\n", " ").replace("\r", " ");
+  }
+
+  private List<String> getTargetHosts(final ResourceSpecification resourceSpecification,
+                                      final int numToRequest) {
+    if (resourceSpecification.getPreferredHost() != null && !resourceSpecification.getPreferredHost().isEmpty()) {
+      final List<String> targetHosts = new ArrayList<>(numToRequest);
+      for (int i = 0; i < numToRequest; i++) {
+        targetHosts.add(resourceSpecification.getPreferredHost());
+      }
+      return targetHosts;
+    }
+    return placementPolicy.requestHostsFor(resourceSpecification.getContainerType(), numToRequest);
   }
 }

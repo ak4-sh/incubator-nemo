@@ -42,6 +42,11 @@ SCALER_START_PHASE_DELAY_SEC=${SCALER_START_PHASE_DELAY_SEC:-60}
 SCALER_START_WAIT_TIMEOUT_SEC=${SCALER_START_WAIT_TIMEOUT_SEC:-900}
 KAFKA_RESULTS_TOPIC=${KAFKA_RESULTS_TOPIC:-}
 JOB_ID=${JOB_ID:-nx-q${QUERY}-${TOPIC}}
+SOURCE_HOSTS=${SOURCE_HOSTS:-}
+COMPUTE_HOSTS=${COMPUTE_HOSTS:-}
+STRICT_EXECUTOR_PLACEMENT=${STRICT_EXECUTOR_PLACEMENT:-false}
+EXPECTED_EXECUTOR_PLACEMENT_ROWS=${EXPECTED_EXECUTOR_PLACEMENT_ROWS:-5}
+PLACEMENT_WAIT_TIMEOUT_SEC=${PLACEMENT_WAIT_TIMEOUT_SEC:-240}
 
 # Offloading nodes
 OFFLOAD_NODES=${OFFLOAD_NODES:-node4,node6,node7,node8,node13}
@@ -66,6 +71,7 @@ PRODUCER_PARALLELISM=${PRODUCER_PARALLELISM:-8}
 
 KAFKA_ZOOKEEPER=${KAFKA_ZOOKEEPER:-node1:2181,node2:2181,node3:2181}
 WORK_DIR=${WORK_DIR:-/tmp/nx-auto-$TOPIC}
+EXECUTOR_PLACEMENT_REPORT=${EXECUTOR_PLACEMENT_REPORT:-$WORK_DIR/executor_placement.csv}
 LOG_FILE=${LOG_FILE:-/tmp/nx-auto-$TOPIC.log}
 SUB_LOG=${SUB_LOG:-/tmp/nx-auto-sub-$TOPIC.log}
 SOURCE_LOG=$WORK_DIR/source.log
@@ -137,6 +143,61 @@ wait_for_yarn_app_running() {
   echo "ERROR: YARN app $app_id never reached RUNNING. Killing it." >&2
   yarn application -kill "$app_id" 2>/dev/null || true
   return 1
+}
+
+verify_executor_placement() {
+  if [[ "$STRICT_EXECUTOR_PLACEMENT" != "true" ]]; then
+    return 0
+  fi
+  if [[ -z "$AM_HOST" || "$AM_HOST" == "N/A" ]]; then
+    echo "ERROR: strict executor placement requested but AM host is unavailable" >&2
+    return 1
+  fi
+
+  echo "Waiting for executor placement report on $AM_HOST:$EXECUTOR_PLACEMENT_REPORT"
+  local tmp_report="$WORK_DIR/executor_placement.csv.tmp"
+  local local_report="$WORK_DIR/executor_placement.csv"
+  local rows=0
+  local waited
+  for waited in $(seq 1 "$PLACEMENT_WAIT_TIMEOUT_SEC"); do
+    if scp "$AM_HOST:$EXECUTOR_PLACEMENT_REPORT" "$tmp_report" >/dev/null 2>&1; then
+      rows=$(awk -F, 'NR > 1 && ($4 == "Source" || $4 == "Compute") { n++ } END { print n + 0 }' "$tmp_report")
+      if [[ "$rows" -ge "$EXPECTED_EXECUTOR_PLACEMENT_ROWS" ]]; then
+        mv "$tmp_report" "$local_report"
+        break
+      fi
+    fi
+    sleep 1
+  done
+
+  if [[ "$rows" -lt "$EXPECTED_EXECUTOR_PLACEMENT_ROWS" ]]; then
+    echo "ERROR: placement report did not reach $EXPECTED_EXECUTOR_PLACEMENT_ROWS Source/Compute rows within ${PLACEMENT_WAIT_TIMEOUT_SEC}s" >&2
+    return 1
+  fi
+
+  python3 "$SCRIPT_DIR/verify_executor_placement.py" \
+    --report "$local_report" \
+    --source-hosts "$SOURCE_HOSTS" \
+    --compute-hosts "$COMPUTE_HOSTS" \
+    --strict "$STRICT_EXECUTOR_PLACEMENT" \
+    --output-json "$WORK_DIR/executor_placement_verification.json"
+}
+
+cleanup_after_placement_failure() {
+  if [[ -n "${APP_ID:-}" ]]; then
+    "$HADOOP_HOME/bin/yarn" application -kill "$APP_ID" 2>/dev/null || true
+  fi
+  if [[ -f "/tmp/nemo-subscriber-${TOPIC}.pid" ]]; then
+    local sub_pid
+    sub_pid=$(cat "/tmp/nemo-subscriber-${TOPIC}.pid" 2>/dev/null || true)
+    if [[ -n "$sub_pid" ]]; then
+      kill "$sub_pid" >/dev/null 2>&1 || true
+    fi
+  fi
+  IFS=',' read -ra cleanup_nodes <<< "$OFFLOAD_NODES"
+  for node in "${cleanup_nodes[@]}"; do
+    ssh "$node" "pkill -f '[o]rg.apache.nemo.offloading.workers.vm.VMWorker' || true" >/dev/null 2>&1 || true
+  done
 }
 
 start_producer_with_source_log() {
@@ -356,6 +417,7 @@ export AUTOSCALING
 export JOB_ID
 export NEMO_WORK_DIR="$WORK_DIR"
 export NEMO_JOB_ID="$JOB_ID"
+export SOURCE_HOSTS COMPUTE_HOSTS STRICT_EXECUTOR_PLACEMENT EXECUTOR_PLACEMENT_REPORT
 
 # Run subscriber from repo root so JobLauncher finds vm_addresses.txt
 (cd "$NEMO_REPO_ROOT" && "$SCRIPT_DIR/run_q8_subscriber_yarn.sh")
@@ -369,12 +431,19 @@ APP_ID=$(grep -o 'application_[0-9]\+_[0-9]\+' "$SUB_LOG" | head -1)
 AM_HOST=$($HADOOP_HOME/bin/yarn application -status "$APP_ID" 2>/dev/null | grep "AM Host" | awk '{print $NF}')
 echo "  App ID: $APP_ID"
 echo "  AM Host: $AM_HOST"
+printf 'appId,amHost\n%s,%s\n' "$APP_ID" "$AM_HOST" > "$WORK_DIR/application_master.csv"
 
 if [[ -n "$AM_HOST" && "$AM_HOST" != "N/A" ]]; then
   echo "Cleaning stale AM-side fallback metrics on $AM_HOST"
   ssh "$AM_HOST" "rm -f /tmp/scaling_decisions.csv /tmp/scaler_metrics.csv /tmp/source_metrics.csv /tmp/source_aggregate_metrics.csv /tmp/source_task_metrics.csv /tmp/task_metrics.csv" || true
 else
   echo "WARNING: AM host unavailable; skipping AM-side metrics cleanup" >&2
+fi
+
+if ! verify_executor_placement; then
+  echo "ERROR: executor placement verification failed before live production. Cleaning up $APP_ID." >&2
+  cleanup_after_placement_failure
+  exit 1
 fi
 
 # 7. Wait for subscriber scaling service to start reading scaling.txt
