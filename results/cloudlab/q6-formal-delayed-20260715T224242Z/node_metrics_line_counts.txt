@@ -1,0 +1,15 @@
+   567 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node2.csv
+   563 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node9.csv
+   557 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node8.csv
+   559 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node0.csv
+   566 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node3.csv
+   557 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node7.csv
+   557 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node6.csv
+   563 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node10.csv
+   558 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node4.csv
+   565 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node1.csv
+   560 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node11.csv
+   553 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node13.csv
+   565 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node5.csv
+   562 /users/akash01/incubator-nemo/results/cloudlab/q6-formal-delayed-20260715T224242Z/node_metrics/node12.csv
+  7852 total

@@ -1,0 +1,3 @@
+26/07/15 22:59:11 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Total number of applications (application-types: [] and states: [SUBMITTED, ACCEPTED, RUNNING]):0
+                Application-Id	    Application-Name	    Application-Type	      User	     Queue	             State	       Final-State	       Progress	                       Tracking-URL

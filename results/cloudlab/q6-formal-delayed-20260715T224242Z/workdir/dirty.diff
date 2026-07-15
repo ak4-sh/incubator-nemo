@@ -1,0 +1,128 @@
+diff --git a/scripts/cloudlab/metrics_collector.py b/scripts/cloudlab/metrics_collector.py
+index 3f111c0c9..231cd619a 100644
+--- a/scripts/cloudlab/metrics_collector.py
++++ b/scripts/cloudlab/metrics_collector.py
+@@ -17,30 +17,77 @@ INTERVAL_S = 5
+ KAFKA_HOME = os.environ.get("KAFKA_HOME", "/users/akash01/kafka")
+ KAFKA_NODE = os.environ.get("KAFKA_NODE", "node1")
+ KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP", "node1:9092,node2:9092,node3:9092")
+-OFFSET_CMD = [
++KAFKA_CONSUMER_GROUP = os.environ.get("KAFKA_CONSUMER_GROUP", "disaggregated-streaming")
++LEGACY_OFFSET_CMD = [
+     "ssh", KAFKA_NODE, f"{KAFKA_HOME}/bin/kafka-get-offsets.sh",
+     "--bootstrap-server", KAFKA_BOOTSTRAP,
+     "--topic", "{topic}", "--time", "-1"
+ ]
++RUN_CLASS_OFFSET_CMD = [
++    "ssh", KAFKA_NODE, f"{KAFKA_HOME}/bin/kafka-run-class.sh",
++    "kafka.tools.GetOffsetShell",
++    "--broker-list", KAFKA_BOOTSTRAP,
++    "--topic", "{topic}", "--time", "-1"
++]
++CONSUMER_GROUP_CMD = [
++    "ssh", KAFKA_NODE, f"{KAFKA_HOME}/bin/kafka-consumer-groups.sh",
++    "--bootstrap-server", KAFKA_BOOTSTRAP,
++    "--describe", "--group", "{group}"
++]
+ 
+ # ── helpers ───────────────────────────────────────────────────────────────
+ def get_topic_offset(topic: str) -> int:
+     """Return the latest offset for a topic, or -1 on error."""
+-    cmd = [c.replace("{topic}", topic) for c in OFFSET_CMD]
++    errors = []
++    for template in (RUN_CLASS_OFFSET_CMD, LEGACY_OFFSET_CMD):
++        cmd = [c.replace("{topic}", topic) for c in template]
++        try:
++            out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL, text=True, timeout=10)
++            total = 0
++            count = 0
++            for line in out.strip().splitlines():
++                parts = line.strip().split(":")
++                if len(parts) == 3:
++                    total += int(parts[2])
++                    count += 1
++            return total if count > 0 else -1
++        except Exception as e:
++            errors.append(f"{cmd}: {e}")
++    print(f"[metrics] offset check failed: {'; '.join(errors)}", file=sys.stderr)
++    return -1
++
++
++def get_consumer_group_lag(group: str, topic: str) -> dict:
++    """Return committed offset, log-end offset, and lag for a consumer group/topic."""
++    cmd = [c.replace("{group}", group) for c in CONSUMER_GROUP_CMD]
+     try:
+         out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL, text=True, timeout=10)
+-        # output format: topic:partition:offset
+-        total = 0
++        current_total = 0
++        end_total = 0
++        lag_total = 0
+         count = 0
+         for line in out.strip().splitlines():
+-            parts = line.strip().split(":")
+-            if len(parts) == 3:
+-                total += int(parts[2])
++            parts = line.split()
++            if len(parts) < 6 or parts[0] == "GROUP":
++                continue
++            if parts[1] != topic:
++                continue
++            try:
++                current_total += int(parts[3])
++                end_total += int(parts[4])
++                lag_total += int(parts[5])
+                 count += 1
+-        return total if count > 0 else -1
++            except ValueError:
++                continue
++        if count > 0:
++            return {
++                "consumerCommittedOffset": current_total,
++                "consumerLogEndOffset": end_total,
++                "consumerLag": lag_total,
++            }
+     except Exception as e:
+-        print(f"[metrics] offset check failed: {e}", file=sys.stderr)
+-    return -1
++        print(f"[metrics] consumer-group lag check failed: {e}", file=sys.stderr)
++    return {}
+ 
+ 
+ def _ssh_read_tail(host: str, filepath: str, lines: int = 50) -> list[str]:
+@@ -210,7 +257,8 @@ def main():
+         f.write(
+             "timestamp,inputOffset,resultOffset,sourceCount,inputLag,resultLag,"
+             "kafkaQueueTimeP50,kafkaQueueTimeP95,kafkaQueueTimeP99,latencyMedian,latencyP95,"
+-            "latencyP99,latencyTail,avgCpu,avgInput,avgProcess,queueSize,numExecutors,numLambdaExecutors\n"
++            "latencyP99,latencyTail,avgCpu,avgInput,avgProcess,queueSize,numExecutors,numLambdaExecutors,"
++            "consumerCommittedOffset,consumerLogEndOffset,consumerLag\n"
+         )
+ 
+     print(f"[metrics] collector started for topic={topic} result_topic={result_topic} work_dir={work_dir}")
+@@ -219,6 +267,7 @@ def main():
+         ts = int(time.time() * 1000)
+         offset = get_topic_offset(topic)
+         result_offset = get_topic_offset(result_topic) if result_topic else -1
++        consumer_lag = get_consumer_group_lag(KAFKA_CONSUMER_GROUP, topic)
+         source, last_valid_source = read_source_count(work_dir, offset, am_host, last_valid_source)
+         input_lag = max(0, offset - source) if offset >= 0 and source >= 0 else -1
+         result_lag = max(0, offset - result_offset) if offset >= 0 and result_offset >= 0 else -1
+@@ -246,6 +295,9 @@ def main():
+             cpu.get("queue", -1),
+             cpu.get("numExecutors", -1),
+             cpu.get("numLambdaExecutors", -1),
++            consumer_lag.get("consumerCommittedOffset", -1),
++            consumer_lag.get("consumerLogEndOffset", -1),
++            consumer_lag.get("consumerLag", -1),
+         ]
+ 
+         with open(combined_csv, "a") as f:
+@@ -254,6 +306,7 @@ def main():
+         print(
+             f"[metrics] ts={ts} input={offset} result={result_offset} source={source} "
+             f"inputLag={input_lag} resultLag={result_lag} "
++            f"consumerLag={consumer_lag.get('consumerLag', -1)} "
+             f"kafkaQueueP95={source_queue.get('p95', -1):.1f}ms "
+             f"cpu={cpu.get('avgCpu', -1):.4f} queue={cpu.get('queue', -1):.0f}"
+         )
