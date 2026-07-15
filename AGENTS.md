@@ -46,18 +46,61 @@ done
 - Current Q6 executor config to use:
   `configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json`.
 - That config means:
-  - 1 Source executor, 8 slots
+  - 1 Source executor, 4096 MB, 8 slots
   - 4 Compute executors, each 8192 MB, `capacity=3`, `slot=3`
   - 12 total compute logical slots
-- Exact executor/memory JSON used for the 8 GB Q6 threshold run:
+- Exact current executor/memory JSON:
 
 ```json
 [
   { "type": "Transient", "memory_mb": 768,  "capacity": 1, "slot": 1, "num": 0 },
   { "type": "Reserved",  "memory_mb": 768,  "capacity": 1, "slot": 1, "num": 0 },
-  { "type": "Source",    "memory_mb": 2048, "capacity": 8, "slot": 8, "num": 1 },
+  { "type": "Source",    "memory_mb": 4096, "capacity": 8, "slot": 8, "num": 1 },
   { "type": "Compute",   "memory_mb": 8192, "capacity": 3, "slot": 3, "num": 4 }
 ]
+```
+
+- Reproducible build tarball for the current known-good deployment:
+  `/users/akash01/sponge-q6-build-5a7bd3fb-20260715.tar.gz`.
+  - Size: `501M`.
+  - Tarball SHA256:
+
+```text
+4a2ce7864d19cc056442e6346fc348d390803b4090a06ff6ac80b7f25f3a13ff
+```
+
+  - Built from clean commit `5a7bd3fb8020310d0eb7acae022775af75b4411c` on branch `cloudlab-build-fixes-wip`.
+  - Rebuild command used:
+
+```bash
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 \
+PATH=/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH \
+mvn clean install -Dmaven.test.skip=true -DskipITs -T 2C
+```
+
+  - Build result: Maven `BUILD SUCCESS`, finished `2026-07-15T04:30:11Z`.
+  - Bundle contains:
+    - `jars/nemo-client-0.2-SNAPSHOT-shaded.jar`
+    - `jars/nexmark-0.2-SNAPSHOT-shaded.jar`
+    - `jars/offloading-vm-0.2-SNAPSHOT-shaded.jar`
+    - `source/repository.bundle`
+    - `source/source-5a7bd3fb.tar.gz`
+    - Q6 config, CloudLab run scripts, docs, `BUILD_MANIFEST.txt`, `SHA256SUMS`, and verification outputs.
+  - Payload validation was performed by extracting to `/tmp/verify-sponge-q6-build-5a7bd3fb` and running `sha256sum -c SHA256SUMS`; all files passed.
+  - Key classfile checks report Java 8 bytecode (`major version: 52`).
+  - Client shaded jar checks passed: Apache HTTP and Netty are relocated under `org/apache/nemo/shaded/...`; AWS bytecode references relocated Apache HTTP.
+  - Jar SHA256 values:
+
+```text
+6e721372a82c7f06507ff443e24ac348f8d9ae632e698769fd27c19d98f30bbe  nemo-client-0.2-SNAPSHOT-shaded.jar
+b764af214a5d3c2c2dae798a5bc13cb32ccba6e572719d5a1370d6e3a0664b8a  nexmark-0.2-SNAPSHOT-shaded.jar
+a6c5644d1a67512fc3accef9f96f7519e808aa52ebf8fcd33b4337296a0047df  offloading-vm-0.2-SNAPSHOT-shaded.jar
+```
+
+  - Download from a local machine with:
+
+```bash
+scp akash01@node0:/users/akash01/sponge-q6-build-5a7bd3fb-20260715.tar.gz .
 ```
 
 - Keep `capacity=3,slot=3` for Q6. The older `capacity=1,slot=1` compute config can starve Stage2/Stage3 because streaming tasks are long-lived.
