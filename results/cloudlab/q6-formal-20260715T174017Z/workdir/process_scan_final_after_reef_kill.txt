@@ -1,0 +1,30 @@
+===node0===
+1599607 /bin/bash -lc source /tmp/nemo-formal-current.env; for n in node0 node1 node2 node3 node4 node5 node6 node7 node8 node9 node10 node11 node12 node13; do echo ===$n===; ssh -o BatchMode=yes $n "pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true"; done > "$WORK_DIR/process_scan_final_after_reef_kill.txt"; cat "$WORK_DIR/process_scan_final_after_reef_kill.txt"
+1599609 ssh -o BatchMode=yes node0 pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+1599636 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node1===
+283984 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node2===
+68477 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node3===
+68267 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node4===
+117472 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node5===
+252737 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node6===
+117241 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node7===
+139677 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node8===
+111653 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node9===
+228469 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node10===
+272107 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node11===
+261498 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node12===
+366903 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true
+===node13===
+135365 bash -c pgrep -af 'q6-formal-20260715T174017Z|application_1784096431599_0002|REEFLauncher|JobLauncher|StandaloneNexmarkKafkaProducer|metrics_collector|node_system_collector|org.apache.nemo.offloading.workers.vm.VMWorker' || true

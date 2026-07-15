@@ -1,0 +1,15 @@
+===node0===
+akash01  1515344       1  0 Jul14 ?        00:01:45 /usr/lib/jvm/java-8-openjdk-amd64/bin/java -Dproc_datanode -Xmx1000m -Djava.net.preferIPv4Stack=true -Dhadoop.log.dir=/users/akash01/hadoop/logs -Dhadoop.log.file=hadoop.log -Dhadoop.home.dir=/users/akash01/hadoop -Dhadoop.id.str=akash01 -Dhadoop.root.logger=INFO,console -Djava.library.path=/users/akash01/hadoop/lib/native -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Stack=true -Dhadoop.log.dir=/users/akash01/hadoop/logs -Dhadoop.log.file=hadoop-akash01-datanode-node0.akash01-310593.nsdi27-casp-pg0.utah.cloudlab.us.log -Dhadoop.home.dir=/users/akash01/hadoop -Dhadoop.id.str=akash01 -Dhadoop.root.logger=INFO,RFA -Djava.library.path=/users/akash01/hadoop/lib/native -Dhadoop.policy.file=hadoop-policy.xml -Djava.net.preferIPv4Stack=true -server -Dhadoop.security.logger=ERROR,RFAS -Dhadoop.security.logger=ERROR,RFAS -Dhadoop.security.logger=ERROR,RFAS -Dhadoop.security.logger=INFO,RFAS org.apache.hadoop.hdfs.server.datanode.DataNode
+===node1===
+===node2===
+===node3===
+===node4===
+===node5===
+===node6===
+===node7===
+===node8===
+===node9===
+===node10===
+===node11===
+===node12===
+===node13===

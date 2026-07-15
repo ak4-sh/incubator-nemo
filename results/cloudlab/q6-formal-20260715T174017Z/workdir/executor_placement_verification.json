@@ -1,0 +1,68 @@
+{
+  "compute_count": 4,
+  "compute_hosts": [
+    "node9-link-1",
+    "node10-link-1",
+    "node11-link-1",
+    "node12-link-1"
+  ],
+  "failures": [],
+  "passed": true,
+  "rows": [
+    {
+      "containerId": "container_1784096431599_0002_01_000002",
+      "executorId": "Executor0",
+      "executorType": "Source",
+      "jobId": "q6-formal-20260715T174017Z",
+      "physicalHost": "node5-link-1",
+      "placementPassed": "true",
+      "requestedHost": "node5-link-1",
+      "timestamp": "1784137971267"
+    },
+    {
+      "containerId": "container_1784096431599_0002_01_000004",
+      "executorId": "Executor2",
+      "executorType": "Compute",
+      "jobId": "q6-formal-20260715T174017Z",
+      "physicalHost": "node10-link-1",
+      "placementPassed": "true",
+      "requestedHost": "node10-link-1",
+      "timestamp": "1784137972412"
+    },
+    {
+      "containerId": "container_1784096431599_0002_01_000006",
+      "executorId": "Executor4",
+      "executorType": "Compute",
+      "jobId": "q6-formal-20260715T174017Z",
+      "physicalHost": "node12-link-1",
+      "placementPassed": "true",
+      "requestedHost": "node12-link-1",
+      "timestamp": "1784137972416"
+    },
+    {
+      "containerId": "container_1784096431599_0002_01_000005",
+      "executorId": "Executor3",
+      "executorType": "Compute",
+      "jobId": "q6-formal-20260715T174017Z",
+      "physicalHost": "node11-link-1",
+      "placementPassed": "true",
+      "requestedHost": "node11-link-1",
+      "timestamp": "1784137972418"
+    },
+    {
+      "containerId": "container_1784096431599_0002_01_000003",
+      "executorId": "Executor1",
+      "executorType": "Compute",
+      "jobId": "q6-formal-20260715T174017Z",
+      "physicalHost": "node9-link-1",
+      "placementPassed": "true",
+      "requestedHost": "node9-link-1",
+      "timestamp": "1784137972432"
+    }
+  ],
+  "source_count": 1,
+  "source_hosts": [
+    "node5-link-1"
+  ],
+  "strict": true
+}

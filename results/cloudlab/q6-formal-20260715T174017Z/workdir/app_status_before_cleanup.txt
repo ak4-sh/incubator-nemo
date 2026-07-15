@@ -1,0 +1,17 @@
+26/07/15 18:07:18 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Application Report : 
+	Application-Id : application_1784096431599_0002
+	Application-Name : q6-formal-20260715T174017Z
+	Application-Type : YARN
+	User : akash01
+	Queue : default
+	Start-Time : 1784137949934
+	Finish-Time : 0
+	Progress : 0%
+	State : RUNNING
+	Final-State : UNDEFINED
+	Tracking-URL : N/A
+	RPC Port : -1
+	AM Host : node5
+	Aggregate Resource Allocation : 33180082 MB-seconds, 5264 vcore-seconds
+	Diagnostics : 

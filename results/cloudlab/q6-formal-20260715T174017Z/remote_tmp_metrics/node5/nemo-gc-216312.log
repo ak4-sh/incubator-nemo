@@ -1,0 +1,5 @@
+[2026-07-15T10:54:41.089-0600][0.006s][info][gc,heap] Heap region size: 1M
+[2026-07-15T10:54:41.153-0600][0.070s][info][gc     ] Using G1
+[2026-07-15T10:54:41.153-0600][0.070s][info][gc,heap,coops] Heap address: 0x0000000706400000, size: 3996 MB, Compressed Oops mode: Zero based, Oop shift amount: 3
+[2026-07-15T10:54:41.153-0600][0.071s][info][gc,cds       ] Mark closed archive regions in map: [0x00000007ffc00000, 0x00000007ffc6bff8]
+[2026-07-15T10:54:41.153-0600][0.071s][info][gc,cds       ] Mark open archive regions in map: [0x00000007ff800000, 0x00000007ff847ff8]

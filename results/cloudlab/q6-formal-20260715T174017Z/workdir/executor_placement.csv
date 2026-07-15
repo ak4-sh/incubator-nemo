@@ -1,0 +1,6 @@
+timestamp,jobId,executorId,executorType,containerId,requestedHost,physicalHost,placementPassed
+1784137971267,q6-formal-20260715T174017Z,Executor0,Source,container_1784096431599_0002_01_000002,node5-link-1,node5-link-1,true
+1784137972412,q6-formal-20260715T174017Z,Executor2,Compute,container_1784096431599_0002_01_000004,node10-link-1,node10-link-1,true
+1784137972416,q6-formal-20260715T174017Z,Executor4,Compute,container_1784096431599_0002_01_000006,node12-link-1,node12-link-1,true
+1784137972418,q6-formal-20260715T174017Z,Executor3,Compute,container_1784096431599_0002_01_000005,node11-link-1,node11-link-1,true
+1784137972432,q6-formal-20260715T174017Z,Executor1,Compute,container_1784096431599_0002_01_000003,node9-link-1,node9-link-1,true

@@ -1,0 +1,2 @@
+yarn.log-aggregation-enable=false
+log_aggregation_disabled=true

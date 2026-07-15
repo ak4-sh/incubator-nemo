@@ -1,0 +1,6 @@
+[
+  { "type": "Transient", "memory_mb": 768,  "capacity": 1, "slot": 1, "num": 0 },
+  { "type": "Reserved",  "memory_mb": 768,  "capacity": 1, "slot": 1, "num": 0 },
+  { "type": "Source",    "memory_mb": 4096, "capacity": 8, "slot": 8, "num": 1 },
+  { "type": "Compute",   "memory_mb": 8192, "capacity": 3, "slot": 3, "num": 4 }
+]

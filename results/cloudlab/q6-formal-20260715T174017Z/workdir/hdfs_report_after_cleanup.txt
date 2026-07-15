@@ -1,0 +1,31 @@
+Configured Capacity: 67050090496 (62.45 GB)
+Present Capacity: 38555537408 (35.91 GB)
+DFS Remaining: 37098688512 (34.55 GB)
+DFS Used: 1456848896 (1.36 GB)
+DFS Used%: 3.78%
+Under replicated blocks: 254
+Blocks with corrupt replicas: 0
+Missing blocks: 224
+Missing blocks (with replication factor 1): 0
+
+-------------------------------------------------
+Live datanodes (1):
+
+Name: 10.10.1.1:50010 (node0-link-1)
+Hostname: er062.utah.cloudlab.us
+Decommission Status : Normal
+Configured Capacity: 67050090496 (62.45 GB)
+DFS Used: 1456848896 (1.36 GB)
+Non DFS Used: 28494553088 (26.54 GB)
+DFS Remaining: 37098688512 (34.55 GB)
+DFS Used%: 2.17%
+DFS Remaining%: 55.33%
+Configured Cache Capacity: 0 (0 B)
+Cache Used: 0 (0 B)
+Cache Remaining: 0 (0 B)
+Cache Used%: 100.00%
+Cache Remaining%: 0.00%
+Xceivers: 1
+Last contact: Wed Jul 15 18:08:50 UTC 2026
+
+

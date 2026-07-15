@@ -1,0 +1,141 @@
+Q6 warmup/steady/burst autoscaling run
+  prefill events:   100
+  warmup:           20000 ev/s for 100s = 2000000 events (excluded)
+  steady settling:  100000 ev/s for 60s = 0 events (excluded)
+  measured steady:  100000 ev/s for 150s = 15000000 events
+  measured burst:   200000 ev/s for 150s = 30000000 events
+  measured events:  45000000
+  live events:      47000000
+  total events:     47000100
+  phase rates:      20000,100000,200000
+  phase durations:  100,150,150
+  scaler start:     immediate
+Generating vm_addresses.txt for offloading nodes: node4,node6,node7,node8,node13
+Generated /users/akash01/incubator-nemo/vm_addresses.txt: 160 workers
+Creating Kafka topic q6-formal-20260715T174017Z-topic with 8 partitions
+Error while executing topic command : Topic 'q6-formal-20260715T174017Z-topic' already exists.
+[2026-07-15 17:51:26,225] ERROR org.apache.kafka.common.errors.TopicExistsException: Topic 'q6-formal-20260715T174017Z-topic' already exists.
+ (kafka.admin.TopicCommand$)
+Completed updating config for topic q6-formal-20260715T174017Z-topic.
+Prefilling 100 records
+=== NEXMark Legacy Bursty Mode ===
+  0s at 20000 ev/s
+  1s at 20000 ev/s
+  total 100 events
+  generators: 1
+  per-generator: 20000/20000 ev/s, ~100 events each, 1 generators
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+  [gen-0] done: 100 events
+  All generators done: 100 events in 811 ms (123.3 ev/s avg)
+KAFKA_PRODUCER_DONE topic=q6-formal-20260715T174017Z-topic totalSent=100 elapsedMs=811 avgRate=123.30
+Starting warm VMWorker pools
+  Starting pool on node4
+  Starting pool on node6
+  Starting pool on node7
+  Starting pool on node8
+  Starting pool on node13
+Checking VM worker connectivity...
+  All VM workers reachable
+Preflight passed: 5/5 YARN NodeManagers running.
+Cleaning stale baseline worker metrics
+Launching subscriber
+Launching Q6 subscriber
+  topic=q6-formal-20260715T174017Z-topic
+  sink=COUNT_ONLY
+  job_id=q6-formal-20260715T174017Z
+  kafka_consumer_group=disaggregated-streaming
+  executor_json=/users/akash01/incubator-nemo/configs/cloudlab/nemo-yarn-kafka-1source-8slot-4compute-8g-cap3.json
+  offloading=1
+  autoscaling=true
+  source_hosts=node5-link-1
+  compute_hosts=node9-link-1,node10-link-1,node11-link-1,node12-link-1
+  strict_executor_placement=true
+  executor_placement_report=/tmp/q6-formal-20260715T174017Z/executor_placement.csv
+  log=/tmp/q6-formal-20260715T174017Z/subscriber.log
+Subscriber launched in background (PID: 1570305, log: /tmp/q6-formal-20260715T174017Z/subscriber.log)
+YARN app submitted: application_1784096431599_0002
+YARN app application_1784096431599_0002 is RUNNING.
+  App ID: application_1784096431599_0002
+  AM Host: node5
+Cleaning stale AM-side fallback metrics on node5
+Waiting for executor placement report on node5:/tmp/q6-formal-20260715T174017Z/executor_placement.csv
+placement verification passed: sources=1 computes=4
+Waiting 10s before enabling autoscaler commands
+Waiting for Nemo source tasks to report 'Curr input:' in /tmp/q6-formal-20260715T174017Z/subscriber.log ...
+  Nemo source metrics stable after ~55s; sleeping 90s for partition assignment
+Writing scaling commands to /tmp/q6-formal-20260715T174017Z/scaling.txt
+Starting metrics collector (AM host: node5)
+Metrics collector PID: 1576379
+Producing 47000000 live bursty records
+=== NEXMark Explicit Phases Mode ===
+  phase 1: 100s at 20000 ev/s
+  phase 2: 150s at 100000 ev/s
+  phase 3: 150s at 200000 ev/s
+  generators: 8
+  maxEvents: 47000000
+  plannedEvents: 47000000
+  totalEvents: 47000000 (~5875000 per gen)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+  [gen-1] phase 1/3 100s at 2500 ev/s
+  [gen-6] phase 1/3 100s at 2500 ev/s
+  [gen-5] phase 1/3 100s at 2500 ev/s
+  [gen-7] phase 1/3 100s at 2500 ev/s
+  [gen-2] phase 1/3 100s at 2500 ev/s
+  [gen-0] phase 1/3 100s at 2500 ev/s
+  [gen-3] phase 1/3 100s at 2500 ev/s
+  [gen-4] phase 1/3 100s at 2500 ev/s
+  [gen-6] phase 2/3 150s at 12500 ev/s
+  [gen-3] phase 2/3 150s at 12500 ev/s
+  [gen-1] phase 2/3 150s at 12500 ev/s
+  [gen-2] phase 2/3 150s at 12500 ev/s
+  [gen-5] phase 2/3 150s at 12500 ev/s
+  [gen-7] phase 2/3 150s at 12500 ev/s
+  [gen-4] phase 2/3 150s at 12500 ev/s
+  [gen-0] phase 2/3 150s at 12500 ev/s
+  [gen-6] phase 3/3 150s at 25000 ev/s
+  [gen-2] phase 3/3 150s at 25000 ev/s
+  [gen-5] phase 3/3 150s at 25000 ev/s
+  [gen-1] phase 3/3 150s at 25000 ev/s
+  [gen-7] phase 3/3 150s at 25000 ev/s
+  [gen-3] phase 3/3 150s at 25000 ev/s
+  [gen-0] phase 3/3 150s at 25000 ev/s
+  [gen-4] phase 3/3 150s at 25000 ev/s
+  [gen-2] done: 5875000 events in 400046 ms
+  [gen-6] done: 5875000 events in 400051 ms
+  [gen-5] done: 5875000 events in 400051 ms
+  [gen-1] done: 5875000 events in 400057 ms
+  [gen-3] done: 5875000 events in 400055 ms
+  [gen-4] done: 5875000 events in 400062 ms
+  [gen-7] done: 5875000 events in 400066 ms
+  [gen-0] done: 5875000 events in 400066 ms
+  Phases done: 47000000 events in 400701 ms (117294.4 ev/s avg)
+KAFKA_PRODUCER_DONE topic=q6-formal-20260715T174017Z-topic totalSent=47000000 elapsedMs=400701 avgRate=117294.44
+
+Autoscaler harness running.
+  Subscriber PID: 1570305
+  Subscriber log: /tmp/q6-formal-20260715T174017Z/subscriber.log
+  Work dir: /tmp/q6-formal-20260715T174017Z
+  Scaling commands: /tmp/q6-formal-20260715T174017Z/scaling.txt
+  Scaler enable log: /tmp/q6-formal-20260715T174017Z/scaler_enable.csv
+  Metrics collector PID: 1576379
+  Metrics collector log: /tmp/q6-formal-20260715T174017Z/metrics_collector.log
+
+To monitor:
+  tail -f /tmp/q6-formal-20260715T174017Z/subscriber.log
+  tail -f /tmp/q6-formal-20260715T174017Z/metrics_collector.log
+  yarn application -list
+
+To stop:
+  yarn application -kill <APP_ID>
+  kill 1570305
+  kill 1576379
+
+To check Kafka offsets:
+  ssh node1 "/users/akash01/kafka/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list 'node1:9092,node2:9092,node3:9092' --topic 'q6-formal-20260715T174017Z-topic' --time -1"
+
+To plot metrics after the test:
+  python3 /users/akash01/incubator-nemo/scripts/cloudlab/plot_metrics.py /tmp/q6-formal-20260715T174017Z

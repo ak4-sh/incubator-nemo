@@ -1,0 +1,3 @@
+320adcc86c3ad7894540d5e302c0016ac47dc368ed786868659dfb2060fd0bec  client/target/nemo-client-0.2-SNAPSHOT-shaded.jar
+e37972ca2386b6fef0461291200912b5472133e6c31f0f5d28a693f37aafbc5d  examples/nexmark/target/nexmark-0.2-SNAPSHOT-shaded.jar
+fd1c594a6005be3db8ea5a5589382db2b00de61512b34c090f8f93c06b4d603c  offloading/workers/vm/target/offloading-vm-0.2-SNAPSHOT-shaded.jar

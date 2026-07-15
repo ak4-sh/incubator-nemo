@@ -1,0 +1,9 @@
+Topic: q6-formal-20260715T174017Z-topic	TopicId: 42J3jLTzSDCb5JTaAPbf1w	PartitionCount: 8	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 0	Leader: 3	Replicas: 3	Isr: 3
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 2	Leader: 2	Replicas: 2	Isr: 2
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 3	Leader: 3	Replicas: 3	Isr: 3
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 4	Leader: 1	Replicas: 1	Isr: 1
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 5	Leader: 2	Replicas: 2	Isr: 2
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 6	Leader: 3	Replicas: 3	Isr: 3
+	Topic: q6-formal-20260715T174017Z-topic	Partition: 7	Leader: 1	Replicas: 1	Isr: 1

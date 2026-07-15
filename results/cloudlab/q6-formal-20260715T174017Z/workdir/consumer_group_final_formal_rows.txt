@@ -1,0 +1,8 @@
+disaggregated-streaming q6-formal-20260715T174017Z-topic  5          5875013         5875013         0               -               -               -
+disaggregated-streaming q6-formal-20260715T174017Z-topic  4          5875013         5875013         0               -               -               -
+disaggregated-streaming q6-formal-20260715T174017Z-topic  6          5875012         5875012         0               -               -               -
+disaggregated-streaming q6-formal-20260715T174017Z-topic  7          5875012         5875012         0               -               -               -
+disaggregated-streaming q6-formal-20260715T174017Z-topic  0          5875013         5875013         0               -               -               -
+disaggregated-streaming q6-formal-20260715T174017Z-topic  1          5875013         5875013         0               -               -               -
+disaggregated-streaming q6-formal-20260715T174017Z-topic  2          5875012         5875012         0               -               -               -
+disaggregated-streaming q6-formal-20260715T174017Z-topic  3          5875012         5875012         0               -               -               -

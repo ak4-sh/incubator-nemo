@@ -1,0 +1,3 @@
+/users/akash01/hadoop/etc/hadoop/yarn-site.xml:41:    <name>yarn.log-aggregation-enable</name>
+configs/cloudlab/hadoop-config/yarn-site.xml:15:  <property><name>yarn.log-aggregation-enable</name><value>false</value></property>
+Error: Could not find or load main class getconf
