@@ -75,6 +75,7 @@ EXECUTOR_PLACEMENT_REPORT=${EXECUTOR_PLACEMENT_REPORT:-$WORK_DIR/executor_placem
 LOG_FILE=${LOG_FILE:-/tmp/nx-auto-$TOPIC.log}
 SUB_LOG=${SUB_LOG:-/tmp/nx-auto-sub-$TOPIC.log}
 SOURCE_LOG=$WORK_DIR/source.log
+TOPIC_CONFIG_DESCRIBE=$WORK_DIR/kafka_topic_config_input.txt
 
 mkdir -p "$WORK_DIR"
 : > "$SOURCE_LOG"
@@ -83,6 +84,24 @@ SCALER_ENABLE_LOG=$WORK_DIR/scaler_enable.csv
 : > "$SCALER_ENABLE_LOG"
 PRODUCER_PID=""
 SCALER_STARTED=false
+
+verify_kafka_topic_log_append_time() {
+  local topic=$1
+  local output_file=$2
+  local describe_output
+  describe_output=$(ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --entity-type topics --entity-name '$topic' --describe")
+  {
+    echo "topic=$topic"
+    echo "bootstrap=$KAFKA_BOOTSTRAP"
+    echo "$describe_output"
+  } > "$output_file"
+  cat "$output_file"
+  if ! grep -q "message.timestamp.type=LogAppendTime" "$output_file"; then
+    echo "ERROR: Kafka input topic '$topic' is not configured with message.timestamp.type=LogAppendTime" >&2
+    echo "See $output_file for kafka-configs.sh --describe output." >&2
+    exit 1
+  fi
+}
 
 if [[ "$SCALER_START_MODE" == "after_phase_delay" && "$BURST_MODE" != "phases" ]]; then
   echo "ERROR: SCALER_START_MODE=after_phase_delay requires BURST_MODE=phases" >&2
@@ -352,8 +371,9 @@ python3 "$SCRIPT_DIR/generate_vm_addresses.py" \
 
 # 2. Create Kafka topic and prefill
 echo "Creating Kafka topic $TOPIC with $KAFKA_PARTITIONS partitions"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --bootstrap-server node1:9092 --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server node1:9092 --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
+ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1,message.timestamp.type=LogAppendTime || true"
+verify_kafka_topic_log_append_time "$TOPIC" "$TOPIC_CONFIG_DESCRIBE"
 
 if [[ "$PREFILL_EVENTS" -gt 0 ]]; then
   echo "Prefilling $PREFILL_EVENTS records"

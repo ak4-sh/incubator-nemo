@@ -4,6 +4,8 @@ Metrics collector for Nemo autoscaler tests.
 Polls Kafka offsets, reads source/task metrics, and produces combined_metrics.csv.
 """
 
+from __future__ import annotations
+
 import os
 import sys
 import time
@@ -212,6 +214,9 @@ def read_source_queue_metrics(work_dir: str, am_host: str | None = None,
         if host and host != am_host:
             paths.append((host, "/tmp/source_task_metrics.csv"))
     values = []
+    weighted_sum = 0.0
+    total_samples = 0
+    seen_intervals: set[tuple[str, str, str]] = set()
     for host, path in paths:
         for line in _read_tail(host, path, 200):
             if line.startswith("timestamp"):
@@ -219,10 +224,16 @@ def read_source_queue_metrics(work_dir: str, am_host: str | None = None,
             parts = line.split(",")
             if len(parts) >= 10:
                 try:
+                    interval_key = (parts[0], parts[1], parts[2])
+                    if interval_key in seen_intervals:
+                        continue
                     avg_ns = float(parts[5])
                     samples = int(float(parts[7]))
                     if avg_ns >= 0 and samples > 0:
-                        values.append(avg_ns / 1_000_000.0)
+                        seen_intervals.add(interval_key)
+                        values.append(avg_ns)
+                        weighted_sum += avg_ns * samples
+                        total_samples += samples
                 except (ValueError, IndexError):
                     continue
     if not values:
@@ -230,8 +241,16 @@ def read_source_queue_metrics(work_dir: str, am_host: str | None = None,
     values.sort()
     def pct(p: float) -> float:
         idx = min(len(values) - 1, max(0, int(round((len(values) - 1) * p))))
-        return values[idx]
-    return {"p50": pct(0.50), "p95": pct(0.95), "p99": pct(0.99)}
+        return values[idx] / 1_000_000.0
+    return {
+        "p50": pct(0.50),
+        "p95": pct(0.95),
+        "p99": pct(0.99),
+        "unweightedMean": (sum(values) / len(values)) / 1_000_000.0,
+        "weightedMean": (weighted_sum / total_samples) / 1_000_000.0 if total_samples > 0 else -1,
+        "totalSamples": total_samples,
+        "validTasks": len(values),
+    }
 
 
 # ── main loop ─────────────────────────────────────────────────────────────
@@ -258,7 +277,9 @@ def main():
             "timestamp,inputOffset,resultOffset,sourceCount,inputLag,resultLag,"
             "kafkaQueueTimeP50,kafkaQueueTimeP95,kafkaQueueTimeP99,latencyMedian,latencyP95,"
             "latencyP99,latencyTail,avgCpu,avgInput,avgProcess,queueSize,numExecutors,numLambdaExecutors,"
-            "consumerCommittedOffset,consumerLogEndOffset,consumerLag\n"
+            "consumerCommittedOffset,consumerLogEndOffset,consumerLag,"
+            "kafkaQueueTimeUnweightedMeanMs,kafkaQueueTimeWeightedMeanMs,"
+            "kafkaQueueTimeTotalSamples,kafkaQueueTimeValidTasks\n"
         )
 
     print(f"[metrics] collector started for topic={topic} result_topic={result_topic} work_dir={work_dir}")
@@ -298,6 +319,10 @@ def main():
             consumer_lag.get("consumerCommittedOffset", -1),
             consumer_lag.get("consumerLogEndOffset", -1),
             consumer_lag.get("consumerLag", -1),
+            source_queue.get("unweightedMean", -1),
+            source_queue.get("weightedMean", -1),
+            source_queue.get("totalSamples", -1),
+            source_queue.get("validTasks", -1),
         ]
 
         with open(combined_csv, "a") as f:
@@ -307,6 +332,7 @@ def main():
             f"[metrics] ts={ts} input={offset} result={result_offset} source={source} "
             f"inputLag={input_lag} resultLag={result_lag} "
             f"consumerLag={consumer_lag.get('consumerLag', -1)} "
+            f"kafkaQueueMean={source_queue.get('unweightedMean', -1):.1f}ms "
             f"kafkaQueueP95={source_queue.get('p95', -1):.1f}ms "
             f"cpu={cpu.get('avgCpu', -1):.4f} queue={cpu.get('queue', -1):.0f}"
         )

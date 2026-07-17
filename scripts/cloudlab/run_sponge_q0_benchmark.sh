@@ -346,6 +346,7 @@ save_artifacts() {
   copy_if_exists "$WORK_DIR/source.log" "$ARTIFACT_DIR/source.log"
   copy_if_exists "$WORK_DIR/scaling.txt" "$ARTIFACT_DIR/scaling.txt"
   copy_if_exists "$WORK_DIR/metrics_collector.log" "$ARTIFACT_DIR/metrics_collector.log"
+  copy_if_exists "$WORK_DIR/kafka_topic_config_input.txt" "$ARTIFACT_DIR/kafka_topic_config_input.txt"
   copy_if_exists "$HARNESS_LOG" "$ARTIFACT_DIR/harness.log"
   copy_if_exists "$SUB_LOG" "$ARTIFACT_DIR/subscriber.log"
 
@@ -475,6 +476,7 @@ Kafka source benchmark with VM offloading.
 ## Files
 
 - \`combined_metrics.csv\`: collector timeline.
+- \`kafka_topic_config_input.txt\`: input topic name and \`kafka-configs.sh --describe\` output.
 - \`source_aggregate_metrics.csv\`: AM-side source progress timeline.
 - \`source_task_metrics.csv\`: source-task queue time, idle time, and input rate.
 - \`scaler_metrics.csv\`: periodic scaler state timeline.

@@ -232,9 +232,23 @@ def create_topic(runner: Runner, kafka_node: str, kafka_home: str, zookeeper: st
     runner.ssh(
         kafka_node,
         f"{shlex.quote(kafka_home)}/bin/kafka-configs.sh --zookeeper {shlex.quote(zookeeper)} "
-        f"--entity-type topics --entity-name {shlex.quote(topic)} --alter --add-config min.insync.replicas=1 || true",
+        f"--entity-type topics --entity-name {shlex.quote(topic)} --alter "
+        f"--add-config min.insync.replicas=1,message.timestamp.type=LogAppendTime || true",
         check=False,
     )
+    describe = runner.ssh(
+        kafka_node,
+        f"{shlex.quote(kafka_home)}/bin/kafka-configs.sh --zookeeper {shlex.quote(zookeeper)} "
+        f"--entity-type topics --entity-name {shlex.quote(topic)} --describe",
+        check=False,
+    )
+    if not runner.dry_run:
+        describe_output = f"{describe.stdout or ''}{describe.stderr or ''}"
+        print(describe_output.strip())
+        if describe.returncode != 0 or "message.timestamp.type=LogAppendTime" not in describe_output:
+            raise RuntimeError(
+                f"Kafka topic {topic} is not configured with message.timestamp.type=LogAppendTime"
+            )
 
 
 def run_nexmark_benchmark(
