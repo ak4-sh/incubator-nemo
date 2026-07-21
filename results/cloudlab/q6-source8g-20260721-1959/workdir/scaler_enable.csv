@@ -1,0 +1,2 @@
+timestamp,reason,phase,targetRate,delaySec
+1784664386288,after_phase_delay,2,100000,60

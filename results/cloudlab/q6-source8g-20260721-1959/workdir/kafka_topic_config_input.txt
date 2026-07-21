@@ -1,0 +1,3 @@
+topic=q6-source8g-20260721-1959
+bootstrap=node1:9092,node2:9092,node3:9092
+Configs for topic 'q6-source8g-20260721-1959' are message.timestamp.type=LogAppendTime,min.insync.replicas=1
