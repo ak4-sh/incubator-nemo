@@ -1,0 +1,27 @@
+{
+  "applicationId": "application_1785281863435_0001",
+  "artifactSha256": {
+    "nemoClient": "dba6d7dff6d41a18ce89e89d3776636f00860753672fecb17712ce4e758e998c",
+    "nexmark": "ea914de46ec14df44ca77c9afe5b7e9a35d1c1a219ca7ead3e7fc86b3bd366af"
+  },
+  "consumerLag": 0,
+  "evaluatorErrorCount": 0,
+  "expectedInputEvents": 47000000,
+  "jobId": "q6-holostream-metricsfix-20260728T233300Z",
+  "metricsCollectorStatus": "terminal_validated",
+  "metricsRows": 35,
+  "placementPassed": true,
+  "producerStatus": "success",
+  "rawMetricFiles": [
+    "remote_tmp_metrics/node10/task_metrics.csv",
+    "remote_tmp_metrics/node11/task_metrics.csv",
+    "remote_tmp_metrics/node12/task_metrics.csv",
+    "remote_tmp_metrics/node5/source_task_metrics.csv",
+    "remote_tmp_metrics/node5/task_metrics.csv",
+    "remote_tmp_metrics/node9/task_metrics.csv"
+  ],
+  "rawMetricsPreserved": true,
+  "sourceProcessedEvents": 47000000,
+  "terminalInputOffset": 47000000,
+  "validated": true
+}

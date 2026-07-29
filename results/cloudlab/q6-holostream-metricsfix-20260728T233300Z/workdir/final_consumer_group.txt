@@ -1,0 +1,18 @@
+
+TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+nexmark-auction 6          359700          359700          0               -               -               -
+nexmark-bid     7          5515300         5515300         0               -               -               -
+nexmark-auction 2          359700          359700          0               -               -               -
+nexmark-bid     2          5515300         5515300         0               -               -               -
+nexmark-bid     5          5515300         5515300         0               -               -               -
+nexmark-auction 3          359700          359700          0               -               -               -
+nexmark-auction 1          359700          359700          0               -               -               -
+nexmark-auction 5          359700          359700          0               -               -               -
+nexmark-bid     4          5515300         5515300         0               -               -               -
+nexmark-auction 4          359700          359700          0               -               -               -
+nexmark-bid     6          5515300         5515300         0               -               -               -
+nexmark-bid     0          5515300         5515300         0               -               -               -
+nexmark-auction 0          359700          359700          0               -               -               -
+nexmark-bid     3          5515300         5515300         0               -               -               -
+nexmark-bid     1          5515300         5515300         0               -               -               -
+nexmark-auction 7          359700          359700          0               -               -               -

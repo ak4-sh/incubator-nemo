@@ -1,0 +1,17 @@
+26/07/28 23:58:58 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Application Report : 
+	Application-Id : application_1785281863435_0001
+	Application-Name : q6-holostream-metricsfix-20260728T233300Z
+	Application-Type : YARN
+	User : akash01
+	Queue : default
+	Start-Time : 1785282048288
+	Finish-Time : 0
+	Progress : 0%
+	State : RUNNING
+	Final-State : UNDEFINED
+	Tracking-URL : N/A
+	RPC Port : -1
+	AM Host : node11
+	Aggregate Resource Allocation : 40832741 MB-seconds, 6474 vcore-seconds
+	Diagnostics : 

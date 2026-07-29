@@ -1,0 +1,12 @@
+{
+  "aggregateColumnsRequireAllTopics": true,
+  "consumerGroup": "sponge-q6-holostream-metricsfix-20260728T233300Z",
+  "expectedPartitionsPerTopic": 8,
+  "jobId": "q6-holostream-metricsfix-20260728T233300Z",
+  "kafkaCommandMode": "local",
+  "queueTimeScope": "aggregate across source tasks; topic identity unavailable",
+  "topics": [
+    "nexmark-auction",
+    "nexmark-bid"
+  ]
+}

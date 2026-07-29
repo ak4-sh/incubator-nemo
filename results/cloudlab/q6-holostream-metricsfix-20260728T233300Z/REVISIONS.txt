@@ -1,0 +1,9 @@
+Sponge repository:
+d89746299 Add HoloStream Q6 input and reliable telemetry
+
+Beam repository:
+0d55405978 Add HoloStream Nexmark Kafka adapter
+
+Deployed artifact SHA-256 values:
+dba6d7dff6d41a18ce89e89d3776636f00860753672fecb17712ce4e758e998c  nemo-client-0.2-SNAPSHOT-shaded.jar
+ea914de46ec14df44ca77c9afe5b7e9a35d1c1a219ca7ead3e7fc86b3bd366af  nexmark-0.2-SNAPSHOT-shaded.jar

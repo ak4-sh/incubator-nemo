@@ -1,0 +1,4 @@
+26/07/28 23:58:59 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Total number of application attempts :1
+         ApplicationAttempt-Id	               State	                    AM-Container-Id	                       Tracking-URL
+appattempt_1785281863435_0001_000001	             RUNNING	container_1785281863435_0001_01_000001	http://node0:8088/proxy/application_1785281863435_0001/

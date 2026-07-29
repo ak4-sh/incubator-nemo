@@ -1,0 +1,2 @@
+26/07/29 00:00:14 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Application with id 'application_1785281863435_0001' doesn't exist in RM or Timeline Server.

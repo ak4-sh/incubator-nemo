@@ -1,0 +1,9 @@
+26/07/28 23:59:00 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Total number of containers :6
+                  Container-Id	          Start Time	         Finish Time	               State	                Host	   Node Http Address	                            LOG-URL
+container_1785281863435_0001_01_000005	Tue Jul 28 23:41:02 +0000 2026	                 N/A	             RUNNING	 node11-link-1:32933	http://node11-link-1:8042	http://node11-link-1:8042/node/containerlogs/container_1785281863435_0001_01_000005/akash01
+container_1785281863435_0001_01_000006	Tue Jul 28 23:41:04 +0000 2026	                 N/A	             RUNNING	 node12-link-1:41583	http://node12-link-1:8042	http://node12-link-1:8042/node/containerlogs/container_1785281863435_0001_01_000006/akash01
+container_1785281863435_0001_01_000001	Tue Jul 28 23:40:48 +0000 2026	                 N/A	             RUNNING	 node11-link-1:32933	http://node11-link-1:8042	http://node11-link-1:8042/node/containerlogs/container_1785281863435_0001_01_000001/akash01
+container_1785281863435_0001_01_000002	Tue Jul 28 23:40:56 +0000 2026	                 N/A	             RUNNING	  node5-link-1:45491	http://node5-link-1:8042	http://node5-link-1:8042/node/containerlogs/container_1785281863435_0001_01_000002/akash01
+container_1785281863435_0001_01_000003	Tue Jul 28 23:40:58 +0000 2026	                 N/A	             RUNNING	  node9-link-1:45313	http://node9-link-1:8042	http://node9-link-1:8042/node/containerlogs/container_1785281863435_0001_01_000003/akash01
+container_1785281863435_0001_01_000004	Tue Jul 28 23:41:00 +0000 2026	                 N/A	             RUNNING	 node10-link-1:38535	http://node10-link-1:8042	http://node10-link-1:8042/node/containerlogs/container_1785281863435_0001_01_000004/akash01
