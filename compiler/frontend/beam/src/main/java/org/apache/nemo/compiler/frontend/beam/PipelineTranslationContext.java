@@ -316,7 +316,10 @@ final class PipelineTranslationContext {
       return CommunicationPatternProperty.Value.OneToOne;
     }
     if (dstTransform instanceof FlattenTransform) {
-      return CommunicationPatternProperty.Value.Shuffle;
+      // Flatten is a keyless union. Its inputs may have unrelated element types
+      // and coders, so treating the edge as a keyed shuffle creates an invalid
+      // IR edge whenever the flattened PCollection is not a KV.
+      return CommunicationPatternProperty.Value.RoundRobin;
     }
 
     if (dstTransform instanceof GroupByKeyAndWindowDoFnTransform
@@ -363,4 +366,3 @@ final class PipelineTranslationContext {
     }
   }
 }
-

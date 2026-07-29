@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import importlib.util
+import csv
 import pathlib
 import tempfile
 import unittest
@@ -13,6 +14,78 @@ SPEC.loader.exec_module(METRICS)
 
 
 class MetricsCollectorTest(unittest.TestCase):
+    def test_parse_active_consumer_group_output(self):
+        output = """\
+GROUP TOPIC PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG CONSUMER-ID HOST CLIENT-ID
+group nexmark-auction 0 10 12 2 consumer /host client
+group nexmark-auction 1 20 20 0 consumer /host client
+group nexmark-bid 0 30 35 5 consumer /host client
+group nexmark-bid 1 40 40 0 consumer /host client
+"""
+        parsed = METRICS.parse_consumer_group_output(
+            output, ["nexmark-auction", "nexmark-bid"], 2
+        )
+        self.assertEqual(parsed["nexmark-auction"]["consumerCommittedOffset"], 30)
+        self.assertEqual(parsed["nexmark-auction"]["consumerLag"], 2)
+        self.assertEqual(parsed["nexmark-bid"]["consumerLogEndOffset"], 75)
+        self.assertEqual(parsed["nexmark-bid"]["consumerLag"], 5)
+
+    def test_parse_inactive_consumer_group_output(self):
+        output = """\
+TOPIC PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG CONSUMER-ID HOST CLIENT-ID
+nexmark-auction 0 10 10 0 - - -
+nexmark-auction 1 20 20 0 - - -
+nexmark-bid 0 30 30 0 - - -
+nexmark-bid 1 40 40 0 - - -
+"""
+        parsed = METRICS.parse_consumer_group_output(
+            output, ["nexmark-auction", "nexmark-bid"], 2
+        )
+        self.assertEqual(parsed["nexmark-auction"]["consumerCommittedOffset"], 30)
+        self.assertEqual(parsed["nexmark-bid"]["consumerLogEndOffset"], 70)
+        self.assertEqual(parsed["nexmark-auction"]["consumerLag"], 0)
+        self.assertEqual(parsed["nexmark-bid"]["consumerLag"], 0)
+
+    def test_parse_requires_expected_partition_count(self):
+        output = "nexmark-auction 0 10 10 0 - - -\n"
+        self.assertEqual(
+            METRICS.parse_consumer_group_output(
+                output, ["nexmark-auction"], expected_partitions=2
+            ),
+            {},
+        )
+
+    def test_prepare_csv_refuses_truncation_and_resumes_safely(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "metrics.csv"
+            METRICS.prepare_csv(path, ["timestamp", "value"], resume=False)
+            METRICS.append_csv_rows(
+                path,
+                ["timestamp", "value"],
+                [{"timestamp": 1, "value": 2}],
+            )
+            with self.assertRaises(RuntimeError):
+                METRICS.prepare_csv(path, ["timestamp", "value"], resume=False)
+            METRICS.prepare_csv(path, ["timestamp", "value"], resume=True)
+            METRICS.append_csv_rows(
+                path,
+                ["timestamp", "value"],
+                [{"timestamp": 3, "value": 4}],
+            )
+            with path.open(newline="") as source:
+                rows = list(csv.reader(source))
+        self.assertEqual(
+            rows,
+            [["timestamp", "value"], ["1", "2"], ["3", "4"]],
+        )
+
+    def test_prepare_csv_rejects_incompatible_resume(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "metrics.csv"
+            path.write_text("wrong,header\n", encoding="utf-8")
+            with self.assertRaises(RuntimeError):
+                METRICS.prepare_csv(path, ["timestamp", "value"], resume=True)
+
     def test_queue_time_means_ignore_invalid_rows(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = pathlib.Path(tmp) / "source_task_metrics.csv"

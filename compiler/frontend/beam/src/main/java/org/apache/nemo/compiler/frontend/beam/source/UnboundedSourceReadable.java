@@ -4,6 +4,7 @@ import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.UnboundedSource;
 import org.apache.beam.sdk.io.kafka.KafkaUnboundedReader;
 import org.apache.beam.sdk.io.kafka.KafkaUnboundedSource;
+import org.apache.beam.sdk.io.kafka.KafkaRecord;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.windowing.GlobalWindow;
 import org.apache.beam.sdk.util.WindowedValue;
@@ -304,12 +305,16 @@ public final class UnboundedSourceReadable<O, M extends UnboundedSource.Checkpoi
       long queueTimeNs = 0;
       if (kafkaReader != null && samplingCounter.incrementAndGet() >= 1000) {
         samplingCounter.set(0);
-        // Kafka message timestamp is available via getCurrentTimestamp
-        // Queue time = current time - message timestamp
-        queueTimeNs = (currentTimeMs - currTs.getMillis()) * 1_000_000L;
-        kafkaQueueTimeSumNs.addAndGet(queueTimeNs);
-        kafkaQueueTimeSamples.incrementAndGet();
-        kafkaQueueTimeMaxNs.accumulateAndGet(queueTimeNs, Math::max);
+        // Event time and Kafka append time are deliberately separate. The
+        // former drives Nexmark windows; the latter measures Kafka residence.
+        Object currentRecord = kafkaReader.getCurrent();
+        if (currentRecord instanceof KafkaRecord) {
+          long appendTimeMs = ((KafkaRecord) currentRecord).getTimestamp();
+          queueTimeNs = Math.max(0L, (currentTimeMs - appendTimeMs) * 1_000_000L);
+          kafkaQueueTimeSumNs.addAndGet(queueTimeNs);
+          kafkaQueueTimeSamples.incrementAndGet();
+          kafkaQueueTimeMaxNs.accumulateAndGet(queueTimeNs, Math::max);
+        }
       }
 
       // Report metrics every 5 seconds

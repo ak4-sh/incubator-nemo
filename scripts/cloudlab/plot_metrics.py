@@ -30,7 +30,10 @@ def load_combined(work_dir: str) -> pd.DataFrame:
     for col in [
         "inputOffset", "resultOffset", "sourceCount", "inputLag", "resultLag",
         "kafkaQueueTimeP50", "kafkaQueueTimeP95", "kafkaQueueTimeP99",
-        "avgCpu", "avgInput", "avgProcess", "queueSize", "numExecutors", "numLambdaExecutors"
+        "kafkaQueueTimeUnweightedMeanMs", "kafkaQueueTimeWeightedMeanMs",
+        "kafkaQueueTimeTotalSamples", "kafkaQueueTimeValidTasks",
+        "avgCpu", "avgInput", "avgProcess", "queueSize", "numExecutors", "numLambdaExecutors",
+        "consumerCommittedOffset", "consumerLogEndOffset", "consumerLag"
     ]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -49,6 +52,34 @@ def load_combined(work_dir: str) -> pd.DataFrame:
     t0 = df["timestamp"].min()
     df["rel_s"] = (df["timestamp"] - t0).dt.total_seconds()
     # Skip warmup for full runs, but keep short smoke runs plottable.
+    warmed = df[df["rel_s"] >= WARMUP_MS / 1000]
+    return warmed if not warmed.empty else df
+
+
+def load_kafka_topic_metrics(work_dir: str) -> pd.DataFrame:
+    path = Path(work_dir) / "kafka_topic_metrics.csv"
+    if not path.exists():
+        return pd.DataFrame()
+    df = pd.read_csv(path)
+    required = {
+        "timestamp",
+        "topic",
+        "endOffset",
+        "committedOffset",
+        "consumerLogEndOffset",
+        "consumerLag",
+    }
+    if df.empty or not required.issubset(df.columns):
+        print(f"[plot] ignoring malformed {path}")
+        return pd.DataFrame()
+    df["timestamp"] = pd.to_numeric(df["timestamp"], errors="coerce")
+    df = df.dropna(subset=["timestamp", "topic"]).copy()
+    for col in required - {"timestamp", "topic"}:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    if df.empty:
+        return df
+    t0 = df["timestamp"].min()
+    df["rel_s"] = (df["timestamp"] - t0) / 1000.0
     warmed = df[df["rel_s"] >= WARMUP_MS / 1000]
     return warmed if not warmed.empty else df
 
@@ -201,7 +232,129 @@ def plot_kafka_result_lag(df: pd.DataFrame, work_dir: str):
     save_plot(work_dir, "kafka_result_lag")
 
 
-def plot_source_queue_time(source_df: pd.DataFrame, work_dir: str):
+def plot_kafka_topics(topic_df: pd.DataFrame, work_dir: str):
+    if topic_df.empty:
+        return
+
+    plt.figure(figsize=(10, 5))
+    plotted_rate = False
+    for topic, group in topic_df.groupby("topic"):
+        group = group.sort_values("timestamp")
+        valid = group["endOffset"] >= 0
+        group = group.loc[valid]
+        if len(group) < 2:
+            continue
+        dt = group["timestamp"].diff() / 1000.0
+        rate = group["endOffset"].diff() / dt.replace(0, float("nan"))
+        plt.plot(
+            group["rel_s"],
+            rate.rolling(3, min_periods=1, center=True).mean(),
+            label=f"{topic} rate",
+        )
+        plotted_rate = True
+    complete_offsets = topic_df.pivot_table(
+        index="timestamp", columns="topic", values="endOffset", aggfunc="last"
+    ).dropna()
+    complete_offsets = complete_offsets[
+        (complete_offsets >= 0).all(axis=1)
+    ]
+    if len(complete_offsets) >= 2:
+        aggregate = complete_offsets.sum(axis=1)
+        dt = aggregate.index.to_series().diff() / 1000.0
+        aggregate_rate = aggregate.diff() / dt.replace(0, float("nan"))
+        rel_s = (aggregate.index - topic_df["timestamp"].min()) / 1000.0
+        plt.plot(
+            rel_s,
+            aggregate_rate.rolling(3, min_periods=1, center=True).mean(),
+            label="aggregate rate",
+            color="black",
+            linewidth=2,
+        )
+        plotted_rate = True
+    if plotted_rate:
+        plt.xlabel("Time (s)")
+        plt.ylabel("Events / s")
+        plt.title("Kafka Input Rate by Topic")
+        plt.legend()
+        plt.grid(True)
+        save_plot(work_dir, "kafka_topic_rates")
+    else:
+        plt.close()
+
+    plt.figure(figsize=(10, 5))
+    plotted_lag = False
+    for topic, group in topic_df.groupby("topic"):
+        valid = group["consumerLag"] >= 0
+        if valid.any():
+            plt.plot(
+                group.loc[valid, "rel_s"],
+                group.loc[valid, "consumerLag"],
+                label=f"{topic} lag",
+            )
+            plotted_lag = True
+    complete_lag = topic_df.pivot_table(
+        index="timestamp", columns="topic", values="consumerLag", aggfunc="last"
+    ).dropna()
+    complete_lag = complete_lag[(complete_lag >= 0).all(axis=1)]
+    if not complete_lag.empty:
+        aggregate_lag = complete_lag.sum(axis=1)
+        rel_s = (aggregate_lag.index - topic_df["timestamp"].min()) / 1000.0
+        plt.plot(
+            rel_s,
+            aggregate_lag,
+            label="aggregate lag",
+            color="black",
+            linewidth=2,
+        )
+        plotted_lag = True
+    if plotted_lag:
+        plt.xlabel("Time (s)")
+        plt.ylabel("Events")
+        plt.title("Kafka Consumer Lag by Topic")
+        plt.legend()
+        plt.grid(True)
+        save_plot(work_dir, "kafka_topic_lag")
+    else:
+        plt.close()
+
+
+def plot_source_queue_time(df: pd.DataFrame, source_df: pd.DataFrame, work_dir: str):
+    if not df.empty and "kafkaQueueTimeUnweightedMeanMs" in df.columns:
+        valid = df["kafkaQueueTimeUnweightedMeanMs"] >= 0
+        if valid.any():
+            plt.figure(figsize=(10, 5))
+            plt.plot(
+                df.loc[valid, "rel_s"],
+                df.loc[valid, "kafkaQueueTimeUnweightedMeanMs"],
+                label="Unweighted mean",
+                linewidth=2.0,
+            )
+            if "kafkaQueueTimeWeightedMeanMs" in df.columns:
+                weighted = df["kafkaQueueTimeWeightedMeanMs"] >= 0
+                if weighted.any():
+                    plt.plot(
+                        df.loc[weighted, "rel_s"],
+                        df.loc[weighted, "kafkaQueueTimeWeightedMeanMs"],
+                        label="Weighted mean",
+                        linestyle="--",
+                        alpha=0.8,
+                    )
+            for col, label, linestyle in [
+                ("kafkaQueueTimeP50", "P50", ":"),
+                ("kafkaQueueTimeP95", "P95", "-."),
+                ("kafkaQueueTimeP99", "P99", "--"),
+            ]:
+                if col in df.columns:
+                    pct_valid = df[col] >= 0
+                    if pct_valid.any():
+                        plt.plot(df.loc[pct_valid, "rel_s"], df.loc[pct_valid, col], label=label, linestyle=linestyle, alpha=0.55)
+            plt.xlabel("Time (s)")
+            plt.ylabel("Kafka queue residence time (ms)")
+            plt.title("Source Kafka Queue Residence Time")
+            plt.legend()
+            plt.grid(True)
+            save_plot(work_dir, "source_kafka_queue_time")
+
     if source_df.empty or "kafkaQueueTimeAvgNs" not in source_df.columns:
         return
     valid = source_df["kafkaQueueTimeAvgNs"] >= 0
@@ -212,10 +365,10 @@ def plot_source_queue_time(source_df: pd.DataFrame, work_dir: str):
         plt.plot(group["rel_s"], group["kafkaQueueTimeAvgNs"] / 1_000_000.0, label=f"{task} avg")
     plt.xlabel("Time (s)")
     plt.ylabel("Kafka queue time (ms)")
-    plt.title("Source Kafka Queue Time")
+    plt.title("Per-Task Source Kafka Queue Time")
     plt.legend()
     plt.grid(True)
-    save_plot(work_dir, "source_kafka_queue_time")
+    save_plot(work_dir, "source_kafka_queue_time_by_task")
 
 
 def plot_latency(df: pd.DataFrame, work_dir: str):
@@ -329,6 +482,7 @@ def main():
     else:
         print("[plot] could not infer jobId; task metrics will not be filtered")
     df = load_combined(work_dir)
+    topic_df = load_kafka_topic_metrics(work_dir)
     task_df = load_task_metrics(work_dir, job_id)
     source_task_df = load_source_task_metrics(work_dir)
 
@@ -339,7 +493,8 @@ def main():
     plot_input_rate(df, work_dir)
     plot_kafka_lag(df, work_dir)
     plot_kafka_result_lag(df, work_dir)
-    plot_source_queue_time(source_task_df, work_dir)
+    plot_kafka_topics(topic_df, work_dir)
+    plot_source_queue_time(df, source_task_df, work_dir)
     plot_latency(df, work_dir)
     plot_cpu(df, work_dir)
     plot_scaling_events(df, work_dir)

@@ -166,7 +166,12 @@ public final class InputAndCpuBasedScaler implements Scaler {
         final double avgCpu = avgCpuUse.getMean();
         final double avgProcess = avgSrcProcessingRate.getMean();
         final double avgInput = avgInputRate.getMean();
-        final long queue = aggInput.get() - currSourceEvent;
+        final long rawQueue = rawQueue();
+        final long queue = clampQueue(rawQueue);
+        if (rawQueue < 0) {
+          LOG.warn("Processed source count exceeds observed Kafka input: rawQueue={}, clampedQueue=0",
+            rawQueue);
+        }
 
         clientRPC.send(ControlMessage.DriverToClientMessage.newBuilder()
           .setType(ControlMessage.DriverToClientMessageType.PrintLog)
@@ -280,7 +285,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
   private Optional<ScalingDecisionSnapshot> queueSizeBasedScalingDecision(final double avgCpu,
                                                                           final double expectedCpu,
                                                                           final int numExecutors) {
-    final long queue = aggInput.get() - currSourceEvent;
+    final long queue = currentQueue();
     final double processingRate = avgSrcProcessingRate.getMean();
     final double avgInput = avgInputRate.getMean();
     final double queueDelay = processingRate > 0 ? queue / processingRate : -1.0;
@@ -334,7 +339,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
       final double rawRatio = 1 - policyConf.scalerTargetCpu / avgExpectedCpuVal;
       final double ratioToScaleout = Math.max(0.0, Math.min(0.95, rawRatio));
       // move ratioToScaleout % of computations to Lambda
-      final long queue = aggInput.get() - currSourceEvent;
+      final long queue = currentQueue();
       final double processingRate = avgSrcProcessingRate.getMean();
       final double avgInput = avgInputRate.getMean();
       final double queueDelay = processingRate > 0 ? queue / processingRate : -1.0;
@@ -418,7 +423,7 @@ public final class InputAndCpuBasedScaler implements Scaler {
     final double avgProcess = avgSrcProcessingRate.getMean();
     final double avgCpu = avgCpuUse.getMean();
     final boolean inputIdle = avgInput <= 0 || isInputStale();
-    final long queue = aggInput.get() - currSourceEvent;
+    final long queue = currentQueue();
 
     // Only scale in after a scale-out has happened and there are actually
     // eligible tasks on lambda executors to move back.
@@ -476,9 +481,9 @@ public final class InputAndCpuBasedScaler implements Scaler {
 
       final ScalingDecisionSnapshot decision = newDecision("SCALE_IN", "IDLE", avgCpuUse.getMean(),
         avgExpectedCpu.getMean(), avgInputRate.getMean(), avgSrcProcessingRate.getMean(),
-        aggInput.get() - currSourceEvent,
+        currentQueue(),
         avgSrcProcessingRate.getMean() > 0
-          ? (aggInput.get() - currSourceEvent) / avgSrcProcessingRate.getMean() : -1.0,
+          ? currentQueue() / avgSrcProcessingRate.getMean() : -1.0,
         1.0, executorRegistry.getRunningExecutors().size());
       emitDecisionLog(decision);
       writeScalingDecision(decision);
@@ -537,6 +542,18 @@ public final class InputAndCpuBasedScaler implements Scaler {
     currInputRate = delta;
     avgInputRate.addValue(delta);
     aggInput.getAndAdd(delta);
+  }
+
+  private long rawQueue() {
+    return aggInput.get() - currSourceEvent;
+  }
+
+  private long currentQueue() {
+    return clampQueue(rawQueue());
+  }
+
+  private long clampQueue(final long queue) {
+    return Math.max(0L, queue);
   }
 
   private void emitDecisionLog(final ScalingDecisionSnapshot decision) {

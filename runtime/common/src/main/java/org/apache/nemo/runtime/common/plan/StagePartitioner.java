@@ -19,7 +19,6 @@
 package org.apache.nemo.runtime.common.plan;
 
 import net.jcip.annotations.ThreadSafe;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.nemo.common.ir.IRDAG;
 import org.apache.nemo.common.ir.edge.IREdge;
 import org.apache.nemo.common.ir.edge.executionproperty.CommunicationPatternProperty;
@@ -57,8 +56,6 @@ import java.util.stream.Collectors;
 public final class StagePartitioner implements Function<IRDAG, Map<IRVertex, Integer>> {
   private static final Logger LOG = LoggerFactory.getLogger(StagePartitioner.class.getName());
   private final Set<Class<? extends VertexExecutionProperty>> ignoredPropertyKeys = ConcurrentHashMap.newKeySet();
-  private final MutableInt nextStageIndex = new MutableInt(0);
-
   private final EvalConf evalConf;
 
   public StagePartitioner(final EvalConf evalConf) {
@@ -83,12 +80,14 @@ public final class StagePartitioner implements Function<IRDAG, Map<IRVertex, Int
   @Override
   public Map<IRVertex, Integer> apply(final IRDAG irDAG) {
     final Map<IRVertex, Integer> vertexToStageIdMap = new HashMap<>();
+    // Allocate stage ids locally for each partitioning operation. In particular,
+    // every independent DAG root must receive a fresh id; reusing the current id
+    // can merge an unrelated root into a stage created for another branch.
+    final int[] nextStageIndex = {-1};
     irDAG.topologicalDo(irVertex -> {
       // Base case: for root vertices
-      boolean isRoot = false;
       if (vertexToStageIdMap.get(irVertex) == null) {
-        vertexToStageIdMap.put(irVertex, nextStageIndex.getValue());
-        isRoot = true;
+        vertexToStageIdMap.put(irVertex, ++nextStageIndex[0]);
       }
 
       // Get stage id of irVertex
@@ -110,7 +109,7 @@ public final class StagePartitioner implements Function<IRDAG, Map<IRVertex, Int
         if (testMergeability(edge, irDAG)) {
           vertexToStageIdMap.put(connectedIRVertex, stageId);
         } else {
-          vertexToStageIdMap.put(connectedIRVertex, nextStageIndex.incrementAndGet());
+          vertexToStageIdMap.put(connectedIRVertex, ++nextStageIndex[0]);
         }
       }
     });

@@ -70,14 +70,10 @@ public final class StreamingResourceAffinityPass extends AnnotatingPass {
         .collect(Collectors.toList()));
     }
 
-    // Set [Src->CR vertex] to SOURCE in order to schedule them in the same machine
-    if (dag.getRootVertices().size() > 1) {
-      throw new RuntimeException("Root vertex size > 1");
-    }
-
-    final IRVertex rootVertex = dag.getRootVertices().get(0);
-    dag.getOutgoingEdgesOf(rootVertex)
-      .stream()
+    // Set every [Src->CR vertex] to SOURCE so each source-side router stays
+    // with its source. Multi-topic pipelines legitimately have multiple roots.
+    dag.getRootVertices().stream()
+      .flatMap(rootVertex -> dag.getOutgoingEdgesOf(rootVertex).stream())
       .filter(edge -> edge.getDst() instanceof ConditionalRouterVertex)
       .forEach(edge -> edge.getDst()
         .setPropertyPermanently(ResourcePriorityProperty.of(ResourcePriorityProperty.SOURCE)));

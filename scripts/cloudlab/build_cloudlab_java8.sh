@@ -15,6 +15,7 @@ echo "  JAVA_HOME=$JAVA_HOME"
 
 mvn -DskipTests -Djava.version=1.8 package
 
+"$SCRIPT_DIR/verify_cloudlab_artifacts.sh"
 "$SCRIPT_DIR/compile_standalone_producer.sh"
 
 echo "Build complete"

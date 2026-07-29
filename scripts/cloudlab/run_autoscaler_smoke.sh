@@ -23,12 +23,41 @@ NUM_BURSTS=${NUM_BURSTS:-3}
 RAMP_UP_SEC=${RAMP_UP_SEC:-60}
 
 # Legacy mode support (when BURST_MODE=legacy)
+PRODUCER_IMPL=${PRODUCER_IMPL:-beam}
 TOTAL_EVENTS=${TOTAL_EVENTS:-500}
-PREFILL_EVENTS=${PREFILL_EVENTS:-100}
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  PREFILL_EVENTS=${PREFILL_EVENTS:-0}
+else
+  PREFILL_EVENTS=${PREFILL_EVENTS:-100}
+fi
 LIVE_EVENTS=$((TOTAL_EVENTS - PREFILL_EVENTS))
 RATE_PERIOD_SEC=${RATE_PERIOD_SEC:-50}
 SUBSCRIBER_WAIT=${SUBSCRIBER_WAIT:-10}
 PRODUCER_RATE_LIMITED=${PRODUCER_RATE_LIMITED:-true}
+HARNESS_PREFLIGHT_ONLY=${HARNESS_PREFLIGHT_ONLY:-false}
+HOLOSTREAM_LAUNCHER=${HOLOSTREAM_LAUNCHER:-$SCRIPT_DIR/holostream/run_producers.py}
+HOLOSTREAM_TOPIC_RESETTER=${HOLOSTREAM_TOPIC_RESETTER:-$SCRIPT_DIR/holostream/reset_topics.py}
+HOLOSTREAM_CONFIG=${HOLOSTREAM_CONFIG:-$SCRIPT_DIR/holostream/config/sponge_q6_formal.json}
+HOLOSTREAM_PRODUCER_BINARY=${HOLOSTREAM_PRODUCER_BINARY:-bin/nexmarkKafkaProducer}
+HOLOSTREAM_EXPECTED_PRODUCER_SHA256=${HOLOSTREAM_EXPECTED_PRODUCER_SHA256:-}
+HOLOSTREAM_PRODUCER_TIMEOUT=${HOLOSTREAM_PRODUCER_TIMEOUT:-600}
+HOLOSTREAM_TELEMETRY_INTERVAL_MS=${HOLOSTREAM_TELEMETRY_INTERVAL_MS:-1000}
+HOLOSTREAM_TELEMETRY_START_TIMEOUT=${HOLOSTREAM_TELEMETRY_START_TIMEOUT:-60}
+METRICS_TERMINAL_TIMEOUT_SEC=${METRICS_TERMINAL_TIMEOUT_SEC:-300}
+METRICS_TERMINAL_STABLE_SAMPLES=${METRICS_TERMINAL_STABLE_SAMPLES:-3}
+METRICS_KAFKA_COMMAND_MODE=${METRICS_KAFKA_COMMAND_MODE:-local}
+METRICS_MAX_CONSECUTIVE_FAILURES=${METRICS_MAX_CONSECUTIVE_FAILURES:-5}
+HOLOSTREAM_RESET_TOPICS=${HOLOSTREAM_RESET_TOPICS:-false}
+HOLOSTREAM_TOPIC_RESET_TIMEOUT=${HOLOSTREAM_TOPIC_RESET_TIMEOUT:-120}
+HOLOSTREAM_AUCTION_TOPIC=${HOLOSTREAM_AUCTION_TOPIC:-nexmark-auction}
+HOLOSTREAM_BID_TOPIC=${HOLOSTREAM_BID_TOPIC:-nexmark-bid}
+HOLOSTREAM_AUCTION_EVENTS=${HOLOSTREAM_AUCTION_EVENTS:-}
+HOLOSTREAM_BID_EVENTS=${HOLOSTREAM_BID_EVENTS:-}
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  KAFKA_INPUT_FORMAT=${KAFKA_INPUT_FORMAT:-HOLOSTREAM_MUS}
+else
+  KAFKA_INPUT_FORMAT=${KAFKA_INPUT_FORMAT:-BEAM_EVENT}
+fi
 
 QUERY=${QUERY:-0}
 EXECUTOR_JSON=${EXECUTOR_JSON:-$NEMO_REPO_ROOT/configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json}
@@ -42,6 +71,11 @@ SCALER_START_PHASE_DELAY_SEC=${SCALER_START_PHASE_DELAY_SEC:-60}
 SCALER_START_WAIT_TIMEOUT_SEC=${SCALER_START_WAIT_TIMEOUT_SEC:-900}
 KAFKA_RESULTS_TOPIC=${KAFKA_RESULTS_TOPIC:-}
 JOB_ID=${JOB_ID:-nx-q${QUERY}-${TOPIC}}
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  KAFKA_CONSUMER_GROUP=${KAFKA_CONSUMER_GROUP:-sponge-$JOB_ID}
+else
+  KAFKA_CONSUMER_GROUP=${KAFKA_CONSUMER_GROUP:-disaggregated-streaming}
+fi
 SOURCE_HOSTS=${SOURCE_HOSTS:-}
 COMPUTE_HOSTS=${COMPUTE_HOSTS:-}
 STRICT_EXECUTOR_PLACEMENT=${STRICT_EXECUTOR_PLACEMENT:-false}
@@ -68,6 +102,7 @@ LAMBDA_MEMORY=${LAMBDA_MEMORY:-1024}
 # Kafka topic and producer parallelism (Sponge: PARALLELISM=8)
 KAFKA_PARTITIONS=${KAFKA_PARTITIONS:-8}
 PRODUCER_PARALLELISM=${PRODUCER_PARALLELISM:-8}
+KAFKA_REPLICATION_FACTOR=${KAFKA_REPLICATION_FACTOR:-1}
 
 KAFKA_ZOOKEEPER=${KAFKA_ZOOKEEPER:-node1:2181,node2:2181,node3:2181}
 WORK_DIR=${WORK_DIR:-/tmp/nx-auto-$TOPIC}
@@ -75,7 +110,12 @@ EXECUTOR_PLACEMENT_REPORT=${EXECUTOR_PLACEMENT_REPORT:-$WORK_DIR/executor_placem
 LOG_FILE=${LOG_FILE:-/tmp/nx-auto-$TOPIC.log}
 SUB_LOG=${SUB_LOG:-/tmp/nx-auto-sub-$TOPIC.log}
 SOURCE_LOG=$WORK_DIR/source.log
+HOLOSTREAM_LAUNCHER_LOG=$WORK_DIR/holostream_launcher.log
+HOLOSTREAM_TELEMETRY_LOG=$WORK_DIR/kafka_input_telemetry.log
+HOLOSTREAM_TELEMETRY_CSV=$WORK_DIR/kafka_input_telemetry.csv
 TOPIC_CONFIG_DESCRIBE=$WORK_DIR/kafka_topic_config_input.txt
+AUCTION_TOPIC_CONFIG_DESCRIBE=$WORK_DIR/kafka_topic_config_auction.txt
+BID_TOPIC_CONFIG_DESCRIBE=$WORK_DIR/kafka_topic_config_bid.txt
 
 mkdir -p "$WORK_DIR"
 : > "$SOURCE_LOG"
@@ -83,17 +123,162 @@ SCALER_ENABLE_LOG=$WORK_DIR/scaler_enable.csv
 : > "$WORK_DIR/producer_phases.csv"
 : > "$SCALER_ENABLE_LOG"
 PRODUCER_PID=""
+HOLOSTREAM_TELEMETRY_PID=""
+METRICS_PID=""
 SCALER_STARTED=false
+HOLOSTREAM_PLAN_JSON=$WORK_DIR/holostream_producer_plan.json
+HOLOSTREAM_LOCK_DIR=/tmp/sponge-holostream-kafka.lock
+HOLOSTREAM_LOCK_HELD=false
+
+cleanup_holostream_launcher() {
+  if [[ -n "${METRICS_PID:-}" ]] &&
+     kill -0 "$METRICS_PID" 2>/dev/null; then
+    echo "Stopping metrics collector PID $METRICS_PID" >&2
+    kill -TERM "$METRICS_PID" 2>/dev/null || true
+    wait "$METRICS_PID" 2>/dev/null || true
+  fi
+  METRICS_PID=""
+  if [[ "$PRODUCER_IMPL" == "holostream" &&
+        -n "${HOLOSTREAM_TELEMETRY_PID:-}" ]] &&
+     kill -0 "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null; then
+    echo "Stopping Kafka input telemetry PID $HOLOSTREAM_TELEMETRY_PID" >&2
+    kill -TERM "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null || true
+    wait "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null || true
+  fi
+  if [[ "$PRODUCER_IMPL" == "holostream" &&
+        -n "${PRODUCER_PID:-}" ]] &&
+     kill -0 "$PRODUCER_PID" 2>/dev/null; then
+    echo "Stopping HoloStream producer launcher PID $PRODUCER_PID" >&2
+    kill -TERM "$PRODUCER_PID" 2>/dev/null || true
+    wait "$PRODUCER_PID" 2>/dev/null || true
+  fi
+  if [[ "$HOLOSTREAM_LOCK_HELD" == "true" ]]; then
+    rm -f "$HOLOSTREAM_LOCK_DIR/owner"
+    rmdir "$HOLOSTREAM_LOCK_DIR" 2>/dev/null || true
+    HOLOSTREAM_LOCK_HELD=false
+  fi
+}
+trap cleanup_holostream_launcher EXIT
+
+acquire_holostream_lock() {
+  if ! mkdir "$HOLOSTREAM_LOCK_DIR" 2>/dev/null; then
+    echo "ERROR: another HoloStream fixed-topic run holds $HOLOSTREAM_LOCK_DIR" >&2
+    if [[ -f "$HOLOSTREAM_LOCK_DIR/owner" ]]; then
+      echo "Lock owner: $(cat "$HOLOSTREAM_LOCK_DIR/owner")" >&2
+    fi
+    return 1
+  fi
+  HOLOSTREAM_LOCK_HELD=true
+  printf 'pid=%s jobId=%s workDir=%s started=%s\n' \
+    "$$" "$JOB_ID" "$WORK_DIR" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    > "$HOLOSTREAM_LOCK_DIR/owner"
+}
+
+preflight_holostream_plan() {
+  local plan_tmp="$HOLOSTREAM_PLAN_JSON.tmp"
+  local configured_auction_events=$HOLOSTREAM_AUCTION_EVENTS
+  local configured_bid_events=$HOLOSTREAM_BID_EVENTS
+  local plan_value
+  local -a plan_values=()
+
+  if [[ ! -x "$HOLOSTREAM_LAUNCHER" ]]; then
+    echo "ERROR: HoloStream launcher is not executable: $HOLOSTREAM_LAUNCHER" >&2
+    return 1
+  fi
+  if [[ ! -f "$STANDALONE_PRODUCER_OUT/KafkaInputOffsetTelemetry.class" ]]; then
+    echo "ERROR: Kafka input telemetry is not compiled: $STANDALONE_PRODUCER_OUT/KafkaInputOffsetTelemetry.class" >&2
+    echo "Run scripts/cloudlab/compile_standalone_producer.sh before the benchmark." >&2
+    return 1
+  fi
+  if [[ ! -f "$HOLOSTREAM_CONFIG" ]]; then
+    echo "ERROR: HoloStream config does not exist: $HOLOSTREAM_CONFIG" >&2
+    return 1
+  fi
+
+  python3 "$HOLOSTREAM_LAUNCHER" \
+    --config "$HOLOSTREAM_CONFIG" \
+    --run-id "$JOB_ID" \
+    --output-dir "$WORK_DIR" \
+    --expected-partitions "$KAFKA_PARTITIONS" \
+    --describe-json > "$plan_tmp"
+  mv "$plan_tmp" "$HOLOSTREAM_PLAN_JSON"
+
+  while IFS= read -r plan_value; do
+    plan_values+=("$plan_value")
+  done < <(
+    python3 -c '
+import json
+import sys
+plan = json.load(open(sys.argv[1]))
+print(plan["replicas"])
+print(plan["auctionTopic"])
+print(plan["bidTopic"])
+print(plan["auctionTotal"])
+print(plan["bidTotal"])
+print(plan["totalEvents"])
+print(",".join(str(round(phase["targetRate"])) for phase in plan["phases"]))
+print(",".join(str(phase["durationSec"]).rstrip("0").rstrip(".") for phase in plan["phases"]))
+' "$HOLOSTREAM_PLAN_JSON"
+  )
+  if [[ "${#plan_values[@]}" -ne 8 ]]; then
+    echo "ERROR: incomplete HoloStream launcher plan in $HOLOSTREAM_PLAN_JSON" >&2
+    return 1
+  fi
+
+  if [[ "${plan_values[0]}" -ne "$PRODUCER_PARALLELISM" ]]; then
+    echo "ERROR: producer config has ${plan_values[0]} replicas but PRODUCER_PARALLELISM=$PRODUCER_PARALLELISM" >&2
+    return 1
+  fi
+  if [[ "$HOLOSTREAM_AUCTION_TOPIC" != "${plan_values[1]}" ||
+        "$HOLOSTREAM_BID_TOPIC" != "${plan_values[2]}" ]]; then
+    echo "ERROR: unchanged HoloStream requires topics ${plan_values[1]} and ${plan_values[2]}" >&2
+    return 1
+  fi
+  if [[ -n "$configured_auction_events" &&
+        "$configured_auction_events" != "${plan_values[3]}" ]]; then
+    echo "ERROR: HOLOSTREAM_AUCTION_EVENTS=$configured_auction_events disagrees with config total ${plan_values[3]}" >&2
+    return 1
+  fi
+  if [[ -n "$configured_bid_events" &&
+        "$configured_bid_events" != "${plan_values[4]}" ]]; then
+    echo "ERROR: HOLOSTREAM_BID_EVENTS=$configured_bid_events disagrees with config total ${plan_values[4]}" >&2
+    return 1
+  fi
+
+  HOLOSTREAM_AUCTION_EVENTS=${plan_values[3]}
+  HOLOSTREAM_BID_EVENTS=${plan_values[4]}
+  TOTAL_EVENTS=${plan_values[5]}
+  LIVE_EVENTS=$TOTAL_EVENTS
+  NUM_EVENTS=$TOTAL_EVENTS
+  BURST_MODE=phases
+  PHASE_RATES=${plan_values[6]}
+  PHASE_DURATIONS_SEC=${plan_values[7]}
+
+  echo "Validated HoloStream plan:"
+  echo "  config=$HOLOSTREAM_CONFIG"
+  echo "  plan=$HOLOSTREAM_PLAN_JSON"
+  echo "  replicas=${plan_values[0]}"
+  echo "  auctions=$HOLOSTREAM_AUCTION_EVENTS bids=$HOLOSTREAM_BID_EVENTS total=$TOTAL_EVENTS"
+  echo "  phases=$PHASE_RATES durations=$PHASE_DURATIONS_SEC"
+}
+
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  acquire_holostream_lock
+  preflight_holostream_plan
+fi
 
 verify_kafka_topic_log_append_time() {
   local topic=$1
   local output_file=$2
-  local describe_output
-  describe_output=$(ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --entity-type topics --entity-name '$topic' --describe")
+  local config_output
+  local topic_output
+  config_output=$(ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$topic' --describe")
+  topic_output=$(ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --describe --topic '$topic'")
   {
     echo "topic=$topic"
     echo "bootstrap=$KAFKA_BOOTSTRAP"
-    echo "$describe_output"
+    echo "$topic_output"
+    echo "$config_output"
   } > "$output_file"
   cat "$output_file"
   if ! grep -q "message.timestamp.type=LogAppendTime" "$output_file"; then
@@ -101,11 +286,125 @@ verify_kafka_topic_log_append_time() {
     echo "See $output_file for kafka-configs.sh --describe output." >&2
     exit 1
   fi
+  if ! grep -Eq "PartitionCount:[[:space:]]*$KAFKA_PARTITIONS([[:space:]]|$)" "$output_file"; then
+    echo "ERROR: Kafka input topic '$topic' does not have $KAFKA_PARTITIONS partitions" >&2
+    echo "See $output_file for kafka-topics.sh --describe output." >&2
+    exit 1
+  fi
 }
+
+configure_input_topic() {
+  local topic=$1
+  local output_file=$2
+  echo "Creating Kafka topic $topic with $KAFKA_PARTITIONS partitions"
+  ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --zookeeper '$KAFKA_ZOOKEEPER' --create --topic '$topic' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
+  ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --zookeeper '$KAFKA_ZOOKEEPER' --entity-type topics --entity-name '$topic' --alter --add-config min.insync.replicas=1,message.timestamp.type=LogAppendTime || true"
+  verify_kafka_topic_log_append_time "$topic" "$output_file"
+}
+
+case "$PRODUCER_IMPL" in
+  beam)
+    if [[ "$KAFKA_INPUT_FORMAT" != "BEAM_EVENT" ]]; then
+      echo "ERROR: PRODUCER_IMPL=beam requires KAFKA_INPUT_FORMAT=BEAM_EVENT" >&2
+      exit 1
+    fi
+    ;;
+  holostream)
+    if [[ "$QUERY" -ne 6 ]]; then
+      echo "ERROR: HoloStream MUS input currently supports QUERY=6 only" >&2
+      exit 1
+    fi
+    if [[ "$KAFKA_INPUT_FORMAT" != "HOLOSTREAM_MUS" ]]; then
+      echo "ERROR: PRODUCER_IMPL=holostream requires KAFKA_INPUT_FORMAT=HOLOSTREAM_MUS" >&2
+      exit 1
+    fi
+    if [[ "$HOLOSTREAM_RESET_TOPICS" != "true" ]]; then
+      echo "ERROR: HoloStream mode deletes and recreates nexmark-auction and nexmark-bid; set HOLOSTREAM_RESET_TOPICS=true to authorize it" >&2
+      exit 1
+    fi
+    if [[ ! -x "$HOLOSTREAM_TOPIC_RESETTER" ]]; then
+      echo "ERROR: HoloStream topic resetter is not executable: $HOLOSTREAM_TOPIC_RESETTER" >&2
+      exit 1
+    fi
+    if ! [[ "$HOLOSTREAM_EXPECTED_PRODUCER_SHA256" =~ ^[0-9a-fA-F]{64}$ ]]; then
+      echo "ERROR: HoloStream mode requires the 64-character checksum from the comparison producer binary in HOLOSTREAM_EXPECTED_PRODUCER_SHA256" >&2
+      exit 1
+    fi
+    if ! [[ "$HOLOSTREAM_PRODUCER_TIMEOUT" =~ ^[1-9][0-9]*$ ]]; then
+      echo "ERROR: HOLOSTREAM_PRODUCER_TIMEOUT must be a positive integer" >&2
+      exit 1
+    fi
+    if ! [[ "$HOLOSTREAM_TELEMETRY_INTERVAL_MS" =~ ^[1-9][0-9]*$ ]] ||
+       ! [[ "$HOLOSTREAM_TELEMETRY_START_TIMEOUT" =~ ^[1-9][0-9]*$ ]]; then
+      echo "ERROR: HoloStream telemetry interval and start timeout must be positive integers" >&2
+      exit 1
+    fi
+    if ! [[ "$METRICS_TERMINAL_TIMEOUT_SEC" =~ ^[1-9][0-9]*$ ]] ||
+       ! [[ "$METRICS_TERMINAL_STABLE_SAMPLES" =~ ^[1-9][0-9]*$ ]] ||
+       ! [[ "$METRICS_MAX_CONSECUTIVE_FAILURES" =~ ^[1-9][0-9]*$ ]]; then
+      echo "ERROR: metrics terminal timeout, stable samples, and failure limit must be positive integers" >&2
+      exit 1
+    fi
+    if [[ "$METRICS_KAFKA_COMMAND_MODE" != "local" &&
+          "$METRICS_KAFKA_COMMAND_MODE" != "ssh" ]]; then
+      echo "ERROR: METRICS_KAFKA_COMMAND_MODE must be local or ssh" >&2
+      exit 1
+    fi
+    if [[ "$METRICS_KAFKA_COMMAND_MODE" == "local" &&
+          ! -x "$KAFKA_HOME/bin/kafka-run-class.sh" ]]; then
+      echo "ERROR: local Kafka metrics command is unavailable: $KAFKA_HOME/bin/kafka-run-class.sh" >&2
+      exit 1
+    fi
+    if ! [[ "$HOLOSTREAM_TOPIC_RESET_TIMEOUT" =~ ^[1-9][0-9]*$ ]]; then
+      echo "ERROR: HOLOSTREAM_TOPIC_RESET_TIMEOUT must be a positive integer" >&2
+      exit 1
+    fi
+    if ! [[ "$KAFKA_REPLICATION_FACTOR" =~ ^[1-9][0-9]*$ ]]; then
+      echo "ERROR: KAFKA_REPLICATION_FACTOR must be a positive integer" >&2
+      exit 1
+    fi
+    if [[ -z "$HOLOSTREAM_AUCTION_TOPIC" || -z "$HOLOSTREAM_BID_TOPIC" ]]; then
+      echo "ERROR: HoloStream Auction and Bid topic names must be non-empty" >&2
+      exit 1
+    fi
+    if [[ "$HOLOSTREAM_AUCTION_TOPIC" == "$HOLOSTREAM_BID_TOPIC" ]]; then
+      echo "ERROR: HoloStream Auction and Bid topics must be different" >&2
+      exit 1
+    fi
+    if ! [[ "$HOLOSTREAM_AUCTION_EVENTS" =~ ^[1-9][0-9]*$ ]] ||
+       ! [[ "$HOLOSTREAM_BID_EVENTS" =~ ^[1-9][0-9]*$ ]]; then
+      echo "ERROR: HoloStream expected Auction and Bid event counts must be positive integers" >&2
+      exit 1
+    fi
+    if [[ "$PRODUCER_PARALLELISM" -ne "$KAFKA_PARTITIONS" ]]; then
+      echo "ERROR: HoloStream producer parallelism ($PRODUCER_PARALLELISM) must match Kafka partitions ($KAFKA_PARTITIONS)" >&2
+      exit 1
+    fi
+    if [[ "$PREFILL_EVENTS" -ne 0 ]]; then
+      echo "ERROR: HoloStream mode requires PREFILL_EVENTS=0 so the bounded producer command runs exactly once" >&2
+      exit 1
+    fi
+    if [[ "$LIVE_EVENTS" -le 0 ]]; then
+      echo "ERROR: HoloStream mode requires TOTAL_EVENTS > 0 to launch the producer command" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo "ERROR: unsupported PRODUCER_IMPL=$PRODUCER_IMPL; expected beam or holostream" >&2
+    exit 1
+    ;;
+esac
 
 if [[ "$SCALER_START_MODE" == "after_phase_delay" && "$BURST_MODE" != "phases" ]]; then
   echo "ERROR: SCALER_START_MODE=after_phase_delay requires BURST_MODE=phases" >&2
   exit 1
+fi
+
+"$SCRIPT_DIR/verify_cloudlab_artifacts.sh" "$REBUILT_NEMO" "$REBUILT_NEXMARK"
+
+if [[ "$HARNESS_PREFLIGHT_ONLY" == "true" ]]; then
+  echo "Harness preflight completed; no cluster resources were changed."
+  exit 0
 fi
 
 # Preflight: ensure YARN NodeManagers are running
@@ -224,6 +523,87 @@ start_producer_with_source_log() {
   local live=$2
   local parallelism=${3:-$PRODUCER_PARALLELISM}
 
+  if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+    local -a launcher_args=(
+      python3 "$HOLOSTREAM_LAUNCHER"
+      --config "$HOLOSTREAM_CONFIG"
+      --run-id "$JOB_ID"
+      --output-dir "$WORK_DIR"
+      --kafka-node "$KAFKA_NODE"
+      --kafka-home "$KAFKA_HOME"
+      --bootstrap-servers "$KAFKA_BOOTSTRAP"
+      --auction-topic "$HOLOSTREAM_AUCTION_TOPIC"
+      --bid-topic "$HOLOSTREAM_BID_TOPIC"
+      --producer-binary "$HOLOSTREAM_PRODUCER_BINARY"
+      --expected-partitions "$KAFKA_PARTITIONS"
+      --timeout-seconds "$HOLOSTREAM_PRODUCER_TIMEOUT"
+    )
+    if [[ -n "$HOLOSTREAM_EXPECTED_PRODUCER_SHA256" ]]; then
+      launcher_args+=(
+        --expected-producer-sha256 "$HOLOSTREAM_EXPECTED_PRODUCER_SHA256"
+      )
+    fi
+    echo "Starting Kafka end-offset telemetry for HoloStream input"
+    java -cp "$STANDALONE_PRODUCER_CP" KafkaInputOffsetTelemetry \
+      "$KAFKA_BOOTSTRAP" \
+      "$HOLOSTREAM_AUCTION_TOPIC,$HOLOSTREAM_BID_TOPIC" \
+      "$KAFKA_PARTITIONS" \
+      "$events" \
+      "$SOURCE_LOG" \
+      "$HOLOSTREAM_TELEMETRY_CSV" \
+      "$HOLOSTREAM_TELEMETRY_INTERVAL_MS" \
+      "$((HOLOSTREAM_PRODUCER_TIMEOUT + 120))" \
+      true >"$HOLOSTREAM_TELEMETRY_LOG" 2>&1 &
+    HOLOSTREAM_TELEMETRY_PID=$!
+
+    local waited
+    for waited in $(seq 1 "$HOLOSTREAM_TELEMETRY_START_TIMEOUT"); do
+      if grep -qx '0 events' "$SOURCE_LOG" 2>/dev/null; then
+        break
+      fi
+      if ! kill -0 "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null; then
+        echo "ERROR: Kafka input telemetry exited before establishing its baseline" >&2
+        wait "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null || true
+        HOLOSTREAM_TELEMETRY_PID=""
+        tail -n 50 "$HOLOSTREAM_TELEMETRY_LOG" >&2 || true
+        return 1
+      fi
+      sleep 1
+    done
+    if ! grep -qx '0 events' "$SOURCE_LOG" 2>/dev/null; then
+      echo "ERROR: Kafka input telemetry did not establish a zero baseline within ${HOLOSTREAM_TELEMETRY_START_TIMEOUT}s" >&2
+      tail -n 50 "$HOLOSTREAM_TELEMETRY_LOG" >&2 || true
+      return 1
+    fi
+
+    echo "Launching supervised HoloStream producers with $HOLOSTREAM_LAUNCHER"
+    "${launcher_args[@]}" >"$HOLOSTREAM_LAUNCHER_LOG" 2>&1 &
+    PRODUCER_PID=$!
+
+    for waited in $(seq 1 "$HOLOSTREAM_TELEMETRY_START_TIMEOUT"); do
+      if grep -Eq '^[1-9][0-9]* events$' "$SOURCE_LOG" 2>/dev/null &&
+         grep -Eq 'Avg input: [1-9][0-9]*(\.[0-9]+)?' "$SUB_LOG" 2>/dev/null; then
+        echo "Kafka input telemetry is live and visible to the scaler"
+        return 0
+      fi
+      if ! kill -0 "$PRODUCER_PID" 2>/dev/null; then
+        echo "ERROR: HoloStream producer exited before telemetry became visible to the scaler" >&2
+        tail -n 50 "$HOLOSTREAM_LAUNCHER_LOG" >&2 || true
+        return 1
+      fi
+      if ! kill -0 "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null; then
+        echo "ERROR: Kafka input telemetry exited before becoming visible to the scaler" >&2
+        tail -n 50 "$HOLOSTREAM_TELEMETRY_LOG" >&2 || true
+        return 1
+      fi
+      sleep 1
+    done
+    echo "ERROR: scaler did not observe positive HoloStream input within ${HOLOSTREAM_TELEMETRY_START_TIMEOUT}s" >&2
+    tail -n 50 "$SOURCE_LOG" >&2 || true
+    tail -n 50 "$SUB_LOG" >&2 || true
+    return 1
+  fi
+
   if [[ "$BURST_MODE" == "step" && "$live" == "true" ]]; then
     local maxEvents=0
     if [[ "$events" -gt 0 ]]; then
@@ -267,6 +647,281 @@ start_producer_with_source_log() {
   PRODUCER_PID=$!
 }
 
+wait_for_holostream_production() {
+  local producer_status=0
+  local telemetry_status=0
+
+  while kill -0 "$PRODUCER_PID" 2>/dev/null; do
+    if [[ -n "$METRICS_PID" ]] && ! kill -0 "$METRICS_PID" 2>/dev/null; then
+      echo "ERROR: metrics collector failed while producers were running" >&2
+      tail -n 50 "$WORK_DIR/metrics_collector.log" >&2 || true
+      return 1
+    fi
+    if [[ -n "$HOLOSTREAM_TELEMETRY_PID" ]] &&
+       ! kill -0 "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null; then
+      if wait "$HOLOSTREAM_TELEMETRY_PID"; then
+        HOLOSTREAM_TELEMETRY_PID=""
+      else
+        telemetry_status=$?
+        HOLOSTREAM_TELEMETRY_PID=""
+        echo "ERROR: Kafka input telemetry failed while producers were running (status $telemetry_status)" >&2
+        tail -n 50 "$HOLOSTREAM_TELEMETRY_LOG" >&2 || true
+        return "$telemetry_status"
+      fi
+    fi
+    sleep 1
+  done
+
+  if wait "$PRODUCER_PID"; then
+    producer_status=0
+  else
+    producer_status=$?
+  fi
+  PRODUCER_PID=""
+  if [[ "$producer_status" -ne 0 ]]; then
+    echo "ERROR: HoloStream producer launcher failed with status $producer_status" >&2
+    tail -n 50 "$HOLOSTREAM_LAUNCHER_LOG" >&2 || true
+    return "$producer_status"
+  fi
+
+  if [[ -n "$HOLOSTREAM_TELEMETRY_PID" ]]; then
+    if wait "$HOLOSTREAM_TELEMETRY_PID"; then
+      telemetry_status=0
+    else
+      telemetry_status=$?
+    fi
+    HOLOSTREAM_TELEMETRY_PID=""
+  fi
+  if [[ "$telemetry_status" -ne 0 ]]; then
+    echo "ERROR: Kafka input telemetry failed with status $telemetry_status" >&2
+    tail -n 50 "$HOLOSTREAM_TELEMETRY_LOG" >&2 || true
+    return "$telemetry_status"
+  fi
+
+  local final_total
+  final_total=$(awk '/^[0-9]+ events$/ {value=$1} END {print value}' "$SOURCE_LOG")
+  if [[ "$final_total" != "$TOTAL_EVENTS" ]]; then
+    echo "ERROR: Kafka input telemetry ended at ${final_total:-missing}; expected $TOTAL_EVENTS" >&2
+    return 1
+  fi
+  if ! grep -q "KAFKA_INPUT_TELEMETRY_DONE total=$TOTAL_EVENTS " "$HOLOSTREAM_TELEMETRY_LOG"; then
+    echo "ERROR: Kafka input telemetry has no successful terminal marker" >&2
+    tail -n 50 "$HOLOSTREAM_TELEMETRY_LOG" >&2 || true
+    return 1
+  fi
+}
+
+wait_for_terminal_metrics() {
+  local stable=0
+  local waited
+  local row
+  local input_offset
+  local source_count
+  local consumer_lag
+  local sample_timestamp
+  local last_sample_timestamp=""
+
+  echo "Waiting for terminal metrics: input=$TOTAL_EVENTS source=$TOTAL_EVENTS consumerLag=0"
+  for waited in $(seq 0 "$METRICS_TERMINAL_TIMEOUT_SEC"); do
+    if [[ -z "$METRICS_PID" ]] || ! kill -0 "$METRICS_PID" 2>/dev/null; then
+      echo "ERROR: metrics collector exited before terminal validation" >&2
+      tail -n 50 "$WORK_DIR/metrics_collector.log" >&2 || true
+      return 1
+    fi
+    row=$(awk -F, 'NR > 1 {line=$0} END {print line}' "$WORK_DIR/combined_metrics.csv" 2>/dev/null || true)
+    if [[ -n "$row" ]]; then
+      input_offset=$(printf '%s\n' "$row" | awk -F, '{print $2}')
+      source_count=$(printf '%s\n' "$row" | awk -F, '{print $4}')
+      consumer_lag=$(printf '%s\n' "$row" | awk -F, '{print $22}')
+      sample_timestamp=$(printf '%s\n' "$row" | awk -F, '{print $1}')
+      if [[ "$input_offset" == "$TOTAL_EVENTS" &&
+            "$source_count" == "$TOTAL_EVENTS" &&
+            "$consumer_lag" == "0" ]]; then
+        if [[ "$sample_timestamp" != "$last_sample_timestamp" ]]; then
+          stable=$((stable + 1))
+          last_sample_timestamp=$sample_timestamp
+        fi
+        if [[ "$stable" -ge "$METRICS_TERMINAL_STABLE_SAMPLES" ]]; then
+          echo "Terminal metrics stable for $stable samples after ${waited}s"
+          return 0
+        fi
+      else
+        stable=0
+        last_sample_timestamp=$sample_timestamp
+      fi
+    fi
+    sleep 1
+  done
+  echo "ERROR: terminal metrics did not stabilize within ${METRICS_TERMINAL_TIMEOUT_SEC}s" >&2
+  tail -n 10 "$WORK_DIR/combined_metrics.csv" >&2 || true
+  return 1
+}
+
+preserve_run_metrics() {
+  local metrics_dir="$WORK_DIR/remote_tmp_metrics"
+  local node
+  local file
+  local task_files=0
+  local source_task_files=0
+
+  echo "Preserving raw AM and executor metrics"
+  mkdir -p "$metrics_dir"
+  for node in $BASELINE_NODES; do
+    mkdir -p "$metrics_dir/$node"
+    for file in task_metrics.csv source_task_metrics.csv; do
+      if ssh "$node" "test -f /tmp/$file"; then
+        scp "$node:/tmp/$file" "$metrics_dir/$node/$file" >/dev/null
+        if [[ "$file" == "task_metrics.csv" ]]; then
+          task_files=$((task_files + 1))
+        else
+          source_task_files=$((source_task_files + 1))
+        fi
+      fi
+    done
+  done
+  if [[ "$task_files" -ne "$EXPECTED_NM_COUNT" || "$source_task_files" -lt 1 ]]; then
+    echo "ERROR: raw metric preservation incomplete: task_files=$task_files source_task_files=$source_task_files" >&2
+    return 1
+  fi
+  for file in source_aggregate_metrics.csv scaler_metrics.csv; do
+    if ! ssh "$AM_HOST" "test -f /tmp/$file"; then
+      echo "ERROR: required AM metric is missing: $AM_HOST:/tmp/$file" >&2
+      return 1
+    fi
+    scp "$AM_HOST:/tmp/$file" "$WORK_DIR/$file" >/dev/null
+  done
+  for file in scaling_decisions.csv; do
+    if ssh "$AM_HOST" "test -f /tmp/$file"; then
+      scp "$AM_HOST:/tmp/$file" "$WORK_DIR/$file" >/dev/null
+    fi
+  done
+
+  "$KAFKA_HOME/bin/kafka-consumer-groups.sh" \
+    --bootstrap-server "$KAFKA_BOOTSTRAP" \
+    --describe \
+    --group "$KAFKA_CONSUMER_GROUP" \
+    > "$WORK_DIR/final_consumer_group.txt"
+  : > "$WORK_DIR/final_kafka_offsets.txt"
+  IFS=',' read -ra metrics_topics <<< "$METRICS_INPUT_TOPICS"
+  for topic in "${metrics_topics[@]}"; do
+    "$KAFKA_HOME/bin/kafka-run-class.sh" kafka.tools.GetOffsetShell \
+      --broker-list "$KAFKA_BOOTSTRAP" \
+      --topic "$topic" \
+      --time -1 >> "$WORK_DIR/final_kafka_offsets.txt"
+  done
+}
+
+stop_metrics_collector() {
+  local status=0
+  if [[ -z "$METRICS_PID" ]]; then
+    return 0
+  fi
+  if kill -0 "$METRICS_PID" 2>/dev/null; then
+    kill -TERM "$METRICS_PID" 2>/dev/null || true
+  fi
+  wait "$METRICS_PID" || status=$?
+  METRICS_PID=""
+  if [[ "$status" -ne 0 && "$status" -ne 143 ]]; then
+    echo "ERROR: metrics collector exited with status $status" >&2
+    return "$status"
+  fi
+}
+
+write_final_validation() {
+  local row
+  local input_offset
+  local source_count
+  local consumer_lag
+  local producer_status="not_applicable"
+  local nemo_sha256
+  local nexmark_sha256
+  local placement_passed=false
+  local evaluator_error_count=0
+  local placement_timestamp
+  local placement_job
+  local executor_id
+  local executor_type
+  local container_id
+  local requested_host
+  local physical_host
+  local row_passed
+
+  row=$(awk -F, 'NR > 1 {line=$0} END {print line}' "$WORK_DIR/combined_metrics.csv")
+  input_offset=$(printf '%s\n' "$row" | awk -F, '{print $2}')
+  source_count=$(printf '%s\n' "$row" | awk -F, '{print $4}')
+  consumer_lag=$(printf '%s\n' "$row" | awk -F, '{print $22}')
+  if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+    producer_status=$(python3 -c \
+      'import json,sys; print(json.load(open(sys.argv[1]))["status"])' \
+      "$WORK_DIR/holostream_producer_completion.json")
+  fi
+  nemo_sha256=$(sha256sum "$REBUILT_NEMO" | awk '{print $1}')
+  nexmark_sha256=$(sha256sum "$REBUILT_NEXMARK" | awk '{print $1}')
+  if [[ -f "$WORK_DIR/executor_placement_verification.json" ]] &&
+     grep -q '"passed":[[:space:]]*true' "$WORK_DIR/executor_placement_verification.json"; then
+    placement_passed=true
+  elif [[ "$STRICT_EXECUTOR_PLACEMENT" != "true" ]]; then
+    placement_passed=true
+  fi
+  : > "$WORK_DIR/evaluator_errors.txt"
+  if [[ -f "$WORK_DIR/executor_placement.csv" ]]; then
+    while IFS=, read -r placement_timestamp placement_job executor_id executor_type \
+      container_id requested_host physical_host row_passed; do
+      if [[ "$executor_type" != "Source" && "$executor_type" != "Compute" ]]; then
+        continue
+      fi
+      ssh \
+        -o BatchMode=yes \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/tmp/casp-internal-known-hosts \
+        "$physical_host" \
+        "grep -E 'InvalidClassException|OutOfMemoryError:|Exception in thread|Failed to deserialize|Failed to decode' '/data/hadoop/yarn/logs/$APP_ID/$container_id/evaluator.stderr' 2>/dev/null || true" \
+        >> "$WORK_DIR/evaluator_errors.txt"
+    done < "$WORK_DIR/executor_placement.csv"
+  fi
+  evaluator_error_count=$(wc -l < "$WORK_DIR/evaluator_errors.txt" | tr -d ' ')
+  python3 -c '
+import json
+import sys
+from pathlib import Path
+
+(
+    output, job_id, app_id, expected, produced, source, lag, producer_status,
+    nemo_sha256, nexmark_sha256, placement_passed, evaluator_error_count,
+) = sys.argv[1:]
+payload = {
+    "applicationId": app_id,
+    "artifactSha256": {
+        "nemoClient": nemo_sha256,
+        "nexmark": nexmark_sha256,
+    },
+    "consumerLag": int(lag),
+    "evaluatorErrorCount": int(evaluator_error_count),
+    "expectedInputEvents": int(expected),
+    "jobId": job_id,
+    "metricsCollectorStatus": "terminal_validated",
+    "placementPassed": placement_passed == "true",
+    "producerStatus": producer_status,
+    "rawMetricsPreserved": True,
+    "sourceProcessedEvents": int(source),
+    "terminalInputOffset": int(produced),
+    "validated": (
+        producer_status in ("success", "not_applicable")
+        and int(produced) == int(expected)
+        and int(source) == int(expected)
+        and int(lag) == 0
+        and placement_passed == "true"
+        and int(evaluator_error_count) == 0
+    ),
+}
+Path(output).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+' "$WORK_DIR/final_validation.json" "$JOB_ID" "$APP_ID" "$TOTAL_EVENTS" \
+    "$input_offset" "$source_count" "$consumer_lag" "$producer_status" \
+    "$nemo_sha256" "$nexmark_sha256" "$placement_passed" \
+    "$evaluator_error_count"
+  grep -q '"validated": true' "$WORK_DIR/final_validation.json"
+}
+
 run_producer_with_source_log() {
   local events=$1
   local live=$2
@@ -274,6 +929,10 @@ run_producer_with_source_log() {
   local status
 
   start_producer_with_source_log "$events" "$live" "$parallelism"
+  if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+    wait_for_holostream_production
+    return $?
+  fi
   status=0
   wait "$PRODUCER_PID" || status=$?
   return "$status"
@@ -330,6 +989,13 @@ wait_for_phase_start() {
       echo "ERROR: producer exited before phase $phase started" >&2
       return 1
     fi
+    if [[ "$PRODUCER_IMPL" == "holostream" &&
+          -n "$HOLOSTREAM_TELEMETRY_PID" ]] &&
+       ! kill -0 "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null; then
+      echo "ERROR: Kafka input telemetry exited before phase $phase started" >&2
+      tail -n 50 "$HOLOSTREAM_TELEMETRY_LOG" >&2 || true
+      return 1
+    fi
     sleep 1
   done
   echo "ERROR: phase $phase did not start within ${timeout_sec}s" >&2
@@ -369,11 +1035,22 @@ python3 "$SCRIPT_DIR/generate_vm_addresses.py" \
   --workers-per-node "$WORKERS_PER_NODE" \
   --output "$NEMO_REPO_ROOT/vm_addresses.txt"
 
-# 2. Create Kafka topic and prefill
-echo "Creating Kafka topic $TOPIC with $KAFKA_PARTITIONS partitions"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-topics.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --create --topic '$TOPIC' --partitions $KAFKA_PARTITIONS --replication-factor 1 || true"
-ssh "$KAFKA_NODE" "$KAFKA_HOME/bin/kafka-configs.sh --bootstrap-server '$KAFKA_BOOTSTRAP' --entity-type topics --entity-name '$TOPIC' --alter --add-config min.insync.replicas=1,message.timestamp.type=LogAppendTime || true"
-verify_kafka_topic_log_append_time "$TOPIC" "$TOPIC_CONFIG_DESCRIBE"
+# 2. Create Kafka input topic(s) and prefill
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  echo "Resetting fixed HoloStream Kafka topics"
+  python3 "$HOLOSTREAM_TOPIC_RESETTER" \
+    --kafka-node "$KAFKA_NODE" \
+    --kafka-home "$KAFKA_HOME" \
+    --bootstrap-servers "$KAFKA_BOOTSTRAP" \
+    --zookeeper "$KAFKA_ZOOKEEPER" \
+    --consumer-group "$KAFKA_CONSUMER_GROUP" \
+    --partitions "$KAFKA_PARTITIONS" \
+    --replication-factor "$KAFKA_REPLICATION_FACTOR" \
+    --timeout-seconds "$HOLOSTREAM_TOPIC_RESET_TIMEOUT" \
+    --output-dir "$WORK_DIR"
+else
+  configure_input_topic "$TOPIC" "$TOPIC_CONFIG_DESCRIBE"
+fi
 
 if [[ "$PREFILL_EVENTS" -gt 0 ]]; then
   echo "Prefilling $PREFILL_EVENTS records"
@@ -438,6 +1115,9 @@ export JOB_ID
 export NEMO_WORK_DIR="$WORK_DIR"
 export NEMO_JOB_ID="$JOB_ID"
 export SOURCE_HOSTS COMPUTE_HOSTS STRICT_EXECUTOR_PLACEMENT EXECUTOR_PLACEMENT_REPORT
+export KAFKA_INPUT_FORMAT HOLOSTREAM_AUCTION_TOPIC HOLOSTREAM_BID_TOPIC
+export HOLOSTREAM_AUCTION_EVENTS HOLOSTREAM_BID_EVENTS
+export KAFKA_CONSUMER_GROUP KAFKA_PARTITIONS
 
 # Run subscriber from repo root so JobLauncher finds vm_addresses.txt
 (cd "$NEMO_REPO_ROOT" && "$SCRIPT_DIR/run_q8_subscriber_yarn.sh")
@@ -499,7 +1179,23 @@ fi
 
 # 9. Start metrics collector in background (pass AM host for driver-side CSV polling)
 echo "Starting metrics collector (AM host: $AM_HOST)"
-python3 "$SCRIPT_DIR/metrics_collector.py" "$TOPIC" "$WORK_DIR" "$SUB_LOG" "$AM_HOST" "$KAFKA_RESULTS_TOPIC" "$BASELINE_NODES" > "$WORK_DIR/metrics_collector.log" 2>&1 &
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  METRICS_INPUT_TOPICS="$HOLOSTREAM_AUCTION_TOPIC,$HOLOSTREAM_BID_TOPIC"
+else
+  METRICS_INPUT_TOPICS="$TOPIC"
+fi
+echo "  Kafka input topics: $METRICS_INPUT_TOPICS"
+KAFKA_COMMAND_MODE="$METRICS_KAFKA_COMMAND_MODE" \
+METRICS_JOB_ID="$JOB_ID" \
+METRICS_RESUME=false \
+METRICS_MAX_CONSECUTIVE_FAILURES="$METRICS_MAX_CONSECUTIVE_FAILURES" \
+python3 "$SCRIPT_DIR/metrics_collector.py" \
+  "$METRICS_INPUT_TOPICS" \
+  "$WORK_DIR" \
+  "$SUB_LOG" \
+  "$AM_HOST" \
+  "$KAFKA_RESULTS_TOPIC" \
+  "$BASELINE_NODES" > "$WORK_DIR/metrics_collector.log" 2>&1 &
 METRICS_PID=$!
 echo "Metrics collector PID: $METRICS_PID"
 
@@ -516,17 +1212,40 @@ if [[ "$LIVE_EVENTS" -gt 0 ]]; then
     fi
     phase_target_rate=$(printf '%s\n' "$phase_line" | awk -F, 'END {print $4}')
     echo "Sleeping ${SCALER_START_PHASE_DELAY_SEC}s before starting scaler/backpressure"
-    sleep "$SCALER_START_PHASE_DELAY_SEC"
+    for _ in $(seq 1 "$SCALER_START_PHASE_DELAY_SEC"); do
+      if ! kill -0 "$PRODUCER_PID" 2>/dev/null; then
+        echo "ERROR: producer exited during the delayed scaler gate" >&2
+        exit 1
+      fi
+      if [[ "$PRODUCER_IMPL" == "holostream" &&
+            -n "$HOLOSTREAM_TELEMETRY_PID" ]] &&
+         ! kill -0 "$HOLOSTREAM_TELEMETRY_PID" 2>/dev/null; then
+        echo "ERROR: Kafka input telemetry exited during the delayed scaler gate" >&2
+        exit 1
+      fi
+      sleep 1
+    done
     echo "Starting scaler/backpressure after delayed phase gate"
     start_autoscaler_commands "after_phase_delay" "$SCALER_START_PHASE" "$phase_target_rate" "$SCALER_START_PHASE_DELAY_SEC"
-    producer_status=0
-    wait "$PRODUCER_PID" || producer_status=$?
-    if [[ "$producer_status" -ne 0 ]]; then
-      exit "$producer_status"
+    if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+      wait_for_holostream_production
+    else
+      producer_status=0
+      wait "$PRODUCER_PID" || producer_status=$?
+      if [[ "$producer_status" -ne 0 ]]; then
+        exit "$producer_status"
+      fi
     fi
   else
     run_producer_with_source_log "$LIVE_EVENTS" true
   fi
+fi
+
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  wait_for_terminal_metrics
+  preserve_run_metrics
+  write_final_validation
+  stop_metrics_collector
 fi
 
 # 11. Report status
@@ -537,8 +1256,13 @@ echo "  Subscriber log: $SUB_LOG"
 echo "  Work dir: $WORK_DIR"
 echo "  Scaling commands: $WORK_DIR/scaling.txt"
 echo "  Scaler enable log: $SCALER_ENABLE_LOG"
-echo "  Metrics collector PID: $METRICS_PID"
+if [[ -n "$METRICS_PID" ]]; then
+  echo "  Metrics collector PID: $METRICS_PID"
+else
+  echo "  Metrics collector: stopped after terminal validation"
+fi
 echo "  Metrics collector log: $WORK_DIR/metrics_collector.log"
+echo "  Kafka input topics: $METRICS_INPUT_TOPICS"
 echo ""
 echo "To monitor:"
 echo "  tail -f $SUB_LOG"
@@ -548,10 +1272,17 @@ echo ""
 echo "To stop:"
 echo "  yarn application -kill <APP_ID>"
 echo "  kill $SUB_PID"
-echo "  kill $METRICS_PID"
+if [[ -n "$METRICS_PID" ]]; then
+  echo "  kill $METRICS_PID"
+fi
 echo ""
 echo "To check Kafka offsets:"
-echo "  ssh $KAFKA_NODE \"$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$TOPIC' --time -1\""
+if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
+  echo "  ssh $KAFKA_NODE \"$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$HOLOSTREAM_AUCTION_TOPIC' --time -1\""
+  echo "  ssh $KAFKA_NODE \"$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$HOLOSTREAM_BID_TOPIC' --time -1\""
+else
+  echo "  ssh $KAFKA_NODE \"$KAFKA_HOME/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list '$KAFKA_BOOTSTRAP' --topic '$TOPIC' --time -1\""
+fi
 echo ""
 echo "To plot metrics after the test:"
 echo "  python3 $SCRIPT_DIR/plot_metrics.py $WORK_DIR"

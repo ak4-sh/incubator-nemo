@@ -66,12 +66,13 @@ under the License.
       <version>5.1.5.RELEASE</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.apache.beam/beam-sdks-java-io-google-cloud-platform -->
+    <!-- Required to link the Beam 2.6 Nexmark Main class, even in Kafka mode. -->
     <dependency>
       <groupId>org.apache.beam</groupId>
       <artifactId>beam-sdks-java-io-google-cloud-platform</artifactId>
       <version>2.6.0</version>
     </dependency>
+
   </dependencies>
 
 
@@ -98,6 +99,43 @@ under the License.
                             </transformers>
 
                             <filters>
+                              <!--
+                                The custom 2.6.0-SNAPSHOT Nexmark and Kafka artifacts are
+                                Gradle shadow jars. Do not copy their embedded Beam SDK into
+                                this application jar: Nemo provides Beam 2.18 at runtime, and
+                                duplicate Beam classes make REEF's reef/global/* class loading
+                                nondeterministic across evaluators.
+                              -->
+                              <filter>
+                                <artifact>org.apache.beam:beam-sdks-java-nexmark</artifact>
+                                <includes>
+                                  <include>org/apache/beam/sdk/nexmark/**</include>
+                                  <include>org/apache/beam/repackaged/beam_sdks_java_nexmark/**</include>
+                                </includes>
+                              </filter>
+
+                              <filter>
+                                <artifact>org.apache.beam:beam-sdks-java-io-kafka</artifact>
+                                <excludes>
+                                  <exclude>**</exclude>
+                                </excludes>
+                              </filter>
+
+                              <filter>
+                                <artifact>org.apache.beam:beam-sdks-java-core</artifact>
+                                <excludes>
+                                  <exclude>**</exclude>
+                                </excludes>
+                              </filter>
+
+                              <filter>
+                                <artifact>org.apache.beam:beam-sdks-java-extensions-google-cloud-platform-core</artifact>
+                                <excludes>
+                                  <exclude>org/apache/beam/sdk/util/AutoValue_MoreFutures_ExceptionOrResult.class</exclude>
+                                  <exclude>org/apache/beam/sdk/util/AutoValue_ReleaseInfo.class</exclude>
+                                  <exclude>org/apache/beam/sdk/util/AutoValue_RowJsonValueExtractors_ValidatingValueExtractor*.class</exclude>
+                                </excludes>
+                              </filter>
 
                               <filter>
                                 <artifact>*:*</artifact>

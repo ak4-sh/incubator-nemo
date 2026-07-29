@@ -296,6 +296,73 @@ scripts/cloudlab/run_autoscaler_smoke.sh
 
 The streaming app does not naturally exit just because the producer reaches `TOTAL_EVENTS`; kill the YARN app after confirming metrics:
 
+To consume the unchanged HoloStream producer's MUS tuples for raw-event Query
+6, select the HoloStream producer implementation. The harness validates the
+Sponge-owned copy of the producer configuration, derives the Auction and Bid
+counts and phase schedule, and invokes the supervised launcher directly:
+
+```bash
+PRODUCER_IMPL=holostream \
+QUERY=6 \
+KAFKA_PARTITIONS=8 \
+PRODUCER_PARALLELISM=8 \
+HOLOSTREAM_CONFIG="$PWD/scripts/cloudlab/holostream/config/sponge_q6_formal.json" \
+HOLOSTREAM_RESET_TOPICS=true \
+HOLOSTREAM_EXPECTED_PRODUCER_SHA256=<sha256-from-holostream-run> \
+scripts/cloudlab/run_autoscaler_smoke.sh
+```
+
+The configuration must use the unchanged HoloStream schema with exactly one
+Auction and one Bid logical source. Do not add `Topic` or `ExitOnCompletion`.
+The producer writes the fixed `nexmark-auction` and `nexmark-bid` topics. The
+launcher waits for exact per-partition offsets and then terminates the upstream
+producer processes, whose `Run()` method intentionally remains alive after
+bounded generation.
+
+In HoloStream mode, the harness creates and verifies both typed topics with
+`KAFKA_PARTITIONS` partitions and
+`message.timestamp.type=LogAppendTime`. `PRODUCER_PARALLELISM` must equal
+`KAFKA_PARTITIONS` and the configuration's `ProducerIPs` length. HoloStream
+mode defaults to no prefill and requires
+`HOLOSTREAM_EXPECTED_PRODUCER_SHA256`, taken from the producer binary used for
+the corresponding HoloStream run. Because the upstream producer uses fixed
+topic names, the harness also requires the explicit destructive authorization
+`HOLOSTREAM_RESET_TOPICS=true`. It holds a fixed-topic lock for the entire run,
+records the old topic metadata, deletes and recreates only the two allowed
+topics, and verifies that every recreated partition starts at offset zero.
+
+Each run receives a unique Kafka consumer group derived from `JOB_ID`, so
+committed offsets from a previous incarnation of the fixed topics cannot skip
+new records. The machine-readable plan is written to
+`workdir/holostream_producer_plan.json`, and the reset evidence is written to
+`workdir/holostream_topic_reset.json`; completion details and replica logs are
+written alongside them.
+
+For autoscaler input telemetry, the harness does not parse producer output.
+Instead, `KafkaInputOffsetTelemetry` samples the end offsets of both typed
+topics once per second and writes the cumulative total in the legacy
+`N events` format to `workdir/source.log`. The producer supervisor's
+human-readable output is kept separately in
+`workdir/holostream_launcher.log`, and every Kafka sample is recorded in
+`workdir/kafka_input_telemetry.csv`. The run fails before benchmarking if the
+topics do not begin at offset zero, the sampler exits early, or the scaler does
+not report a positive input rate after production starts. At completion, the
+sampler and producer supervisor must both succeed and the final sampled total
+must exactly match the plan.
+
+The checked-in eight-replica formal comparison configuration is:
+
+```text
+scripts/cloudlab/holostream/config/sponge_q6_formal.json
+```
+
+It reproduces the archived Sponge Q6 arrival schedule: 100 seconds at 20k,
+150 seconds at 100k, and 150 seconds at 200k events/second. Auction and Bid
+rates use the 3:46 split and produce exactly 47,000,000 records: 2,877,600
+Auctions and 44,122,400 Bids. If deletion succeeds but topic recreation or
+zero-offset verification fails, the harness aborts before starting Sponge's
+producer launcher and preserves the partial-reset error in the reset manifest.
+
 ```bash
 yarn application -list
 yarn application -kill <APP_ID>
@@ -346,3 +413,53 @@ Expected:
 
 For Q6 heap pressure, do not use the old 1 GB compute config. Use 8 GB compute executors as in the cap3 JSON above.
 The Source executor is 4 GB because the 2 GB Source configuration reached heap OOM after scale-out in the 200k ev/s phase.
+
+### Formal Run Plots
+
+Generate reproducible plots from a formal run archive with:
+
+```bash
+python3 scripts/cloudlab/plot_formal_run.py \
+  results/cloudlab/q6-formal-delayed-20260715T224242Z
+```
+
+The script writes PNGs under the archive's `plots/` directory. It resolves the formal archive layout directly:
+
+- `workdir/combined_metrics.csv`
+- `workdir/kafka_topic_metrics.csv` (new runs; one row per Kafka topic/sample)
+- `workdir/kafka_input_topics.json`
+- `workdir/producer_metrics.csv`
+- `workdir/producer_phases.csv`
+- `workdir/scaler_enable.csv`
+- `formal_metrics/scaler_metrics_am_*.csv`
+- `formal_metrics/scaling_decisions_am_*.csv`
+- `formal_metrics/task_metrics_*.csv`
+- `node_metrics/node*.csv`
+
+Kafka lag and offset plots use the real aggregate fields in
+`workdir/combined_metrics.csv`: `inputLag`, `consumerLag`, `inputOffset`,
+`consumerCommittedOffset`, and `consumerLogEndOffset`. For HoloStream runs,
+these fields are sums across Auction and Bid only when both topics returned
+valid data; otherwise they are `-1`. `workdir/kafka_topic_metrics.csv` retains
+the individual topic values and drives the Auction, Bid, and aggregate
+rate/lag plots. Beam-mode runs continue to use the same schema with one input
+topic.
+
+Kafka offset and consumer-group commands run locally on `node0`, so Kafka
+telemetry does not depend on a forwarded SSH agent. For managed HoloStream
+runs, the harness remains alive until `inputOffset`, `sourceCount`, and
+committed consumer lag reach their expected terminal values for multiple
+collector samples. It then copies raw AM and executor metrics into
+`workdir/remote_tmp_metrics/`, writes `workdir/final_validation.json`, and
+stops the collector before returning. Collector CSVs are never truncated on
+restart; intentional continuation requires `METRICS_RESUME=true`, matching
+run metadata, and matching CSV headers.
+
+Kafka queue-residence metrics and `sourceCount` remain aggregate across source
+tasks. Nemo's current source-task metric rows do not contain Kafka topic
+identity, so the collector does not present those measurements as per-topic
+values. The script intentionally does not use
+`workdir/consumer_group_lag_timeseries.csv`, because older wrapper logic wrote
+the consumer-group `LOG-END-OFFSET` value there instead of `LAG`.
+
+The node RSS and network plots are collector diagnostics, not authoritative cluster-wide resource accounting. `node_nemo_rss.png` shows only processes matched by the node collector's Nemo pattern, and the script warns if that match appears incomplete. `node_network_throughput.png` assumes `rx_bytes` and `tx_bytes` are cumulative byte counters and ignores negative deltas from counter resets.

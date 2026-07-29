@@ -12,6 +12,11 @@ KAFKA_CONSUMER_GROUP=${KAFKA_CONSUMER_GROUP:-disaggregated-streaming}
 EXECUTOR_JSON=${EXECUTOR_JSON:-$NEMO_REPO_ROOT/configs/cloudlab/nemo-yarn-kafka-1source-8slot-12compute.json}
 STREAM_TIMEOUT=${STREAM_TIMEOUT:-240}
 NUM_EVENTS=${NUM_EVENTS:-100000}
+KAFKA_INPUT_FORMAT=${KAFKA_INPUT_FORMAT:-BEAM_EVENT}
+HOLOSTREAM_AUCTION_TOPIC=${HOLOSTREAM_AUCTION_TOPIC:-nexmark-auction}
+HOLOSTREAM_BID_TOPIC=${HOLOSTREAM_BID_TOPIC:-nexmark-bid}
+HOLOSTREAM_AUCTION_EVENTS=${HOLOSTREAM_AUCTION_EVENTS:-0}
+HOLOSTREAM_BID_EVENTS=${HOLOSTREAM_BID_EVENTS:-0}
 CPU_DELAY_MS=${CPU_DELAY_MS:-0}
 OFFLOADING=${OFFLOADING:-0}
 AUTOSCALING=${AUTOSCALING:-false}
@@ -39,6 +44,7 @@ echo "  topic=$TOPIC"
 echo "  sink=$SINK_TYPE"
 echo "  job_id=$JOB_ID"
 echo "  kafka_consumer_group=$KAFKA_CONSUMER_GROUP"
+echo "  kafka_input_format=$KAFKA_INPUT_FORMAT"
 echo "  executor_json=$EXECUTOR_JSON"
 echo "  offloading=$OFFLOADING"
 echo "  autoscaling=$AUTOSCALING"
@@ -65,7 +71,7 @@ nohup java -Dnemo.work.dir="${NEMO_WORK_DIR:-/tmp}" -Dnemo.job.id="$JOB_ID" -cp 
   -optimization_policy org.apache.nemo.compiler.optimizer.policy.StreamingPolicy \
   -scheduler_impl_class_name org.apache.nemo.runtime.master.scheduler.StreamingScheduler \
   "${EXTRA_ARGS[@]}" \
-  -user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=${QUERY} --manageResources=false --monitorJobs=true --streamTimeout=${STREAM_TIMEOUT} --isRateLimited=false --windowSizeSec=10 --windowPeriodSec=1 --fanout=1 --cpuDelayMs=${CPU_DELAY_MS} --samplingRate=1.0 --numEvents=${NUM_EVENTS} --sourceType=KAFKA --pubSubMode=SUBSCRIBE_ONLY --bootstrapServers=${KAFKA_BOOTSTRAP} --kafkaTopic=${TOPIC} --kafkaConsumerGroup=${KAFKA_CONSUMER_GROUP} ${SINK_ARGS} --jobName=${JOB_ID}" \
+  -user_args "--runner=org.apache.nemo.client.beam.NemoRunner --streaming=true --query=${QUERY} --manageResources=false --monitorJobs=true --streamTimeout=${STREAM_TIMEOUT} --isRateLimited=false --windowSizeSec=10 --windowPeriodSec=1 --fanout=1 --cpuDelayMs=${CPU_DELAY_MS} --samplingRate=1.0 --numEvents=${NUM_EVENTS} --sourceType=KAFKA --pubSubMode=SUBSCRIBE_ONLY --bootstrapServers=${KAFKA_BOOTSTRAP} --kafkaTopic=${TOPIC} --kafkaConsumerGroup=${KAFKA_CONSUMER_GROUP} --kafkaInputFormat=${KAFKA_INPUT_FORMAT} --holoStreamAuctionTopic=${HOLOSTREAM_AUCTION_TOPIC} --holoStreamBidTopic=${HOLOSTREAM_BID_TOPIC} --holoStreamAuctionEvents=${HOLOSTREAM_AUCTION_EVENTS} --holoStreamBidEvents=${HOLOSTREAM_BID_EVENTS} ${SINK_ARGS} --jobName=${JOB_ID}" \
   > "$LOG_FILE" 2>&1 &
 
 SUB_PID=$!

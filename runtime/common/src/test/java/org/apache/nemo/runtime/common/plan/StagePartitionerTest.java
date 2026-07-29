@@ -28,11 +28,11 @@ import org.apache.nemo.common.ir.vertex.OperatorVertex;
 import org.apache.nemo.common.ir.vertex.executionproperty.*;
 import org.apache.nemo.common.ir.vertex.executionproperty.ResourcePriorityProperty;
 import org.apache.nemo.conf.EvalConf;
+import org.apache.reef.tang.Tang;
 import org.apache.reef.tang.exceptions.InjectionException;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,15 +48,9 @@ import static org.junit.Assert.assertNotEquals;
 public final class StagePartitionerTest {
   private StagePartitioner stagePartitioner;
 
-  private final EvalConf evalConf;
-
-  @Inject
-  private StagePartitionerTest(final EvalConf evalConf) {
-    this.evalConf = evalConf;
-  }
-
   @Before
   public void setup() throws InjectionException {
+    final EvalConf evalConf = Tang.Factory.getTang().newInjector().getInstance(EvalConf.class);
     stagePartitioner = new StagePartitioner(evalConf);
     stagePartitioner.addIgnoredPropertyKey(IgnoreSchedulingTempDataReceiverProperty.class);
   }
@@ -188,5 +182,29 @@ public final class StagePartitionerTest {
     assertNotEquals(partitioning.get(v0), partitioning.get(v1));
     assertNotEquals(partitioning.get(v1), partitioning.get(v2));
     assertNotEquals(partitioning.get(v2), partitioning.get(v0));
+  }
+
+  /**
+   * Independent roots must not reuse an id already allocated to a stage on
+   * another branch.
+   */
+  @Test
+  public void testMultipleRootsDoNotCollideWithExistingStages() {
+    final DAGBuilder<IRVertex, IREdge> dagBuilder = new DAGBuilder<>();
+    final IRVertex firstRoot = newVertex(1, 0, Collections.emptyList());
+    final IRVertex firstChild = newVertex(4, 0, Collections.emptyList());
+    final IRVertex secondRoot = newVertex(1, 0, Collections.emptyList());
+    dagBuilder.addVertex(firstRoot);
+    dagBuilder.addVertex(firstChild);
+    dagBuilder.addVertex(secondRoot);
+    dagBuilder.connectVertices(
+        new IREdge(CommunicationPatternProperty.Value.OneToOne, firstRoot, firstChild));
+
+    final Map<IRVertex, Integer> partitioning =
+        stagePartitioner.apply(new IRDAG(dagBuilder.buildWithoutSourceSinkCheck()));
+
+    assertNotEquals(partitioning.get(firstRoot), partitioning.get(firstChild));
+    assertNotEquals(partitioning.get(firstRoot), partitioning.get(secondRoot));
+    assertNotEquals(partitioning.get(firstChild), partitioning.get(secondRoot));
   }
 }
