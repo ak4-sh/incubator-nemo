@@ -1,0 +1,16 @@
+Standard Nexmark Q6 comparison methodology
+=============================================
+
+Aggregation interval: 5.0 seconds
+Input throughput: average samples within each source task and interval, then sum all 8 tasks.
+Kafka queue residence: average valid samples within each source task and interval, then take the unweighted task mean.
+A valid queue sample has a nonnegative interval mean; Sponge additionally requires kafkaQueueSamples > 0.
+Kafka queue values are stored in nanoseconds in both systems and converted to milliseconds.
+Sponge P50/P95/P99, weighted mean, and median lines are intentionally not plotted.
+All timelines begin at the first observed live-production phase, not application submission.
+Scale-out markers use the observed runtime decision/event timestamps.
+
+Run timing:
+- Sponge: overload=163.112s, scale-out=261.261s, sources=8
+- HoloStream memory: overload=150.000s, scale-out=258.000s, sources=8
+- HoloStream Pebble: overload=150.000s, scale-out=257.000s, sources=8

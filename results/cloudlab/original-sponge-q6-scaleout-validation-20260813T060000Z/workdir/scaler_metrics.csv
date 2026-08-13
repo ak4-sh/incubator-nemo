@@ -1,0 +1,12 @@
+timestamp,jobId,avgCpu,avgInput,avgProcess,queue,numExecutors,numLambdaExecutors,lastActionWasScaleOut,prevFutureCompleted,registeredVmWorkers,activeVmWorkers,vmWorkerRunningTasks
+1786600934698,original-sponge-q6-scaleout-validation-20260813T060000Z,0.000179,0.0,-1.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786600950601,original-sponge-q6-scaleout-validation-20260813T060000Z,0.024866,225000.0,225000.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786600966352,original-sponge-q6-scaleout-validation-20260813T060000Z,0.02533,225000.0,225000.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786600982243,original-sponge-q6-scaleout-validation-20260813T060000Z,0.026545,450000.0,281250.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786600998160,original-sponge-q6-scaleout-validation-20260813T060000Z,0.029045,450000.0,450000.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786601013901,original-sponge-q6-scaleout-validation-20260813T060000Z,0.028563,450000.0,450000.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786601029614,original-sponge-q6-scaleout-validation-20260813T060000Z,0.023476,450000.0,450000.0,-1,3,-1,unknown,unknown,-1,-1,-1
+1786601045267,original-sponge-q6-scaleout-validation-20260813T060000Z,0.025411,0.0,67500.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786601061278,original-sponge-q6-scaleout-validation-20260813T060000Z,0.023119,0.0,0.0,-1,4,-1,unknown,unknown,-1,-1,-1
+1786601077263,original-sponge-q6-scaleout-validation-20260813T060000Z,0.018857,0.0,0.0,-1,3,-1,unknown,unknown,-1,-1,-1
+1786601093067,original-sponge-q6-scaleout-validation-20260813T060000Z,0.018357,0.0,0.0,-1,4,-1,unknown,unknown,-1,-1,-1

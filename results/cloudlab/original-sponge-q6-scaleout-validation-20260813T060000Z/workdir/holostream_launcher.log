@@ -1,0 +1,20 @@
+[holostream] validated config=/users/akash01/nemo-original-sponge-holostream/scripts/cloudlab/holostream/config/sponge_hardware_matched_q6_scaleout_validation_225k450k.json sha256=b28a64f9edbd970823721e17f765daaa573723c861e526c1e091f090a8180122 replicas=4 auctions=2273040 bids=34851960
+[holostream] verified producer binary sha256=67dd182d4367829ae227dfab8edb61fa64c26fecbe9a30b91c1c94a5f5ea1bf6
+[holostream] launched replica=0 host=node0 ssh_pid=529902 log=/tmp/original-sponge-q6-scaleout-validation-20260813T060000Z/holostream-producer-replica-0.log
+[holostream] launched replica=1 host=node0 ssh_pid=529903 log=/tmp/original-sponge-q6-scaleout-validation-20260813T060000Z/holostream-producer-replica-1.log
+[holostream] launched replica=2 host=node0 ssh_pid=529904 log=/tmp/original-sponge-q6-scaleout-validation-20260813T060000Z/holostream-producer-replica-2.log
+[holostream] launched replica=3 host=node0 ssh_pid=529905 log=/tmp/original-sponge-q6-scaleout-validation-20260813T060000Z/holostream-producer-replica-3.log
+[holostream] phase 1 started; targetRate=225000
+[holostream] progress auctions=17220/2273040 bids=897702/34851960
+[holostream] progress auctions=168756/2273040 bids=3221166/34851960
+[holostream] progress auctions=306516/2273040 bids=5333406/34851960
+[holostream] progress auctions=458052/2273040 bids=7656870/34851960
+[holostream] progress auctions=604449/2273040 bids=10033140/34851960
+[holostream] phase 2 started; targetRate=450000
+[holostream] progress auctions=874776/2273040 bids=14680068/34851960
+[holostream] progress auctions=1177848/2273040 bids=18904548/34851960
+[holostream] progress auctions=1453368/2273040 bids=23551476/34851960
+[holostream] progress auctions=1756440/2273040 bids=27775956/34851960
+[holostream] progress auctions=2031960/2273040 bids=32422884/34851960
+[holostream] progress auctions=2273040/2273040 bids=34851960/34851960
+[holostream] all producer partitions reached exact offsets

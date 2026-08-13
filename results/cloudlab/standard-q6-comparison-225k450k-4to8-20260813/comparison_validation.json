@@ -1,0 +1,77 @@
+{
+  "bin_seconds": 5.0,
+  "experiment_checks": {
+    "holostream_configs_differ_only_by_backend": true,
+    "holostream_topology_verified": "4 auction sources + 4 bid sources -> closedAuction[4] -> statefulMapper[4->8] -> sink[1]",
+    "record_count_verified": 101250000,
+    "sponge_plan_verified": "8 Kafka sources; standard Beam WinningBids and MovingMeanSellingPrice operators present; compute target parallelism 4",
+    "standard_q6_verified": true,
+    "workload_verified": "225k events/s for 150s, then 450k events/s for 150s"
+  },
+  "runs": {
+    "HoloStream Pebble": {
+      "baseline_input_mean_events_s": 227877.91199999998,
+      "input_bins": 58,
+      "metric_database": "/Users/akash/Developer/casp/nemo-original-sponge-holostream/results/cloudlab/holostream-standard-q6-pebble-225k450k-4to8-20260813T150500Z/metricDB/metricCollector.snapshot.db",
+      "overload_input_mean_events_s": 345718.48571428575,
+      "phase2_s": 150.0,
+      "producer_end_s": 300.0,
+      "queue_bins": 68,
+      "queue_metric": "Latency.KafkaQueueTime >= 0",
+      "queue_unit_conversion": "nanoseconds / 1,000,000 = milliseconds",
+      "result_dir": "/Users/akash/Developer/casp/nemo-original-sponge-holostream/results/cloudlab/holostream-standard-q6-pebble-225k450k-4to8-20260813T150500Z",
+      "scale_out_s": 257.0,
+      "source_tasks": 8,
+      "state_backend": "Pebble",
+      "terminal_lag": 0,
+      "timeline_origin": "first baseline producer log line (2026-08-13T15:08:21+00:00)",
+      "total_events": 101250000
+    },
+    "HoloStream memory": {
+      "baseline_input_mean_events_s": 224853.0,
+      "input_bins": 59,
+      "metric_database": "/Users/akash/Developer/casp/nemo-original-sponge-holostream/results/cloudlab/holostream-standard-q6-memory-225k450k-4to8-20260813T143500Z/metricDB/metricCollector.snapshot.db",
+      "overload_input_mean_events_s": 449874.9928571428,
+      "phase2_s": 150.0,
+      "producer_end_s": 300.0,
+      "queue_bins": 59,
+      "queue_metric": "Latency.KafkaQueueTime >= 0",
+      "queue_unit_conversion": "nanoseconds / 1,000,000 = milliseconds",
+      "result_dir": "/Users/akash/Developer/casp/nemo-original-sponge-holostream/results/cloudlab/holostream-standard-q6-memory-225k450k-4to8-20260813T143500Z",
+      "scale_out_s": 258.0,
+      "source_tasks": 8,
+      "state_backend": "memory",
+      "terminal_lag": 0,
+      "timeline_origin": "first baseline producer log line (2026-08-13T14:38:54+00:00)",
+      "total_events": 101250000
+    },
+    "Sponge": {
+      "baseline_input_mean_events_s": 224833.89578571427,
+      "input_bins": 59,
+      "overload_input_mean_events_s": 448824.0100384616,
+      "phase2_s": 163.112,
+      "producer_end_s": 313.11199999999997,
+      "queue_bins": 60,
+      "queue_metric": "kafkaQueueTimeAvgNs with kafkaQueueSamples > 0",
+      "queue_unit_conversion": "nanoseconds / 1,000,000 = milliseconds",
+      "raw_metric_files": [
+        "/Users/akash/Developer/casp/nemo-original-sponge-holostream/results/cloudlab/original-sponge-q6-scaleout-225k450k-20260813T061000Z/workdir/remote_tmp_metrics/node5/source_task_metrics.csv"
+      ],
+      "result_dir": "/Users/akash/Developer/casp/nemo-original-sponge-holostream/results/cloudlab/original-sponge-q6-scaleout-225k450k-20260813T061000Z",
+      "scale_out_s": 261.261,
+      "source_tasks": 8,
+      "terminal_lag": 0,
+      "timeline_origin": "producer_phases.csv first phase (2026-08-13T06:13:06.739000+00:00)",
+      "total_events": 101250000
+    }
+  },
+  "series_policy": {
+    "input_rate": "mean within each source task and five-second bin, then sum task means",
+    "kafka_queue_residence": "unweighted mean of valid source-task interval means",
+    "median_series_plotted": false,
+    "sponge_percentiles_plotted": false,
+    "sponge_weighted_mean_plotted": false
+  },
+  "status": "ok",
+  "warnings": []
+}

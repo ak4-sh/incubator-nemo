@@ -1,0 +1,10 @@
+run,window,start_s,end_s,input_rate_mean_events_s,kafka_queue_unweighted_mean_ms
+Sponge,baseline_steady,15.000,153.112,224833.895786,57.841014
+Sponge,overload_pre_scale,173.112,256.261,449977.733500,78.509921
+Sponge,overload_post_scale,266.261,313.112,449678.968000,15.201981
+HoloStream memory,baseline_steady,15.000,140.000,224853.000000,29.377310
+HoloStream memory,overload_pre_scale,160.000,253.000,449930.526316,52.791650
+HoloStream memory,overload_post_scale,263.000,300.000,449614.057143,54.992747
+HoloStream Pebble,baseline_steady,15.000,140.000,227877.912000,42.086271
+HoloStream Pebble,overload_pre_scale,160.000,252.000,351892.536842,5039.456002
+HoloStream Pebble,overload_post_scale,262.000,300.000,324685.485714,14837.683813
