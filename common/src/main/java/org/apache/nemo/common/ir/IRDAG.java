@@ -1048,8 +1048,18 @@ public final class IRDAG implements DAGInterface<IRVertex, IREdge> {
     // Insert the vertex.
     final IRVertex vertexToInsert = wrapSamplingVertexIfNeeded(streamVertex, edgeToStreamize.getSrc());
     builder.addVertex(vertexToInsert);
-    edgeToStreamize.getDst().getPropertyValue(ParallelismProperty.class)
-      .ifPresent(p -> vertexToInsert.setProperty(ParallelismProperty.of(p)));
+    // A source can expose a different number of physical readables than the policy-requested
+    // downstream parallelism (for example, one readable for each Kafka partition).  The edge
+    // from a source to SrcStreamVertex is OneToOne, so the relay must match the source.  The
+    // original RoundRobin edge is retained after the relay and performs any source-to-compute
+    // parallelism change.
+    if (streamVertex instanceof SrcStreamVertex) {
+      edgeToStreamize.getSrc().getPropertyValue(ParallelismProperty.class)
+        .ifPresent(p -> vertexToInsert.setProperty(ParallelismProperty.of(p)));
+    } else {
+      edgeToStreamize.getDst().getPropertyValue(ParallelismProperty.class)
+        .ifPresent(p -> vertexToInsert.setProperty(ParallelismProperty.of(p)));
+    }
 
     // Build the new DAG to reflect the new topology.
     modifiedDAG.topologicalDo(v -> {

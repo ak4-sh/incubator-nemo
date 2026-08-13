@@ -33,6 +33,7 @@ import org.apache.nemo.common.ir.vertex.executionproperty.*;
 import org.apache.nemo.common.ir.vertex.utility.MessageAggregatorVertex;
 import org.apache.nemo.common.ir.vertex.utility.MessageBarrierVertex;
 import org.apache.nemo.common.ir.vertex.utility.SamplingVertex;
+import org.apache.nemo.common.ir.vertex.utility.SrcStreamVertex;
 import org.apache.nemo.common.ir.vertex.utility.StreamVertex;
 import org.apache.nemo.common.test.EmptyComponents;
 import org.junit.Before;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -257,6 +259,34 @@ public class IRDAGTest {
 
     irdag.delete(svOne);
     mustPass();
+  }
+
+  @Test
+  public void testSourceStreamVertexUsesPhysicalSourceParallelism() {
+    final int sourceParallelism = 8;
+    final int downstreamParallelism = 4;
+    final SourceVertex source = new EmptyComponents.EmptySourceVertex("partitioned-source", sourceParallelism);
+    final OperatorVertex downstream = new OperatorVertex(new EmptyComponents.EmptyTransform("downstream"));
+    source.setProperty(ParallelismProperty.of(sourceParallelism));
+    downstream.setProperty(ParallelismProperty.of(downstreamParallelism));
+
+    final IREdge edge = new IREdge(CommunicationPatternProperty.Value.RoundRobin, source, downstream);
+    edge.setProperty(EncoderProperty.of(EncoderFactory.DUMMY_ENCODER_FACTORY));
+    edge.setProperty(DecoderProperty.of(DecoderFactory.DUMMY_DECODER_FACTORY));
+    final IRDAG dag = new IRDAG(new DAGBuilder<IRVertex, IREdge>()
+      .addVertex(source)
+      .addVertex(downstream)
+      .connectVertices(edge)
+      .build());
+
+    final SrcStreamVertex sourceRelay = new SrcStreamVertex();
+    dag.insert(sourceRelay, edge);
+
+    assertEquals(sourceParallelism,
+      sourceRelay.getPropertyValue(ParallelismProperty.class).get().intValue());
+    if (!dag.checkIntegrity().isPassed()) {
+      throw new AssertionError(dag.checkIntegrity().getFailReason());
+    }
   }
 
   @Test
