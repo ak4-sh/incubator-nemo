@@ -1,0 +1,154 @@
+{
+  "QueryName": "nexmark_query6",
+  "WorkDir": "/users/akash01/holostream",
+  "AllNodeIPs": [
+    "10.10.1.1",
+    "10.10.1.2",
+    "10.10.1.3",
+    "10.10.1.4",
+    "10.10.1.5",
+    "10.10.1.6",
+    "10.10.1.7",
+    "10.10.1.8",
+    "10.10.1.9",
+    "10.10.1.10",
+    "10.10.1.11",
+    "10.10.1.12",
+    "10.10.1.13",
+    "10.10.1.14"
+  ],
+  "KafkaClusterIPs": [
+    "10.10.1.2",
+    "10.10.1.3",
+    "10.10.1.4"
+  ],
+  "ProducerIPs": [
+    "10.10.1.1",
+    "10.10.1.1",
+    "10.10.1.1",
+    "10.10.1.1"
+  ],
+  "WorkerIPs": [
+    "10.10.1.6",
+    "10.10.1.6",
+    "10.10.1.6",
+    "10.10.1.6",
+    "10.10.1.6",
+    "10.10.1.6",
+    "10.10.1.6",
+    "10.10.1.6",
+    "10.10.1.6",
+
+    "10.10.1.10",
+    "10.10.1.10",
+    "10.10.1.11",
+    "10.10.1.11",
+    "10.10.1.12",
+    "10.10.1.12",
+    "10.10.1.13",
+    "10.10.1.13",
+
+    "10.10.1.5",
+    "10.10.1.7",
+    "10.10.1.8",
+    "10.10.1.9"
+  ],
+  "NexmarkLogicalSourceConfigs": [
+    {
+      "EventType": "Auction",
+      "NexmarkSourceConfig": {
+        "NumEvents": 1549800,
+        "OutputEventNumber": 0,
+        "InterEventDelay": "1ms",
+        "PersonProportion": 1,
+        "AuctionProportion": 3,
+        "BidProportion": 46,
+        "NumCategories": 10,
+        "NumInFlightEvents": 500000,
+        "NumActiveAuctions": 30000,
+        "NumActivePeople": 1000,
+        "RateLimiterConfig": {
+          "UseRateLimit": true,
+          "RateLimit": [3444, 6888],
+          "RateChangeInterval": [150, 150],
+          "GeneratorInterval": "1s"
+        }
+      }
+    },
+    {
+      "EventType": "Bid",
+      "NexmarkSourceConfig": {
+        "NumEvents": 23762700,
+        "OutputEventNumber": 0,
+        "InterEventDelay": "1ms",
+        "PersonProportion": 1,
+        "AuctionProportion": 3,
+        "BidProportion": 46,
+        "NumCategories": 10,
+        "NumInFlightEvents": 500000,
+        "NumActiveAuctions": 30000,
+        "NumActivePeople": 1000,
+        "RateLimiterConfig": {
+          "UseRateLimit": true,
+          "RateLimit": [52806, 105612],
+          "RateChangeInterval": [150, 150],
+          "GeneratorInterval": "1s"
+        }
+      }
+    }
+  ],
+  "Reconfigurations": [
+    {
+      "TriggerTimeSeconds": 258,
+      "Type": "scaleup",
+      "TargetOperator": "statefulMapper",
+      "TargetParrallelism": 8
+    }
+  ],
+  "TotalRuntimeSeconds": 420,
+  "ReconfigProtocol": "lazy",
+  "LazyProtocolVersion": "no-migration",
+  "NumBuckets": 128,
+  "PartitionPolicy": "consistent-even",
+  "BufferSize": 50,
+  "BatchSize": 4096,
+  "StateBackendType": "memory",
+  "PebbleEnableConcurrentGetMany": false,
+  "PebbleGetManyMaxConcurrency": 4,
+  "PebbleGetManyBatchSize": 64,
+  "IsWarmUp": false,
+  "LoadWarmUpData": false,
+  "WarmUpDataFolder": {
+    "Pebble": ""
+  },
+  "LookupTableWarmUpDataFolder": "",
+  "EnablePendingBatchTimeout": true,
+  "ClosedAuctionParallelism": 4,
+  "StatefulMapperParallelism": 4,
+  "SinkParallelism": 1,
+  "WatermarkInterval": "100ms",
+  "MaxAllowedDelay": "0ms",
+  "InitialCustomTaskPlacement": [
+    "auctionSource: 10.10.1.6",
+    "auctionSource: 10.10.1.6",
+    "auctionSource: 10.10.1.6",
+    "auctionSource: 10.10.1.6",
+
+    "bidSource: 10.10.1.6",
+    "bidSource: 10.10.1.6",
+    "bidSource: 10.10.1.6",
+    "bidSource: 10.10.1.6",
+
+    "closedAuction: 10.10.1.10",
+    "closedAuction: 10.10.1.11",
+    "closedAuction: 10.10.1.12",
+    "closedAuction: 10.10.1.13",
+
+    "statefulMapper: 10.10.1.10",
+    "statefulMapper: 10.10.1.11",
+    "statefulMapper: 10.10.1.12",
+    "statefulMapper: 10.10.1.13",
+
+    "sink: 10.10.1.6"
+  ]
+}

@@ -1,0 +1,2268 @@
+[INFO] Starting experiment for query nexmark_query6 ...
+
+============================================================
+      [CLEANUP INFO] Cleaning up all components...
+============================================================
+
+[CLEANUP INFO][Progress 1/5] Stopping all producers...
+[Producer INFO] Total number of Nexmark producers to stop: 4
+[Producer INFO] Stopping Nexmark producers on 10.10.1.1 ...
+ssh 10.10.1.1 'cd /users/akash01/holostream/scripts/producer && python3 stopProducerNode.py'
+[Producer INFO] Total 0 producer processes terminated on this node.
+[Producer INFO] All Nexmark producers stopped successfully.
+
+[CLEANUP INFO][Progress 2/5] Stopping remote pebble instances...
+[CLEANUP INFO] No remote pebble instances to stop.
+
+[CLEANUP INFO][Progress 3/5] Shutting down coordinator and workers...
+[CLEANUP WARNING] No coordinator process found on this node.
+
+[CLEANUP INFO][Progress 4/5] Stopping Kafka cluster...
+[Kafka INFO] Stopping the Kafka cluster ...
+[Kafka INFO] Total number of Kafka nodes to stop: 3
+[Kafka INFO] Stopping Kafka node on 10.10.1.2 ...
+ssh 10.10.1.2 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+No kafka server to stop
+ssh 10.10.1.2 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+ssh 10.10.1.2 'sudo rm -rf /tmp/kraft-combined-logs'
+[Kafka INFO] Kafka node on 10.10.1.2 stopped and data cleared.
+[Kafka INFO] Stopping Kafka node on 10.10.1.3 ...
+ssh 10.10.1.3 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+No kafka server to stop
+ssh 10.10.1.3 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+ssh 10.10.1.3 'sudo rm -rf /tmp/kraft-combined-logs'
+[Kafka INFO] Kafka node on 10.10.1.3 stopped and data cleared.
+[Kafka INFO] Stopping Kafka node on 10.10.1.4 ...
+ssh 10.10.1.4 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+No kafka server to stop
+ssh 10.10.1.4 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+ssh 10.10.1.4 'sudo rm -rf /tmp/kraft-combined-logs'
+[Kafka INFO] Kafka node on 10.10.1.4 stopped and data cleared.
+[Kafka INFO] Kafka cluster stopped and data cleared!
+
+[CLEANUP INFO][Progress 5/5] Cleaning up data folders in all nodes...
+ssh 10.10.1.1 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.2 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.3 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.4 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.5 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.6 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.7 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.8 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.9 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.10 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.11 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.12 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.13 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.14 'rm -rf /users/akash01/holostream/data'
+[CLEANUP INFO] Clean up done!
+
+
+============================================================
+                   Updating config files...
+============================================================
+[CONFIG INFO] Updating coordinator address to 10.10.1.1 in /users/akash01/holostream/config.yaml
+[config.yaml] Updating field CoordinatorAddr to 10.10.1.1:8888 in config.yaml
+[config.yaml] Updating field CoordinatorAPIAddr to 10.10.1.1:9999 in config.yaml
+[config.yaml] Updating field CoordinatorMetricCollectorAddr to 10.10.1.1:8887 in config.yaml
+[Placement INFO] Using custom task placement
+   auctionSource: 10.10.1.6
+   auctionSource: 10.10.1.6
+   auctionSource: 10.10.1.6
+   auctionSource: 10.10.1.6
+   bidSource: 10.10.1.6
+   bidSource: 10.10.1.6
+   bidSource: 10.10.1.6
+   bidSource: 10.10.1.6
+   closedAuction: 10.10.1.10
+   closedAuction: 10.10.1.11
+   closedAuction: 10.10.1.12
+   closedAuction: 10.10.1.13
+   statefulMapper: 10.10.1.10
+   statefulMapper: 10.10.1.11
+   statefulMapper: 10.10.1.12
+   statefulMapper: 10.10.1.13
+   sink: 10.10.1.6
+[Custom Placement INFO] customPlacement.txt updated
+[config.yaml] Updating field TaskPlacementPolicy to custom in config.yaml
+[config.yaml] Updating field ReconfigProtocol to lazy in config.yaml
+[config.yaml] Updating field LazyProtocolVersion to no-migration in config.yaml
+[config.yaml] Updating field StateBackendType to memory in config.yaml
+[config.yaml] Updating field NumBuckets to 128 in config.yaml
+[config.yaml] Updating field PartitionPolicy to consistent-even in config.yaml
+[config.yaml] Updating field BufferSize to 50 in config.yaml
+[config.yaml] Updating field BatchSize to 4096 in config.yaml
+[config.yaml] Updating field IsWarmup to False in config.yaml
+[config.yaml] Updating field LoadWarmupData to False in config.yaml
+[config.yaml] Updating field LookupTableWarmUpDataFolder to  in config.yaml
+[config.yaml] Updating field PebbleEnableConcurrentGetMany to False in config.yaml
+[config.yaml] Updating field PebbleGetManyMaxConcurrency to 4 in config.yaml
+[config.yaml] Updating field PebbleGetManyBatchSize to 64 in config.yaml
+[config.yaml] Updating field EnablePendingBatchTimeout to True in config.yaml
+cd /users/akash01/holostream && make
+go build -o ./bin/client cmd/client/client.go
+go build -o ./bin/kafkaProducer cmd/kafkaProducer/kafkaProducer.go
+go build -o ./bin/fileReaderKafkaProducer cmd/fileReaderKafkaProducer/fileReaderKafkaProducer.go
+go build -o ./bin/remotePebble cmd/remotePebble/remotePebble.go
+cd /users/akash01/holostream && make
+go build -o ./bin/client cmd/client/client.go
+go build -o ./bin/kafkaProducer cmd/kafkaProducer/kafkaProducer.go
+go build -o ./bin/fileReaderKafkaProducer cmd/fileReaderKafkaProducer/fileReaderKafkaProducer.go
+go build -o ./bin/remotePebble cmd/remotePebble/remotePebble.go
+
+============================================================
+    [SYNC INFO] Starting SyncRepo to all remote machines...
+============================================================
+[SYNC INFO] 10.10.1.1 is local machine, skipping sync.
+ssh 10.10.1.2 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.2:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.2:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.2:/users/akash01/holostream
+ssh 10.10.1.3 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.3:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.3:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.3:/users/akash01/holostream
+ssh 10.10.1.4 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.4:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.4:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.4:/users/akash01/holostream
+ssh 10.10.1.5 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.5:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.5:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.5:/users/akash01/holostream
+ssh 10.10.1.6 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.6:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.6:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.6:/users/akash01/holostream
+ssh 10.10.1.7 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.7:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.7:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.7:/users/akash01/holostream
+ssh 10.10.1.8 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.8:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.8:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.8:/users/akash01/holostream
+ssh 10.10.1.9 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.9:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.9:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.9:/users/akash01/holostream
+ssh 10.10.1.10 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.10:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.10:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.10:/users/akash01/holostream
+ssh 10.10.1.11 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.11:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.11:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.11:/users/akash01/holostream
+ssh 10.10.1.12 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.12:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.12:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.12:/users/akash01/holostream
+ssh 10.10.1.13 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.13:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.13:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.13:/users/akash01/holostream
+ssh 10.10.1.14 'mkdir -p /users/akash01/holostream'
+scp -r /users/akash01/holostream/config.yaml 10.10.1.14:/users/akash01/holostream
+scp -r /users/akash01/holostream/bin 10.10.1.14:/users/akash01/holostream
+scp -r /users/akash01/holostream/scripts 10.10.1.14:/users/akash01/holostream
+[SYNC INFO] SyncRepo completed for all remote machines.
+
+
+============================================================
+                     Load warmup Data...
+============================================================
+
+============================================================
+          [Kafka INFO] Start Kafka cluster...
+============================================================
+[Kafka INFO] Total number of Kafka nodes to start: 3
+[Kafka INFO] Starting Kafka node on 10.10.1.2 ...
+ssh 10.10.1.2 'cd /users/akash01/holostream/scripts/kafka && ./deployKafkaNode.sh 10.10.1.2,10.10.1.3,10.10.1.4'
+[Kafka INFO] Starting Kafka node on 10.10.1.3 ...
+ssh 10.10.1.3 'cd /users/akash01/holostream/scripts/kafka && ./deployKafkaNode.sh 10.10.1.2,10.10.1.3,10.10.1.4'
+[Kafka INFO] Starting Kafka node on 10.10.1.4 ...
+ssh 10.10.1.4 'cd /users/akash01/holostream/scripts/kafka && ./deployKafkaNode.sh 10.10.1.2,10.10.1.3,10.10.1.4'
+[Kafka INFO] Waiting for Kafka cluster to start ...
+++ KAFKA_VERSION=3.9.0/kafka_2.13-3.9.0.tgz
+++ KAFKA_PKG=kafka_2.13-3.9.0.tgz
+++ KAFKA_DIR=kafka_2.13-3.9.0
++++ echo 10.10.1.2,10.10.1.3,10.10.1.4
++++ tr -d ' '
+++ BROKER_IPS=10.10.1.2,10.10.1.3,10.10.1.4
+++ KAFKA_DOWNLOAD_URL=https://archive.apache.org/dist/kafka/3.9.0/kafka_2.13-3.9.0.tgz
+++ CONFIG=config/kraft/reconfig-server.properties
+++ '[' '!' -d kafka_2.13-3.9.0 ']'
+++ cd kafka_2.13-3.9.0
+++ IFS=,
+++ read -ra IPS
+++ VOTERS=
+++ NODE_ID=1
++++ ip route get 1.1.1.1
++++ awk '{print $5; exit}'
+++ KAFKA_VERSION=3.9.0/kafka_2.13-3.9.0.tgz
+++ KAFKA_PKG=kafka_2.13-3.9.0.tgz
+++ KAFKA_DIR=kafka_2.13-3.9.0
+++ KAFKA_VERSION=3.9.0/kafka_2.13-3.9.0.tgz
+++ KAFKA_PKG=kafka_2.13-3.9.0.tgz
+++ KAFKA_DIR=kafka_2.13-3.9.0
+++ PRIMARY_IFACE=eno12399
+++ '[' -z eno12399 ']'
+++ echo 'Identified primary interface: eno12399'
++++ echo 10.10.1.2,10.10.1.3,10.10.1.4
++++ tr -d ' '
++++ echo 10.10.1.2,10.10.1.3,10.10.1.4
++++ tr -d ' '
++++ hostname -I
++++ tr ' ' '\n'
++++ grep -E '^10\.|^172\.|^192\.168\.'
++++ head -n 1
+++ BROKER_IPS=10.10.1.2,10.10.1.3,10.10.1.4
+++ KAFKA_DOWNLOAD_URL=https://archive.apache.org/dist/kafka/3.9.0/kafka_2.13-3.9.0.tgz
+++ CONFIG=config/kraft/reconfig-server.properties
+++ '[' '!' -d kafka_2.13-3.9.0 ']'
+++ cd kafka_2.13-3.9.0
+++ IFS=,
+++ read -ra IPS
+++ BROKER_IPS=10.10.1.2,10.10.1.3,10.10.1.4
+++ KAFKA_DOWNLOAD_URL=https://archive.apache.org/dist/kafka/3.9.0/kafka_2.13-3.9.0.tgz
+++ VOTERS=
+++ NODE_ID=1
+++ CONFIG=config/kraft/reconfig-server.properties
+++ '[' '!' -d kafka_2.13-3.9.0 ']'
+++ cd kafka_2.13-3.9.0
+++ IFS=,
+++ read -ra IPS
+++ VOTERS=
+++ NODE_ID=1
++++ ip route get 1.1.1.1
++++ awk '{print $5; exit}'
++++ ip route get 1.1.1.1
++++ awk '{print $5; exit}'
+++ CURRENT_IP=10.10.1.2
+++ '[' -z 10.10.1.2 ']'
+++ for ip in "${IPS[@]}"
++++ echo 10.10.1.2
++++ xargs
+++ PRIMARY_IFACE=eno12399
+++ '[' -z eno12399 ']'
+++ echo 'Identified primary interface: eno12399'
+++ PRIMARY_IFACE=eno12399
+++ '[' -z eno12399 ']'
+++ echo 'Identified primary interface: eno12399'
++++ hostname -I
++++ tr ' ' '\n'
++++ grep -E '^10\.|^172\.|^192\.168\.'
++++ hostname -I
++++ tr ' ' '\n'
++++ head -n 1
++++ grep -E '^10\.|^172\.|^192\.168\.'
++++ head -n 1
+++ ip=10.10.1.2
+++ '[' -z '' ']'
+++ VOTERS=1@10.10.1.2:9093
+++ [[ 10.10.1.2 == \1\0\.\1\0\.\1\.\2 ]]
+++ sed -i 's|^node.id=.*|node.id=1|' config/kraft/reconfig-server.properties
+++ CURRENT_IP=10.10.1.4
+++ '[' -z 10.10.1.4 ']'
+++ for ip in "${IPS[@]}"
+++ CURRENT_IP=10.10.1.3
+++ '[' -z 10.10.1.3 ']'
+++ for ip in "${IPS[@]}"
++++ echo 10.10.1.2
++++ xargs
+++ echo 'Assigned node.id=1 for current node (10.10.1.2)'
+++ (( NODE_ID++ ))
+++ for ip in "${IPS[@]}"
++++ echo 10.10.1.2
++++ xargs
++++ echo 10.10.1.3
++++ xargs
+++ ip=10.10.1.2
+++ '[' -z '' ']'
+++ VOTERS=1@10.10.1.2:9093
+++ [[ 10.10.1.2 == \1\0\.\1\0\.\1\.\4 ]]
+++ (( NODE_ID++ ))
+++ for ip in "${IPS[@]}"
+++ ip=10.10.1.2
+++ '[' -z '' ']'
+++ VOTERS=1@10.10.1.2:9093
+++ [[ 10.10.1.2 == \1\0\.\1\0\.\1\.\3 ]]
+++ (( NODE_ID++ ))
+++ for ip in "${IPS[@]}"
+++ ip=10.10.1.3
+++ '[' -z 1@10.10.1.2:9093 ']'
+++ VOTERS=1@10.10.1.2:9093,2@10.10.1.3:9093
+++ [[ 10.10.1.3 == \1\0\.\1\0\.\1\.\2 ]]
+++ (( NODE_ID++ ))
+++ for ip in "${IPS[@]}"
++++ echo 10.10.1.3
++++ xargs
++++ echo 10.10.1.3
++++ xargs
++++ echo 10.10.1.4
++++ xargs
+++ ip=10.10.1.3
+++ '[' -z 1@10.10.1.2:9093 ']'
+++ VOTERS=1@10.10.1.2:9093,2@10.10.1.3:9093
+++ [[ 10.10.1.3 == \1\0\.\1\0\.\1\.\4 ]]
+++ (( NODE_ID++ ))
+++ for ip in "${IPS[@]}"
+++ ip=10.10.1.3
+++ '[' -z 1@10.10.1.2:9093 ']'
+++ VOTERS=1@10.10.1.2:9093,2@10.10.1.3:9093
+++ [[ 10.10.1.3 == \1\0\.\1\0\.\1\.\3 ]]
+++ sed -i 's|^node.id=.*|node.id=2|' config/kraft/reconfig-server.properties
++++ echo 10.10.1.4
++++ xargs
+++ ip=10.10.1.4
+++ '[' -z 1@10.10.1.2:9093,2@10.10.1.3:9093 ']'
+++ VOTERS=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093
+++ [[ 10.10.1.4 == \1\0\.\1\0\.\1\.\2 ]]
+++ (( NODE_ID++ ))
+++ grep -q '^controller.quorum.voters=' config/kraft/reconfig-server.properties
+++ echo 'Assigned node.id=2 for current node (10.10.1.3)'
+++ (( NODE_ID++ ))
+++ for ip in "${IPS[@]}"
+++ sed -i 's|^controller.quorum.voters=.*|controller.quorum.voters=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093|' config/kraft/reconfig-server.properties
++++ echo 10.10.1.4
++++ xargs
+++ ip=10.10.1.4
+++ '[' -z 1@10.10.1.2:9093,2@10.10.1.3:9093 ']'
+++ VOTERS=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093
+++ [[ 10.10.1.4 == \1\0\.\1\0\.\1\.\4 ]]
+++ sed -i 's|^node.id=.*|node.id=3|' config/kraft/reconfig-server.properties
+++ echo 'Updated controller.quorum.voters=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093 in config/kraft/reconfig-server.properties'
+++ PARTITIONS=3
+++ sed -i 's|^num.partitions=.*|num.partitions=3|' config/kraft/reconfig-server.properties
+++ echo 'Assigned node.id=3 for current node (10.10.1.4)'
+++ (( NODE_ID++ ))
+++ grep -q '^controller.quorum.voters=' config/kraft/reconfig-server.properties
+++ ip=10.10.1.4
+++ '[' -z 1@10.10.1.2:9093,2@10.10.1.3:9093 ']'
+++ VOTERS=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093
+++ [[ 10.10.1.4 == \1\0\.\1\0\.\1\.\3 ]]
+++ (( NODE_ID++ ))
+++ grep -q '^controller.quorum.voters=' config/kraft/reconfig-server.properties
+++ sed -i 's|^controller.quorum.voters=.*|controller.quorum.voters=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093|' config/kraft/reconfig-server.properties
++++ grep '^log.dirs=' config/kraft/reconfig-server.properties
+++ sed -i 's|^controller.quorum.voters=.*|controller.quorum.voters=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093|' config/kraft/reconfig-server.properties
++++ cut -d= -f2
+++ LOG_DIR=/tmp/kraft-combined-logs
+++ mkdir -p /tmp/kraft-combined-logs
+++ echo 'Updated controller.quorum.voters=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093 in config/kraft/reconfig-server.properties'
+++ PARTITIONS=3
+++ sed -i 's|^num.partitions=.*|num.partitions=3|' config/kraft/reconfig-server.properties
+++ echo 'Updated controller.quorum.voters=1@10.10.1.2:9093,2@10.10.1.3:9093,3@10.10.1.4:9093 in config/kraft/reconfig-server.properties'
+++ PARTITIONS=3
+++ sed -i 's|^num.partitions=.*|num.partitions=3|' config/kraft/reconfig-server.properties
+++ '[' '!' -f /tmp/kraft-combined-logs/meta.properties ']'
+++ echo '>>> Formatting storage (no meta.properties found)'
+++ CLUSTER_ID=hi5lupemSWui6TOy7mQlTA
+++ bin/kafka-storage.sh format -t hi5lupemSWui6TOy7mQlTA -c config/kraft/reconfig-server.properties
++++ grep '^log.dirs=' config/kraft/reconfig-server.properties
++++ cut -d= -f2
++++ grep '^log.dirs=' config/kraft/reconfig-server.properties
++++ cut -d= -f2
+++ LOG_DIR=/tmp/kraft-combined-logs
+++ mkdir -p /tmp/kraft-combined-logs
+++ LOG_DIR=/tmp/kraft-combined-logs
+++ mkdir -p /tmp/kraft-combined-logs
+++ '[' '!' -f /tmp/kraft-combined-logs/meta.properties ']'
+++ echo '>>> Formatting storage (no meta.properties found)'
+++ CLUSTER_ID=hi5lupemSWui6TOy7mQlTA
+++ bin/kafka-storage.sh format -t hi5lupemSWui6TOy7mQlTA -c config/kraft/reconfig-server.properties
+++ '[' '!' -f /tmp/kraft-combined-logs/meta.properties ']'
+++ echo '>>> Formatting storage (no meta.properties found)'
+++ CLUSTER_ID=hi5lupemSWui6TOy7mQlTA
+++ bin/kafka-storage.sh format -t hi5lupemSWui6TOy7mQlTA -c config/kraft/reconfig-server.properties
+++ echo -e 'auto.create.topics.enable=true\nmessage.timestamp.type=LogAppendTime'
+++ echo 'Setting advertised.listeners to IP: 10.10.1.3'
+++ sed -i 's|^listeners=.*|listeners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093|' config/kraft/reconfig-server.properties
+++ sed -i 's|^advertised.listeners=.*|advertised.listeners=PLAINTEXT://10.10.1.3:9092,CONTROLLER://10.10.1.3:9093|' config/kraft/reconfig-server.properties
+++ echo '>>> Current listener configuration in config/kraft/reconfig-server.properties:'
+++ grep -E '^listeners=|^advertised.listeners=' config/kraft/reconfig-server.properties
+++ echo '>>> Starting Kafka server in KRaft mode'
+++ bin/kafka-server-start.sh config/kraft/reconfig-server.properties
+++ echo -e 'auto.create.topics.enable=true\nmessage.timestamp.type=LogAppendTime'
+++ echo 'Setting advertised.listeners to IP: 10.10.1.4'
+++ sed -i 's|^listeners=.*|listeners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093|' config/kraft/reconfig-server.properties
+++ sed -i 's|^advertised.listeners=.*|advertised.listeners=PLAINTEXT://10.10.1.4:9092,CONTROLLER://10.10.1.4:9093|' config/kraft/reconfig-server.properties
+++ echo '>>> Current listener configuration in config/kraft/reconfig-server.properties:'
+++ grep -E '^listeners=|^advertised.listeners=' config/kraft/reconfig-server.properties
+++ echo '>>> Starting Kafka server in KRaft mode'
+++ bin/kafka-server-start.sh config/kraft/reconfig-server.properties
+++ echo -e 'auto.create.topics.enable=true\nmessage.timestamp.type=LogAppendTime'
+++ echo 'Setting advertised.listeners to IP: 10.10.1.2'
+++ sed -i 's|^listeners=.*|listeners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093|' config/kraft/reconfig-server.properties
+++ sed -i 's|^advertised.listeners=.*|advertised.listeners=PLAINTEXT://10.10.1.2:9092,CONTROLLER://10.10.1.2:9093|' config/kraft/reconfig-server.properties
+++ echo '>>> Current listener configuration in config/kraft/reconfig-server.properties:'
+++ grep -E '^listeners=|^advertised.listeners=' config/kraft/reconfig-server.properties
+++ echo '>>> Starting Kafka server in KRaft mode'
+++ bin/kafka-server-start.sh config/kraft/reconfig-server.properties
+[Sleep] Slept for 5/15 seconds
+[Sleep] Slept for 10/15 seconds
+[Sleep] Slept for 15/15 seconds
+[Kafka INFO] Kafka cluster started ...
+[Kafka INFO] Started monitoring Kafka cluster health ...
+
+============================================================
+                     Start Coordinator...
+============================================================
+cd /users/akash01/holostream && ./bin/coordinator nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json
+[INFO] Starting coordinator...
+2026/08/13 08:38:01 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:01 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:01 Control plane service starts listening on 10.10.1.1:8888 ...
+2026/08/13 08:38:01 API service starts listening on 10.10.1.1:9999 ...
+2026/08/13 08:38:01 Metric collector service starts listening on 10.10.1.1:8887 ...
+[Sleep] Slept for 1/3 seconds
+[Sleep] Slept for 2/3 seconds
+[Sleep] Slept for 3/3 seconds
+
+============================================================
+                       Start Workers...
+============================================================
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9001 8001 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:04 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:04 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:04 State comm gRPC service starts listening on 0.0.0.0:8001 ...
+2026/08/13 08:38:04 Data plane service starts listening on port 9001 ...
+2026/08/13 08:38:04 New Worker registered with worker id 0
+2026/08/13 08:38:04 [info] Worker ID assigned by Coordinator: 0
+2026/08/13 08:38:04 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9002 8002 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:06 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:06 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:06 State comm gRPC service starts listening on 0.0.0.0:8002 ...
+2026/08/13 08:38:06 Data plane service starts listening on port 9002 ...
+2026/08/13 08:38:06 New Worker registered with worker id 1
+2026/08/13 08:38:06 [info] Worker ID assigned by Coordinator: 1
+2026/08/13 08:38:06 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9003 8003 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:08 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:08 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:08 State comm gRPC service starts listening on 0.0.0.0:8003 ...
+2026/08/13 08:38:08 Data plane service starts listening on port 9003 ...
+2026/08/13 08:38:08 New Worker registered with worker id 2
+2026/08/13 08:38:08 [info] Worker ID assigned by Coordinator: 2
+2026/08/13 08:38:08 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9004 8004 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:10 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:10 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:10 State comm gRPC service starts listening on 0.0.0.0:8004 ...
+2026/08/13 08:38:10 Data plane service starts listening on port 9004 ...
+2026/08/13 08:38:10 New Worker registered with worker id 3
+2026/08/13 08:38:10 [info] Worker ID assigned by Coordinator: 3
+2026/08/13 08:38:10 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9005 8005 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:12 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:12 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:12 State comm gRPC service starts listening on 0.0.0.0:8005 ...
+2026/08/13 08:38:12 Data plane service starts listening on port 9005 ...
+2026/08/13 08:38:12 New Worker registered with worker id 4
+2026/08/13 08:38:12 [info] Worker ID assigned by Coordinator: 4
+2026/08/13 08:38:12 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9006 8006 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:14 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:14 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:14 State comm gRPC service starts listening on 0.0.0.0:8006 ...
+2026/08/13 08:38:14 Data plane service starts listening on port 9006 ...
+2026/08/13 08:38:14 New Worker registered with worker id 5
+2026/08/13 08:38:14 [info] Worker ID assigned by Coordinator: 5
+2026/08/13 08:38:14 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9007 8007 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:16 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:16 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:16 State comm gRPC service starts listening on 0.0.0.0:8007 ...
+2026/08/13 08:38:16 Data plane service starts listening on port 9007 ...
+2026/08/13 08:38:16 New Worker registered with worker id 6
+2026/08/13 08:38:16 [info] Worker ID assigned by Coordinator: 6
+2026/08/13 08:38:16 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9008 8008 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:18 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:18 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:18 State comm gRPC service starts listening on 0.0.0.0:8008 ...
+2026/08/13 08:38:18 Data plane service starts listening on port 9008 ...
+2026/08/13 08:38:18 New Worker registered with worker id 7
+2026/08/13 08:38:18 [info] Worker ID assigned by Coordinator: 7
+2026/08/13 08:38:18 Registration to Coordinator success!
+ssh 10.10.1.6 'cd /users/akash01/holostream && ./bin/worker 9009 8009 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:20 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:20 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:20 State comm gRPC service starts listening on 0.0.0.0:8009 ...
+2026/08/13 08:38:20 Data plane service starts listening on port 9009 ...
+2026/08/13 08:38:20 New Worker registered with worker id 8
+2026/08/13 08:38:20 [info] Worker ID assigned by Coordinator: 8
+2026/08/13 08:38:20 Registration to Coordinator success!
+ssh 10.10.1.10 'cd /users/akash01/holostream && ./bin/worker 9010 8010 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:22 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:22 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:22 State comm gRPC service starts listening on 0.0.0.0:8010 ...
+2026/08/13 08:38:22 Data plane service starts listening on port 9010 ...
+2026/08/13 08:38:22 New Worker registered with worker id 9
+2026/08/13 08:38:22 [info] Worker ID assigned by Coordinator: 9
+2026/08/13 08:38:22 Registration to Coordinator success!
+ssh 10.10.1.10 'cd /users/akash01/holostream && ./bin/worker 9011 8011 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:24 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:24 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:24 State comm gRPC service starts listening on 0.0.0.0:8011 ...
+2026/08/13 08:38:24 Data plane service starts listening on port 9011 ...
+2026/08/13 08:38:24 New Worker registered with worker id 10
+2026/08/13 08:38:24 [info] Worker ID assigned by Coordinator: 10
+2026/08/13 08:38:24 Registration to Coordinator success!
+ssh 10.10.1.11 'cd /users/akash01/holostream && ./bin/worker 9012 8012 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:26 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:26 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:26 State comm gRPC service starts listening on 0.0.0.0:8012 ...
+2026/08/13 08:38:26 Data plane service starts listening on port 9012 ...
+2026/08/13 08:38:26 New Worker registered with worker id 11
+2026/08/13 08:38:26 [info] Worker ID assigned by Coordinator: 11
+2026/08/13 08:38:26 Registration to Coordinator success!
+ssh 10.10.1.11 'cd /users/akash01/holostream && ./bin/worker 9013 8013 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:28 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:28 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:28 State comm gRPC service starts listening on 0.0.0.0:8013 ...
+2026/08/13 08:38:28 Data plane service starts listening on port 9013 ...
+2026/08/13 08:38:28 New Worker registered with worker id 12
+2026/08/13 08:38:28 [info] Worker ID assigned by Coordinator: 12
+2026/08/13 08:38:28 Registration to Coordinator success!
+ssh 10.10.1.12 'cd /users/akash01/holostream && ./bin/worker 9014 8014 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:31 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:31 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:31 State comm gRPC service starts listening on 0.0.0.0:8014 ...
+2026/08/13 08:38:31 Data plane service starts listening on port 9014 ...
+2026/08/13 08:38:31 New Worker registered with worker id 13
+2026/08/13 08:38:31 [info] Worker ID assigned by Coordinator: 13
+2026/08/13 08:38:31 Registration to Coordinator success!
+ssh 10.10.1.12 'cd /users/akash01/holostream && ./bin/worker 9015 8015 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:32 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:32 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:32 State comm gRPC service starts listening on 0.0.0.0:8015 ...
+2026/08/13 08:38:32 Data plane service starts listening on port 9015 ...
+2026/08/13 08:38:32 New Worker registered with worker id 14
+2026/08/13 08:38:32 [info] Worker ID assigned by Coordinator: 14
+2026/08/13 08:38:32 Registration to Coordinator success!
+ssh 10.10.1.13 'cd /users/akash01/holostream && ./bin/worker 9016 8016 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:34 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:34 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:34 State comm gRPC service starts listening on 0.0.0.0:8016 ...
+2026/08/13 08:38:34 Data plane service starts listening on port 9016 ...
+2026/08/13 08:38:34 New Worker registered with worker id 15
+2026/08/13 08:38:34 [info] Worker ID assigned by Coordinator: 15
+2026/08/13 08:38:34 Registration to Coordinator success!
+ssh 10.10.1.13 'cd /users/akash01/holostream && ./bin/worker 9017 8017 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:36 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:36 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:36 State comm gRPC service starts listening on 0.0.0.0:8017 ...
+2026/08/13 08:38:36 Data plane service starts listening on port 9017 ...
+2026/08/13 08:38:36 New Worker registered with worker id 16
+2026/08/13 08:38:36 [info] Worker ID assigned by Coordinator: 16
+2026/08/13 08:38:36 Registration to Coordinator success!
+ssh 10.10.1.5 'cd /users/akash01/holostream && ./bin/worker 9018 8018 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:38 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:38 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:38 State comm gRPC service starts listening on 0.0.0.0:8018 ...
+2026/08/13 08:38:38 Data plane service starts listening on port 9018 ...
+2026/08/13 08:38:38 New Worker registered with worker id 17
+2026/08/13 08:38:38 [info] Worker ID assigned by Coordinator: 17
+2026/08/13 08:38:38 Registration to Coordinator success!
+ssh 10.10.1.7 'cd /users/akash01/holostream && ./bin/worker 9019 8019 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:40 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:40 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:40 State comm gRPC service starts listening on 0.0.0.0:8019 ...
+2026/08/13 08:38:40 Data plane service starts listening on port 9019 ...
+2026/08/13 08:38:40 New Worker registered with worker id 18
+2026/08/13 08:38:40 [info] Worker ID assigned by Coordinator: 18
+2026/08/13 08:38:40 Registration to Coordinator success!
+ssh 10.10.1.8 'cd /users/akash01/holostream && ./bin/worker 9020 8020 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:42 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:42 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:42 State comm gRPC service starts listening on 0.0.0.0:8020 ...
+2026/08/13 08:38:42 Data plane service starts listening on port 9020 ...
+2026/08/13 08:38:42 New Worker registered with worker id 19
+2026/08/13 08:38:42 [info] Worker ID assigned by Coordinator: 19
+2026/08/13 08:38:42 Registration to Coordinator success!
+ssh 10.10.1.9 'cd /users/akash01/holostream && ./bin/worker 9021 8021 nexmark_query6 /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json'
+2026/08/13 08:38:44 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:44 [TimeAssigner INFO] Source inits KeyByCollector with TimestampAssigner and WatermarkGenerator
+2026/08/13 08:38:44 State comm gRPC service starts listening on 0.0.0.0:8021 ...
+2026/08/13 08:38:44 Data plane service starts listening on port 9021 ...
+2026/08/13 08:38:44 New Worker registered with worker id 20
+2026/08/13 08:38:44 [info] Worker ID assigned by Coordinator: 20
+2026/08/13 08:38:44 Registration to Coordinator success!
+[INFO] Starting all workers...
+[Sleep] Slept for 1/3 seconds
+[Sleep] Slept for 2/3 seconds
+[Sleep] Slept for 3/3 seconds
+
+============================================================
+                     Submit the query...
+============================================================
+cd /users/akash01/holostream && ./bin/client deploy
+2026/08/13 08:38:48 [Client INFO] Deploy the job ...
+2026/08/13 08:38:48 [Placement policy] Use custom task placement policy
+2026/08/13 08:38:48 
+2026/08/13 08:38:48 [Custom Placement INFO] Placement plan:
+2026/08/13 08:38:48   1. Operator: auctionSource
+2026/08/13 08:38:48    - Worker ID: 0, Address: 10.10.1.6:9001
+2026/08/13 08:38:48    - Worker ID: 1, Address: 10.10.1.6:9002
+2026/08/13 08:38:48    - Worker ID: 2, Address: 10.10.1.6:9003
+2026/08/13 08:38:48    - Worker ID: 3, Address: 10.10.1.6:9004
+2026/08/13 08:38:48   2. Operator: bidSource
+2026/08/13 08:38:48    - Worker ID: 4, Address: 10.10.1.6:9005
+2026/08/13 08:38:48    - Worker ID: 5, Address: 10.10.1.6:9006
+2026/08/13 08:38:48    - Worker ID: 6, Address: 10.10.1.6:9007
+2026/08/13 08:38:48    - Worker ID: 7, Address: 10.10.1.6:9008
+2026/08/13 08:38:48   3. Operator: closedAuction
+2026/08/13 08:38:48    - Worker ID: 9, Address: 10.10.1.10:9010
+2026/08/13 08:38:48    - Worker ID: 11, Address: 10.10.1.11:9012
+2026/08/13 08:38:48    - Worker ID: 13, Address: 10.10.1.12:9014
+2026/08/13 08:38:48    - Worker ID: 15, Address: 10.10.1.13:9016
+2026/08/13 08:38:48   4. Operator: sink
+2026/08/13 08:38:48    - Worker ID: 8, Address: 10.10.1.6:9009
+2026/08/13 08:38:48   5. Operator: statefulMapper
+2026/08/13 08:38:48    - Worker ID: 10, Address: 10.10.1.10:9011
+2026/08/13 08:38:48    - Worker ID: 12, Address: 10.10.1.11:9013
+2026/08/13 08:38:48    - Worker ID: 14, Address: 10.10.1.12:9015
+2026/08/13 08:38:48    - Worker ID: 16, Address: 10.10.1.13:9017
+2026/08/13 08:38:48 
+2026/08/13 08:38:48 [Bucket Partition INFO] bucket count per worker: map[9:32 11:32 13:32 15:32]
+2026/08/13 08:38:48 [Bucket Partition INFO] bucket count per worker: map[10:32 12:32 14:32 16:32]
+2026/08/13 08:38:48 Worker 7:9008 (WorkerId:DataPlanePort) received task [bidSource]
+2026/08/13 08:38:48 Worker 8:9009 (WorkerId:DataPlanePort) received task [sink]
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 Worker 3:9004 (WorkerId:DataPlanePort) received task [auctionSource]
+2026/08/13 08:38:48 Worker 4:9005 (WorkerId:DataPlanePort) received task [bidSource]
+2026/08/13 08:38:48 Worker 6:9007 (WorkerId:DataPlanePort) received task [bidSource]
+2026/08/13 08:38:48 Worker 0:9001 (WorkerId:DataPlanePort) received task [auctionSource]
+2026/08/13 08:38:48 Worker 1:9002 (WorkerId:DataPlanePort) received task [auctionSource]
+2026/08/13 08:38:48 Worker 5:9006 (WorkerId:DataPlanePort) received task [bidSource]
+2026/08/13 08:38:48 Worker 2:9003 (WorkerId:DataPlanePort) received task [auctionSource]
+2026/08/13 08:38:48 Worker 16:9017 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:38:48 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 3
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 0
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 Worker 12:9013 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:38:48 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 Worker 9:9010 (WorkerId:DataPlanePort) received task [closedAuction]
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:10  dataPlaneAddr:"10.10.1.10:9011"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:12  dataPlaneAddr:"10.10.1.11:9013"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:14  dataPlaneAddr:"10.10.1.12:9015"
+2026/08/13 08:38:48 Worker 13:9014 (WorkerId:DataPlanePort) received task [closedAuction]
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:10  dataPlaneAddr:"10.10.1.10:9011"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:12  dataPlaneAddr:"10.10.1.11:9013"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:14  dataPlaneAddr:"10.10.1.12:9015"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:16  dataPlaneAddr:"10.10.1.13:9017"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 2
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 Worker 14:9015 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:38:48 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:16  dataPlaneAddr:"10.10.1.13:9017"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 2
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 Worker 15:9016 (WorkerId:DataPlanePort) received task [closedAuction]
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:10  dataPlaneAddr:"10.10.1.10:9011"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:12  dataPlaneAddr:"10.10.1.11:9013"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:14  dataPlaneAddr:"10.10.1.12:9015"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:16  dataPlaneAddr:"10.10.1.13:9017"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 Worker 10:9011 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:38:48 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 Worker 11:9012 (WorkerId:DataPlanePort) received task [closedAuction]
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:10  dataPlaneAddr:"10.10.1.10:9011"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:12  dataPlaneAddr:"10.10.1.11:9013"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:14  dataPlaneAddr:"10.10.1.12:9015"
+2026/08/13 08:38:48 [Task closedAuction INFO] Connecting to downstream workerId:16  dataPlaneAddr:"10.10.1.13:9017"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 1
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 1
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 0
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 [Task bidSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 [info] Setup Source with replica ID: 3
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:9  dataPlaneAddr:"10.10.1.10:9010"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:11  dataPlaneAddr:"10.10.1.11:9012"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:13  dataPlaneAddr:"10.10.1.12:9014"
+2026/08/13 08:38:48 [Task auctionSource INFO] Connecting to downstream workerId:15  dataPlaneAddr:"10.10.1.13:9016"
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 Task initialized! Waiting for upstream connections...
+2026/08/13 08:38:48 [info] Pending batch timeout is enabled
+2026/08/13 08:38:48 All tasks deployed and running!
+2026/08/13 08:38:48 Job deployment response: Job started
+
+============================================================
+                   Start Kafka producers...
+============================================================
+ssh 10.10.1.1 'cd /users/akash01/holostream && ./bin/nexmarkKafkaProducer /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json 0'
+ssh 10.10.1.1 'cd /users/akash01/holostream && ./bin/nexmarkKafkaProducer /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json 1'
+ssh 10.10.1.1 'cd /users/akash01/holostream && ./bin/nexmarkKafkaProducer /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json 2'
+ssh 10.10.1.1 'cd /users/akash01/holostream && ./bin/nexmarkKafkaProducer /users/akash01/holostream/scripts/nexmarkJson/query6/query6StandardSpongeMatched_memory_225k450k_4to8.json 3'
+2026/08/13 08:38:48 [sink Supplier] New upstream added from statefulMapper (WorkerId: 12). Current number of upstreams: 1. Task deployment phase passed: false
+[INFO] All producers started
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [sink Supplier] New upstream added from statefulMapper (WorkerId: 16). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 7). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 0). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 0). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 0). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:38:48 [sink Supplier] New upstream added from statefulMapper (WorkerId: 10). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 7). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 6). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 7). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 0). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:38:48 [sink Supplier] New upstream added from statefulMapper (WorkerId: 14). Current number of upstreams: 4. Task deployment phase passed: true
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 6). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 7). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 6). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 2). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 4. Task deployment phase passed: true
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 4. Task deployment phase passed: true
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 2). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 4. Task deployment phase passed: true
+2026/08/13 08:38:48 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 4. Task deployment phase passed: true
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 2). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 2). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 6). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 5). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 5). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 5). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 5). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 3). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 1). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 3). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 1). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 4). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 4). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 1). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 4). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from bidSource (WorkerId: 4). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 3). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 1). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:38:48 [closedAuction Supplier] New upstream added from auctionSource (WorkerId: 3). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:38:49 [Kafka] Successfully created topic nexmark-auction.
+2026/08/13 08:38:49 [Kafka] Successfully created topic nexmark-bid.
+2026/08/13 08:38:49 Sink input rate: -1.000000
+[Sleep] Slept for 1/3 seconds
+2026/08/13 08:38:49 Kafka Source error (keep trying without exiting): Subscribed topic not available: nexmark-bid: Broker: Unknown topic or partition
+2026/08/13 08:38:49 Kafka Source error (keep trying without exiting): Subscribed topic not available: nexmark-bid: Broker: Unknown topic or partition
+2026/08/13 08:38:49 Kafka Source error (keep trying without exiting): Subscribed topic not available: nexmark-bid: Broker: Unknown topic or partition
+2026/08/13 08:38:49 Kafka Source error (keep trying without exiting): Subscribed topic not available: nexmark-bid: Broker: Unknown topic or partition
+2026/08/13 08:38:50 Sink input rate: -1.000000
+[Sleep] Slept for 2/3 seconds
+2026/08/13 08:38:51 Sink input rate: -1.000000
+[Sleep] Slept for 3/3 seconds
+
+============================================================
+                     Running experiment...
+============================================================
+[INFO] Experiment running... Elapsed time: 0/420 seconds
+2026/08/13 08:38:52 Sink input rate: -1.000000
+2026/08/13 08:38:53 Sink input rate: -1.000000
+2026/08/13 08:38:54 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:38:54 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:38:54 Sink input rate: -1.000000
+2026/08/13 08:38:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:38:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:38:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:38:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:38:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:38:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:38:55 Sink input rate: -1.000000
+2026/08/13 08:38:56 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 5/420 seconds
+2026/08/13 08:38:57 Sink input rate: 33410.000000
+2026/08/13 08:38:58 Sink input rate: 46793.000000
+2026/08/13 08:38:59 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:38:59 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:38:59 Sink input rate: 14010.000000
+2026/08/13 08:39:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:00 Sink input rate: 13542.000000
+2026/08/13 08:39:01 Sink input rate: 14709.000000
+[INFO] Experiment running... Elapsed time: 10/420 seconds
+2026/08/13 08:39:02 Sink input rate: 12840.000000
+2026/08/13 08:39:03 Sink input rate: 13776.000000
+2026/08/13 08:39:04 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:04 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:04 Sink input rate: 13776.000000
+2026/08/13 08:39:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:05 Sink input rate: 13776.000000
+2026/08/13 08:39:06 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 15/420 seconds
+2026/08/13 08:39:07 Sink input rate: 13776.000000
+2026/08/13 08:39:08 Sink input rate: 13773.000000
+2026/08/13 08:39:09 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:09 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:09 Sink input rate: 13776.000000
+2026/08/13 08:39:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:10 Sink input rate: 13776.000000
+2026/08/13 08:39:11 Sink input rate: 13785.000000
+[INFO] Experiment running... Elapsed time: 20/420 seconds
+2026/08/13 08:39:12 Sink input rate: 13767.000000
+2026/08/13 08:39:13 Sink input rate: 13773.000000
+2026/08/13 08:39:14 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:14 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:14 Sink input rate: 13776.000000
+2026/08/13 08:39:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:15 Sink input rate: 13776.000000
+2026/08/13 08:39:16 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 25/420 seconds
+2026/08/13 08:39:17 Sink input rate: 13776.000000
+2026/08/13 08:39:18 Sink input rate: 13776.000000
+2026/08/13 08:39:19 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:19 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:19 Sink input rate: 13773.000000
+2026/08/13 08:39:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:20 Sink input rate: 13776.000000
+2026/08/13 08:39:21 Sink input rate: 13788.000000
+[INFO] Experiment running... Elapsed time: 30/420 seconds
+2026/08/13 08:39:22 Sink input rate: 13956.000000
+2026/08/13 08:39:23 Sink input rate: 13584.000000
+2026/08/13 08:39:24 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:24 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:24 Sink input rate: 14442.000000
+2026/08/13 08:39:25 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:25 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:25 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:25 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:25 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:25 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:25 Sink input rate: 13107.000000
+2026/08/13 08:39:26 Sink input rate: 14206.000000
+[INFO] Experiment running... Elapsed time: 35/420 seconds
+2026/08/13 08:39:27 Sink input rate: 13346.000000
+2026/08/13 08:39:28 Sink input rate: 13776.000000
+2026/08/13 08:39:29 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:29 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:29 Sink input rate: 13776.000000
+2026/08/13 08:39:30 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:30 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:30 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:30 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:30 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:30 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:30 Sink input rate: 13776.000000
+2026/08/13 08:39:31 Sink input rate: 13773.000000
+[INFO] Experiment running... Elapsed time: 40/420 seconds
+2026/08/13 08:39:32 Sink input rate: 13797.000000
+2026/08/13 08:39:33 Sink input rate: 13776.000000
+2026/08/13 08:39:34 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:34 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:34 Sink input rate: 13776.000000
+2026/08/13 08:39:35 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:35 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:35 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:35 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:35 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:35 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:35 Sink input rate: 14424.000000
+2026/08/13 08:39:36 Sink input rate: 13104.000000
+[INFO] Experiment running... Elapsed time: 45/420 seconds
+2026/08/13 08:39:37 Sink input rate: 13776.000000
+2026/08/13 08:39:38 Sink input rate: 13776.000000
+2026/08/13 08:39:39 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:39 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:39 Sink input rate: 13776.000000
+2026/08/13 08:39:40 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:40 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:40 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:40 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:40 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:40 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:40 Sink input rate: 13785.000000
+2026/08/13 08:39:41 Sink input rate: 13935.000000
+[INFO] Experiment running... Elapsed time: 50/420 seconds
+2026/08/13 08:39:42 Sink input rate: 14076.000000
+2026/08/13 08:39:43 Sink input rate: 13305.000000
+2026/08/13 08:39:44 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:44 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:44 Sink input rate: 14551.000000
+2026/08/13 08:39:45 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:45 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:45 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:45 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:45 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:45 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:45 Sink input rate: 14110.000000
+2026/08/13 08:39:46 Sink input rate: 12706.000000
+[INFO] Experiment running... Elapsed time: 55/420 seconds
+2026/08/13 08:39:47 Sink input rate: 13765.000000
+2026/08/13 08:39:48 Sink input rate: 13745.000000
+2026/08/13 08:39:49 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:49 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:49 Sink input rate: 13776.000000
+2026/08/13 08:39:50 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:50 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:50 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:50 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:50 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:50 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:50 Sink input rate: 13776.000000
+2026/08/13 08:39:51 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 60/420 seconds
+2026/08/13 08:39:52 Sink input rate: 13776.000000
+2026/08/13 08:39:53 Sink input rate: 13776.000000
+2026/08/13 08:39:54 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:54 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:54 Sink input rate: 13773.000000
+2026/08/13 08:39:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:55 Sink input rate: 13785.000000
+2026/08/13 08:39:56 Sink input rate: 13767.000000
+[INFO] Experiment running... Elapsed time: 65/420 seconds
+2026/08/13 08:39:57 Sink input rate: 13809.000000
+2026/08/13 08:39:58 Sink input rate: 13743.000000
+2026/08/13 08:39:59 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:39:59 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:39:59 Sink input rate: 13773.000000
+2026/08/13 08:40:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:00 Sink input rate: 13776.000000
+2026/08/13 08:40:01 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 70/420 seconds
+2026/08/13 08:40:02 Sink input rate: 13776.000000
+2026/08/13 08:40:03 Sink input rate: 13776.000000
+2026/08/13 08:40:04 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:04 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:04 Sink input rate: 13935.000000
+2026/08/13 08:40:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:05 Sink input rate: 14013.000000
+2026/08/13 08:40:06 Sink input rate: 13483.000000
+[INFO] Experiment running... Elapsed time: 75/420 seconds
+2026/08/13 08:40:07 Sink input rate: 13670.000000
+2026/08/13 08:40:08 Sink input rate: 13776.000000
+2026/08/13 08:40:09 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:09 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:09 Sink input rate: 13776.000000
+2026/08/13 08:40:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:10 Sink input rate: 13776.000000
+2026/08/13 08:40:11 Sink input rate: 13773.000000
+[INFO] Experiment running... Elapsed time: 80/420 seconds
+2026/08/13 08:40:12 Sink input rate: 13776.000000
+2026/08/13 08:40:13 Sink input rate: 13776.000000
+2026/08/13 08:40:14 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:14 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:14 Sink input rate: 13776.000000
+2026/08/13 08:40:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:15 Sink input rate: 13776.000000
+2026/08/13 08:40:16 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 85/420 seconds
+2026/08/13 08:40:17 Sink input rate: 13773.000000
+2026/08/13 08:40:18 Sink input rate: 13821.000000
+2026/08/13 08:40:19 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:19 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:19 Sink input rate: 13776.000000
+2026/08/13 08:40:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:20 Sink input rate: 13776.000000
+2026/08/13 08:40:21 Sink input rate: 14316.000000
+[INFO] Experiment running... Elapsed time: 90/420 seconds
+2026/08/13 08:40:22 Sink input rate: 13188.000000
+2026/08/13 08:40:23 Sink input rate: 13776.000000
+2026/08/13 08:40:24 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:24 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:24 Sink input rate: 13776.000000
+2026/08/13 08:40:25 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:25 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:25 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:25 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:25 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:25 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:25 Sink input rate: 13776.000000
+2026/08/13 08:40:26 Sink input rate: 14007.000000
+[INFO] Experiment running... Elapsed time: 95/420 seconds
+2026/08/13 08:40:27 Sink input rate: 13852.000000
+2026/08/13 08:40:28 Sink input rate: 14072.000000
+2026/08/13 08:40:29 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:29 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:29 Sink input rate: 13170.000000
+2026/08/13 08:40:30 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:30 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:30 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:30 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:30 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:30 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:30 Sink input rate: 13776.000000
+2026/08/13 08:40:31 Sink input rate: 15195.000000
+[INFO] Experiment running... Elapsed time: 100/420 seconds
+2026/08/13 08:40:32 Sink input rate: 12357.000000
+2026/08/13 08:40:33 Sink input rate: 13776.000000
+2026/08/13 08:40:34 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:34 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:34 Sink input rate: 13773.000000
+2026/08/13 08:40:35 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:35 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:35 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:35 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:35 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:35 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:35 Sink input rate: 13776.000000
+2026/08/13 08:40:36 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 105/420 seconds
+2026/08/13 08:40:37 Sink input rate: 13776.000000
+2026/08/13 08:40:38 Sink input rate: 13776.000000
+2026/08/13 08:40:39 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:39 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:39 Sink input rate: 13776.000000
+2026/08/13 08:40:40 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:40 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:40 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:40 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:40 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:40 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:40 Sink input rate: 13773.000000
+2026/08/13 08:40:41 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 110/420 seconds
+2026/08/13 08:40:42 Sink input rate: 13776.000000
+2026/08/13 08:40:43 Sink input rate: 13776.000000
+2026/08/13 08:40:44 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:44 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:44 Sink input rate: 13776.000000
+2026/08/13 08:40:45 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:45 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:45 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:45 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:45 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:45 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:45 Sink input rate: 13773.000000
+2026/08/13 08:40:46 Sink input rate: 13842.000000
+[INFO] Experiment running... Elapsed time: 115/420 seconds
+2026/08/13 08:40:47 Sink input rate: 14040.000000
+2026/08/13 08:40:48 Sink input rate: 14010.000000
+2026/08/13 08:40:49 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:49 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:49 Sink input rate: 14187.000000
+2026/08/13 08:40:50 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:50 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:50 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:50 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:50 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:50 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:50 Sink input rate: 13472.000000
+2026/08/13 08:40:51 Sink input rate: 14503.000000
+[INFO] Experiment running... Elapsed time: 120/420 seconds
+2026/08/13 08:40:52 Sink input rate: 13293.000000
+2026/08/13 08:40:53 Sink input rate: 12858.000000
+2026/08/13 08:40:54 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:54 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:54 Sink input rate: 13776.000000
+2026/08/13 08:40:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:55 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:55 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:55 Sink input rate: 13776.000000
+2026/08/13 08:40:56 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 125/420 seconds
+2026/08/13 08:40:57 Sink input rate: 13773.000000
+2026/08/13 08:40:58 Sink input rate: 13776.000000
+2026/08/13 08:40:59 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:40:59 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:40:59 Sink input rate: 13776.000000
+2026/08/13 08:41:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:00 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:00 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:00 Sink input rate: 13776.000000
+2026/08/13 08:41:01 Sink input rate: 13776.000000
+[INFO] Experiment running... Elapsed time: 130/420 seconds
+2026/08/13 08:41:02 Sink input rate: 13833.000000
+2026/08/13 08:41:03 Sink input rate: 13716.000000
+2026/08/13 08:41:04 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:04 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:04 Sink input rate: 13776.000000
+2026/08/13 08:41:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:05 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:05 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:05 Sink input rate: 14406.000000
+2026/08/13 08:41:06 Sink input rate: 13146.000000
+[INFO] Experiment running... Elapsed time: 135/420 seconds
+2026/08/13 08:41:07 Sink input rate: 13776.000000
+2026/08/13 08:41:08 Sink input rate: 13902.000000
+2026/08/13 08:41:09 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:09 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:09 Sink input rate: 13899.000000
+2026/08/13 08:41:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:10 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:10 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:10 Sink input rate: 14043.000000
+2026/08/13 08:41:11 Sink input rate: 13950.000000
+[INFO] Experiment running... Elapsed time: 140/420 seconds
+2026/08/13 08:41:12 Sink input rate: 13590.000000
+2026/08/13 08:41:13 Sink input rate: 14346.000000
+2026/08/13 08:41:14 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:14 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:14 Sink input rate: 12696.000000
+2026/08/13 08:41:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:15 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:15 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:15 Sink input rate: 14206.000000
+2026/08/13 08:41:16 Sink input rate: 13346.000000
+[INFO] Experiment running... Elapsed time: 145/420 seconds
+2026/08/13 08:41:17 Sink input rate: 13776.000000
+2026/08/13 08:41:18 Sink input rate: 13776.000000
+2026/08/13 08:41:19 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:19 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:19 Sink input rate: 13776.000000
+2026/08/13 08:41:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:20 Kafka producer (10.10.1.1) output rate: 52806
+2026/08/13 08:41:20 Kafka producer (10.10.1.1) output rate: 3444
+2026/08/13 08:41:20 Sink input rate: 13773.000000
+2026/08/13 08:41:21 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 150/420 seconds
+2026/08/13 08:41:22 Sink input rate: 27552.000000
+2026/08/13 08:41:23 Sink input rate: 27549.000000
+2026/08/13 08:41:24 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:24 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:24 Sink input rate: 27552.000000
+2026/08/13 08:41:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:25 Sink input rate: 27552.000000
+2026/08/13 08:41:26 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 155/420 seconds
+2026/08/13 08:41:27 Sink input rate: 27552.000000
+2026/08/13 08:41:28 Sink input rate: 27552.000000
+2026/08/13 08:41:29 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:29 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:29 Sink input rate: 27549.000000
+2026/08/13 08:41:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:30 Sink input rate: 27552.000000
+2026/08/13 08:41:31 Sink input rate: 27600.000000
+[INFO] Experiment running... Elapsed time: 160/420 seconds
+2026/08/13 08:41:32 Sink input rate: 27590.000000
+2026/08/13 08:41:33 Sink input rate: 27552.000000
+2026/08/13 08:41:34 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:34 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:34 Sink input rate: 27551.000000
+2026/08/13 08:41:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:35 Sink input rate: 27552.000000
+2026/08/13 08:41:36 Sink input rate: 27513.000000
+[INFO] Experiment running... Elapsed time: 165/420 seconds
+2026/08/13 08:41:37 Sink input rate: 27591.000000
+2026/08/13 08:41:38 Sink input rate: 27458.000000
+2026/08/13 08:41:39 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:39 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:39 Sink input rate: 27552.000000
+2026/08/13 08:41:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:40 Sink input rate: 27549.000000
+2026/08/13 08:41:41 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 170/420 seconds
+2026/08/13 08:41:42 Sink input rate: 27552.000000
+2026/08/13 08:41:43 Sink input rate: 27549.000000
+2026/08/13 08:41:44 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:44 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:44 Sink input rate: 27552.000000
+2026/08/13 08:41:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:45 Sink input rate: 27552.000000
+2026/08/13 08:41:46 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 175/420 seconds
+2026/08/13 08:41:47 Sink input rate: 27552.000000
+2026/08/13 08:41:48 Sink input rate: 27552.000000
+2026/08/13 08:41:49 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:49 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:49 Sink input rate: 27549.000000
+2026/08/13 08:41:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:50 Sink input rate: 27552.000000
+2026/08/13 08:41:51 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 180/420 seconds
+2026/08/13 08:41:52 Sink input rate: 27549.000000
+2026/08/13 08:41:53 Sink input rate: 27552.000000
+2026/08/13 08:41:54 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:54 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:54 Sink input rate: 27552.000000
+2026/08/13 08:41:55 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:55 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:55 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:55 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:55 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:55 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:55 Sink input rate: 27549.000000
+2026/08/13 08:41:56 Sink input rate: 27664.000000
+[INFO] Experiment running... Elapsed time: 185/420 seconds
+2026/08/13 08:41:57 Sink input rate: 27437.000000
+2026/08/13 08:41:58 Sink input rate: 27668.000000
+2026/08/13 08:41:59 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:41:59 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:41:59 Sink input rate: 27436.000000
+2026/08/13 08:42:00 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:00 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:00 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:00 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:00 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:00 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:00 Sink input rate: 27668.000000
+2026/08/13 08:42:01 Sink input rate: 27433.000000
+[INFO] Experiment running... Elapsed time: 190/420 seconds
+2026/08/13 08:42:02 Sink input rate: 27552.000000
+2026/08/13 08:42:03 Sink input rate: 27549.000000
+2026/08/13 08:42:04 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:04 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:04 Sink input rate: 27552.000000
+2026/08/13 08:42:05 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:05 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:05 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:05 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:05 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:05 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:05 Sink input rate: 27552.000000
+2026/08/13 08:42:06 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 195/420 seconds
+2026/08/13 08:42:07 Sink input rate: 27552.000000
+2026/08/13 08:42:08 Sink input rate: 27552.000000
+2026/08/13 08:42:09 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:09 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:09 Sink input rate: 27549.000000
+2026/08/13 08:42:10 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:10 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:10 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:10 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:10 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:10 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:10 Sink input rate: 27552.000000
+2026/08/13 08:42:11 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 200/420 seconds
+2026/08/13 08:42:12 Sink input rate: 27549.000000
+2026/08/13 08:42:13 Sink input rate: 27552.000000
+2026/08/13 08:42:14 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:14 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:14 Sink input rate: 27552.000000
+2026/08/13 08:42:15 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:15 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:15 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:15 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:15 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:15 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:15 Sink input rate: 27549.000000
+2026/08/13 08:42:16 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 205/420 seconds
+2026/08/13 08:42:17 Sink input rate: 27552.000000
+2026/08/13 08:42:18 Sink input rate: 27549.000000
+2026/08/13 08:42:19 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:19 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:19 Sink input rate: 27552.000000
+2026/08/13 08:42:20 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:20 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:20 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:20 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:20 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:20 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:20 Sink input rate: 27549.000000
+2026/08/13 08:42:21 Sink input rate: 27692.000000
+[INFO] Experiment running... Elapsed time: 210/420 seconds
+2026/08/13 08:42:22 Sink input rate: 27412.000000
+2026/08/13 08:42:23 Sink input rate: 27549.000000
+2026/08/13 08:42:24 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:24 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:24 Sink input rate: 27552.000000
+2026/08/13 08:42:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:25 Sink input rate: 27552.000000
+2026/08/13 08:42:26 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 215/420 seconds
+2026/08/13 08:42:27 Sink input rate: 27552.000000
+2026/08/13 08:42:28 Sink input rate: 27552.000000
+2026/08/13 08:42:29 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:29 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:29 Sink input rate: 27549.000000
+2026/08/13 08:42:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:30 Sink input rate: 27552.000000
+2026/08/13 08:42:31 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 220/420 seconds
+2026/08/13 08:42:32 Sink input rate: 27549.000000
+2026/08/13 08:42:33 Sink input rate: 27552.000000
+2026/08/13 08:42:34 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:34 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:34 Sink input rate: 27552.000000
+2026/08/13 08:42:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:35 Sink input rate: 27549.000000
+2026/08/13 08:42:36 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 225/420 seconds
+2026/08/13 08:42:37 Sink input rate: 27636.000000
+2026/08/13 08:42:38 Sink input rate: 27465.000000
+2026/08/13 08:42:39 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:39 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:39 Sink input rate: 27552.000000
+2026/08/13 08:42:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:40 Sink input rate: 27552.000000
+2026/08/13 08:42:41 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 230/420 seconds
+2026/08/13 08:42:42 Sink input rate: 27552.000000
+2026/08/13 08:42:43 Sink input rate: 27713.000000
+2026/08/13 08:42:44 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:44 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:44 Sink input rate: 27552.000000
+2026/08/13 08:42:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:45 Sink input rate: 27388.000000
+2026/08/13 08:42:46 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 235/420 seconds
+2026/08/13 08:42:47 Sink input rate: 27696.000000
+2026/08/13 08:42:48 Sink input rate: 27575.000000
+2026/08/13 08:42:49 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:49 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:49 Sink input rate: 27382.000000
+2026/08/13 08:42:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:50 Sink input rate: 27723.000000
+2026/08/13 08:42:51 Sink input rate: 27407.000000
+[INFO] Experiment running... Elapsed time: 240/420 seconds
+2026/08/13 08:42:52 Sink input rate: 27523.000000
+2026/08/13 08:42:53 Sink input rate: 27552.000000
+2026/08/13 08:42:54 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:54 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:54 Sink input rate: 27552.000000
+2026/08/13 08:42:55 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:55 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:55 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:55 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:55 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:55 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:55 Sink input rate: 27549.000000
+2026/08/13 08:42:56 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 245/420 seconds
+2026/08/13 08:42:57 Sink input rate: 27552.000000
+2026/08/13 08:42:58 Sink input rate: 27549.000000
+2026/08/13 08:42:59 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:42:59 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:42:59 Sink input rate: 27552.000000
+2026/08/13 08:43:00 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:00 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:00 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:00 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:00 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:00 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:00 Sink input rate: 27552.000000
+2026/08/13 08:43:01 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 250/420 seconds
+2026/08/13 08:43:02 Sink input rate: 27552.000000
+2026/08/13 08:43:03 Sink input rate: 27552.000000
+2026/08/13 08:43:04 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:04 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:04 Sink input rate: 27549.000000
+2026/08/13 08:43:05 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:05 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:05 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:05 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:05 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:05 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:05 Sink input rate: 27552.000000
+2026/08/13 08:43:06 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 255/420 seconds
+2026/08/13 08:43:07 Sink input rate: 27549.000000
+2026/08/13 08:43:08 Sink input rate: 27552.000000
+2026/08/13 08:43:09 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:09 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:09 Sink input rate: 27549.000000
+2026/08/13 08:43:10 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:10 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:10 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:10 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:10 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:10 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:10 Sink input rate: 27552.000000
+2026/08/13 08:43:11 Sink input rate: 27552.000000
+[Reconfig INFO] Triggering reconfiguration - type: scaleup, operator: statefulMapper, target parallelism: 8
+cd /users/akash01/holostream && ./bin/client rescale statefulMapper 8
+2026/08/13 08:43:12 [Client INFO] Rescale the job ...
+2026/08/13 08:43:12 [Reconfig worker INFO] Worker num change: 4 -> 8
+2026/08/13 08:43:12 [Reconfig worker INFO] Worker list change details: [10 12 14 16] -> [10 12 14 16 17 18 19 20]
+2026/08/13 08:43:12 [Reconfig worker INFO] New workers: [17 18 19 20]
+2026/08/13 08:43:12 [Reconfig worker INFO] Removed workers: []
+2026/08/13 08:43:12 [Bucket Partition INFO] bucket count per worker: map[10:16 12:16 14:16 16:16 17:16 18:16 19:16 20:16]
+2026/08/13 08:43:12 
+2026/08/13 08:43:12 Bucket owner transfer INFO (Bucket list in format of [startIdx, endIdx]):
+2026/08/13 08:43:12   Worker 10 -> Worker 17: [[28 31]]
+2026/08/13 08:43:12   Worker 10 -> Worker 18: [[24 27]]
+2026/08/13 08:43:12   Worker 10 -> Worker 19: [[20 23]]
+2026/08/13 08:43:12   Worker 10 -> Worker 20: [[16 19]]
+2026/08/13 08:43:12   Worker 12 -> Worker 17: [[60 63]]
+2026/08/13 08:43:12   Worker 12 -> Worker 18: [[56 59]]
+2026/08/13 08:43:12   Worker 12 -> Worker 19: [[52 55]]
+2026/08/13 08:43:12   Worker 12 -> Worker 20: [[48 51]]
+2026/08/13 08:43:12   Worker 14 -> Worker 19: [[84 87]]
+2026/08/13 08:43:12   Worker 14 -> Worker 20: [[80 83]]
+2026/08/13 08:43:12   Worker 14 -> Worker 17: [[92 95]]
+2026/08/13 08:43:12   Worker 14 -> Worker 18: [[88 91]]
+2026/08/13 08:43:12   Worker 16 -> Worker 17: [[124 127]]
+2026/08/13 08:43:12   Worker 16 -> Worker 18: [[120 123]]
+2026/08/13 08:43:12   Worker 16 -> Worker 19: [[116 119]]
+2026/08/13 08:43:12   Worker 16 -> Worker 20: [[112 115]]
+2026/08/13 08:43:12 
+2026/08/13 08:43:12 [InitLazyReconfig] New task with lazy metadata sent to worker 17
+2026/08/13 08:43:12 [InitLazyReconfig] New task with lazy metadata sent to worker 18
+2026/08/13 08:43:12 [InitLazyReconfig] New task with lazy metadata sent to worker 19
+2026/08/13 08:43:12 [InitLazyReconfig] New task with lazy metadata sent to worker 20
+2026/08/13 08:43:12 [InitLazyReconfig] Init metadata sent to worker 10
+2026/08/13 08:43:12 [InitLazyReconfig] Init metadata sent to worker 12
+2026/08/13 08:43:12 [InitLazyReconfig] Init metadata sent to worker 14
+2026/08/13 08:43:12 [InitLazyReconfig] Init metadata sent to worker 16
+2026/08/13 08:43:12 Worker 20:9021 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:43:12 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:43:12 Task initialized! Waiting for upstream connections...
+2026/08/13 08:43:12 [info] Pending batch timeout is enabled
+2026/08/13 08:43:12 Worker 18:9019 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:43:12 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:43:12 Task initialized! Waiting for upstream connections...
+2026/08/13 08:43:12 [info] Pending batch timeout is enabled
+2026/08/13 08:43:12 Worker 17:9018 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:43:12 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:43:12 Task initialized! Waiting for upstream connections...
+2026/08/13 08:43:12 [info] Pending batch timeout is enabled
+2026/08/13 08:43:12 Worker 19:9020 (WorkerId:DataPlanePort) received task [statefulMapper]
+2026/08/13 08:43:12 [Task statefulMapper INFO] Connecting to downstream workerId:8  dataPlaneAddr:"10.10.1.6:9009"
+2026/08/13 08:43:12 Task initialized! Waiting for upstream connections...
+2026/08/13 08:43:12 [info] Pending batch timeout is enabled
+2026/08/13 08:43:12 [Lazy Rescale INFO] Step 1: Lazy reconfig initialized - time taken: 12.271789ms
+2026/08/13 08:43:12 [Fast Forward INFO] Sending fast forward request to worker 16
+2026/08/13 08:43:12 [Fast Forward INFO] Sending fast forward request to worker 10
+2026/08/13 08:43:12 [Fast Forward INFO] Sending fast forward request to worker 12
+2026/08/13 08:43:12 [Fast Forward INFO] Sending fast forward request to worker 14
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:17  dataPlaneAddr:"10.10.1.5:9018" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:18  dataPlaneAddr:"10.10.1.7:9019" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:19  dataPlaneAddr:"10.10.1.8:9020" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:20  dataPlaneAddr:"10.10.1.9:9021" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:19  dataPlaneAddr:"10.10.1.8:9020" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:20  dataPlaneAddr:"10.10.1.9:9021" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:17  dataPlaneAddr:"10.10.1.5:9018" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:18  dataPlaneAddr:"10.10.1.7:9019" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:17  dataPlaneAddr:"10.10.1.5:9018" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:18  dataPlaneAddr:"10.10.1.7:9019" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:19  dataPlaneAddr:"10.10.1.8:9020" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:20  dataPlaneAddr:"10.10.1.9:9021" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:18  dataPlaneAddr:"10.10.1.7:9019" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:19  dataPlaneAddr:"10.10.1.8:9020" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:20  dataPlaneAddr:"10.10.1.9:9021" from upstream closedAuction
+2026/08/13 08:43:12 [INFO] Op statefulMapper creating peer connection struct workerId:17  dataPlaneAddr:"10.10.1.5:9018" from upstream closedAuction
+2026/08/13 08:43:12 [sink Supplier] New upstream added from statefulMapper (WorkerId: 20). Current number of upstreams: 5. Task deployment phase passed: true
+2026/08/13 08:43:12 [sink Supplier] New upstream added from statefulMapper (WorkerId: 17). Current number of upstreams: 6. Task deployment phase passed: true
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 16). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 16). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 16). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 16). Current number of upstreams: 1. Task deployment phase passed: false
+2026/08/13 08:43:12 [Lazy Rescale INFO] Step 2: All fast forward started - time taken: 15.195707ms
+2026/08/13 08:43:12 [Wait Inbound Peers INFO] Checking receiver workers: [19 20 17 18] for peer channel status ...
+2026/08/13 08:43:12 [sink Supplier] New upstream added from statefulMapper (WorkerId: 18). Current number of upstreams: 7. Task deployment phase passed: true
+2026/08/13 08:43:12 [sink Supplier] New upstream added from statefulMapper (WorkerId: 19). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 12). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 10). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 14). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 12). Current number of upstreams: 2. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 14). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 12). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 10). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 14). Current number of upstreams: 3. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 10). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 14). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:43:12 [Lazy Rescale INFO] Step 3: All inbound peers connected - time taken: 37.361539ms
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 10). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 12). Current number of upstreams: 4. Task deployment phase passed: false
+2026/08/13 08:43:12 [Lazy INFO] InflightBarrier sent to all downstreams...
+2026/08/13 08:43:12 [Lazy INFO] InflightBarrier sent to all downstreams...
+2026/08/13 08:43:12 [Lazy INFO] InflightBarrier sent to all downstreams...
+2026/08/13 08:43:12 [Lazy INFO] InflightBarrier sent to all downstreams...
+2026/08/13 08:43:12 [Lazy Rescale INFO] Step 4: Upstream routing updated - time taken: 1.132926ms
+2026/08/13 08:43:12 [Wait Tasks Reconfig Done INFO] Waiting workers to finish: [10 12 14 16 17 18 19 20]
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 5. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 6. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 13). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 7. Task deployment phase passed: false
+2026/08/13 08:43:12 [info] PeerCollector timer timeout routine is terminated
+2026/08/13 08:43:12 [info] PeerCollector timer timeout routine is terminated
+2026/08/13 08:43:12 [info] PeerCollector timer timeout routine is terminated
+2026/08/13 08:43:12 [info] PeerCollector timer timeout routine is terminated
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 15). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 11). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:43:12 [statefulMapper Supplier] New upstream added from closedAuction (WorkerId: 9). Current number of upstreams: 8. Task deployment phase passed: true
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 7 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 6 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 5 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 4 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 7 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 6 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 5 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 4 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 7 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 6 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 5 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 4 upstreams remaining
+2026/08/13 08:43:12 [Lazy Rescale INFO] Step 5: All target tasks reconfig done - time taken: 68.12494ms
+2026/08/13 08:43:12 [Terminate Tasks INFO] Terminating removed tasks on workers: []
+2026/08/13 08:43:12 [Lazy Rescale INFO] Step 6: Removed tasks terminated - time taken: 9.989µs
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 7 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 6 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 5 upstreams remaining
+2026/08/13 08:43:12 [SubSupplier closedAuction] Upstream connection closed with 4 upstreams remaining
+2026/08/13 08:43:12 Job rescale response: Job re-scaled
+[INFO] Experiment running... Elapsed time: 260/420 seconds
+2026/08/13 08:43:12 Sink input rate: 27549.000000
+2026/08/13 08:43:13 Sink input rate: 27552.000000
+2026/08/13 08:43:14 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:14 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:14 Sink input rate: 27653.000000
+2026/08/13 08:43:15 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:15 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:15 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:15 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:15 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:15 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:15 Sink input rate: 27448.000000
+2026/08/13 08:43:16 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 265/420 seconds
+2026/08/13 08:43:17 Sink input rate: 27552.000000
+2026/08/13 08:43:18 Sink input rate: 27549.000000
+2026/08/13 08:43:19 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:19 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:19 Sink input rate: 27552.000000
+2026/08/13 08:43:20 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:20 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:20 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:20 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:20 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:20 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:20 Sink input rate: 27552.000000
+2026/08/13 08:43:21 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 270/420 seconds
+2026/08/13 08:43:22 Sink input rate: 27552.000000
+2026/08/13 08:43:23 Sink input rate: 27552.000000
+2026/08/13 08:43:24 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:24 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:24 Sink input rate: 27549.000000
+2026/08/13 08:43:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:25 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:25 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:25 Sink input rate: 27552.000000
+2026/08/13 08:43:26 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 275/420 seconds
+2026/08/13 08:43:27 Sink input rate: 27549.000000
+2026/08/13 08:43:28 Sink input rate: 27552.000000
+2026/08/13 08:43:29 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:29 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:29 Sink input rate: 27549.000000
+2026/08/13 08:43:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:30 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:30 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:30 Sink input rate: 27552.000000
+2026/08/13 08:43:31 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 280/420 seconds
+2026/08/13 08:43:32 Sink input rate: 27549.000000
+2026/08/13 08:43:33 Sink input rate: 27594.000000
+2026/08/13 08:43:34 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:34 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:34 Sink input rate: 27726.000000
+2026/08/13 08:43:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:35 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:35 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:35 Sink input rate: 27361.000000
+2026/08/13 08:43:36 Sink input rate: 27685.000000
+[INFO] Experiment running... Elapsed time: 285/420 seconds
+2026/08/13 08:43:37 Sink input rate: 27610.000000
+2026/08/13 08:43:38 Sink input rate: 27330.000000
+2026/08/13 08:43:39 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:39 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:39 Sink input rate: 27552.000000
+2026/08/13 08:43:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:40 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:40 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:40 Sink input rate: 27552.000000
+2026/08/13 08:43:41 Sink input rate: 27549.000000
+[INFO] Experiment running... Elapsed time: 290/420 seconds
+2026/08/13 08:43:42 Sink input rate: 27552.000000
+2026/08/13 08:43:43 Sink input rate: 27552.000000
+2026/08/13 08:43:44 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:44 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:44 Sink input rate: 27549.000000
+2026/08/13 08:43:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:45 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:45 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:45 Sink input rate: 27552.000000
+2026/08/13 08:43:46 Sink input rate: 27552.000000
+[INFO] Experiment running... Elapsed time: 295/420 seconds
+2026/08/13 08:43:47 Sink input rate: 27549.000000
+2026/08/13 08:43:48 Sink input rate: 27552.000000
+2026/08/13 08:43:48 SourceFunc exit: all records generated
+2026/08/13 08:43:49 SourceFunc exit: all records generated
+2026/08/13 08:43:49 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:49 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:49 SourceFunc exit: all records generated
+2026/08/13 08:43:49 SourceFunc exit: all records generated
+2026/08/13 08:43:49 SourceFunc exit: all records generated
+2026/08/13 08:43:49 Sink input rate: 27552.000000
+2026/08/13 08:43:50 SourceFunc exit: all records generated
+2026/08/13 08:43:50 SourceFunc exit: all records generated
+2026/08/13 08:43:50 SourceFunc exit: all records generated
+2026/08/13 08:43:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:50 Kafka producer (10.10.1.1) output rate: 105612
+2026/08/13 08:43:50 Kafka producer (10.10.1.1) output rate: 6888
+2026/08/13 08:43:50 Sink input rate: 27549.000000
+2026/08/13 08:43:51 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 300/420 seconds
+2026/08/13 08:43:52 Sink input rate: -1.000000
+2026/08/13 08:43:53 Sink input rate: -1.000000
+2026/08/13 08:43:54 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:54 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:54 Sink input rate: -1.000000
+2026/08/13 08:43:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:55 Sink input rate: -1.000000
+2026/08/13 08:43:56 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 305/420 seconds
+2026/08/13 08:43:57 Sink input rate: -1.000000
+2026/08/13 08:43:58 Sink input rate: -1.000000
+2026/08/13 08:43:59 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:59 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:43:59 Sink input rate: -1.000000
+2026/08/13 08:44:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:00 Sink input rate: -1.000000
+2026/08/13 08:44:01 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 310/420 seconds
+2026/08/13 08:44:02 Sink input rate: -1.000000
+2026/08/13 08:44:03 Sink input rate: -1.000000
+2026/08/13 08:44:04 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:04 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:04 Sink input rate: -1.000000
+2026/08/13 08:44:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:05 Sink input rate: -1.000000
+2026/08/13 08:44:06 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 315/420 seconds
+2026/08/13 08:44:07 Sink input rate: -1.000000
+2026/08/13 08:44:08 Sink input rate: -1.000000
+2026/08/13 08:44:09 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:09 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:09 Sink input rate: -1.000000
+2026/08/13 08:44:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:10 Sink input rate: -1.000000
+2026/08/13 08:44:11 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 320/420 seconds
+2026/08/13 08:44:12 Sink input rate: -1.000000
+2026/08/13 08:44:13 Sink input rate: -1.000000
+2026/08/13 08:44:14 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:14 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:14 Sink input rate: -1.000000
+2026/08/13 08:44:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:15 Sink input rate: -1.000000
+2026/08/13 08:44:16 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 325/420 seconds
+2026/08/13 08:44:17 Sink input rate: -1.000000
+2026/08/13 08:44:18 Sink input rate: -1.000000
+2026/08/13 08:44:19 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:19 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:19 Sink input rate: -1.000000
+2026/08/13 08:44:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:20 Sink input rate: -1.000000
+2026/08/13 08:44:21 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 330/420 seconds
+2026/08/13 08:44:22 Sink input rate: -1.000000
+2026/08/13 08:44:23 Sink input rate: -1.000000
+2026/08/13 08:44:24 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:24 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:24 Sink input rate: -1.000000
+2026/08/13 08:44:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:25 Sink input rate: -1.000000
+2026/08/13 08:44:26 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 335/420 seconds
+2026/08/13 08:44:27 Sink input rate: -1.000000
+2026/08/13 08:44:28 Sink input rate: -1.000000
+2026/08/13 08:44:29 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:29 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:29 Sink input rate: -1.000000
+2026/08/13 08:44:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:30 Sink input rate: -1.000000
+2026/08/13 08:44:31 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 340/420 seconds
+2026/08/13 08:44:32 Sink input rate: -1.000000
+2026/08/13 08:44:33 Sink input rate: -1.000000
+2026/08/13 08:44:34 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:34 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:34 Sink input rate: -1.000000
+2026/08/13 08:44:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:35 Sink input rate: -1.000000
+2026/08/13 08:44:36 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 345/420 seconds
+2026/08/13 08:44:37 Sink input rate: -1.000000
+2026/08/13 08:44:38 Sink input rate: -1.000000
+2026/08/13 08:44:39 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:39 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:39 Sink input rate: -1.000000
+2026/08/13 08:44:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:40 Sink input rate: -1.000000
+2026/08/13 08:44:41 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 350/420 seconds
+2026/08/13 08:44:42 Sink input rate: -1.000000
+2026/08/13 08:44:43 Sink input rate: -1.000000
+2026/08/13 08:44:44 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:44 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:44 Sink input rate: -1.000000
+2026/08/13 08:44:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:45 Sink input rate: -1.000000
+2026/08/13 08:44:46 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 355/420 seconds
+2026/08/13 08:44:47 Sink input rate: -1.000000
+2026/08/13 08:44:48 Sink input rate: -1.000000
+2026/08/13 08:44:49 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:49 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:49 Sink input rate: -1.000000
+2026/08/13 08:44:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:50 Sink input rate: -1.000000
+2026/08/13 08:44:51 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 360/420 seconds
+2026/08/13 08:44:52 Sink input rate: -1.000000
+2026/08/13 08:44:53 Sink input rate: -1.000000
+2026/08/13 08:44:54 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:54 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:54 Sink input rate: -1.000000
+2026/08/13 08:44:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:55 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:55 Sink input rate: -1.000000
+2026/08/13 08:44:56 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 365/420 seconds
+2026/08/13 08:44:57 Sink input rate: -1.000000
+2026/08/13 08:44:58 Sink input rate: -1.000000
+2026/08/13 08:44:59 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:59 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:44:59 Sink input rate: -1.000000
+2026/08/13 08:45:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:00 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:00 Sink input rate: -1.000000
+2026/08/13 08:45:01 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 370/420 seconds
+2026/08/13 08:45:02 Sink input rate: -1.000000
+2026/08/13 08:45:03 Sink input rate: -1.000000
+2026/08/13 08:45:04 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:04 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:04 Sink input rate: -1.000000
+2026/08/13 08:45:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:05 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:05 Sink input rate: -1.000000
+2026/08/13 08:45:06 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 375/420 seconds
+2026/08/13 08:45:07 Sink input rate: -1.000000
+2026/08/13 08:45:08 Sink input rate: -1.000000
+2026/08/13 08:45:09 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:09 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:09 Sink input rate: -1.000000
+2026/08/13 08:45:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:10 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:10 Sink input rate: -1.000000
+2026/08/13 08:45:11 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 380/420 seconds
+2026/08/13 08:45:12 Sink input rate: -1.000000
+2026/08/13 08:45:13 Sink input rate: -1.000000
+2026/08/13 08:45:14 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:14 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:15 Sink input rate: -1.000000
+2026/08/13 08:45:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:15 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:16 Sink input rate: -1.000000
+2026/08/13 08:45:17 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 385/420 seconds
+2026/08/13 08:45:18 Sink input rate: -1.000000
+2026/08/13 08:45:19 Sink input rate: -1.000000
+2026/08/13 08:45:19 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:19 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:20 Sink input rate: -1.000000
+2026/08/13 08:45:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:20 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:21 Sink input rate: -1.000000
+2026/08/13 08:45:22 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 390/420 seconds
+2026/08/13 08:45:23 Sink input rate: -1.000000
+2026/08/13 08:45:24 Sink input rate: -1.000000
+2026/08/13 08:45:24 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:24 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:25 Sink input rate: -1.000000
+2026/08/13 08:45:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:25 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:26 Sink input rate: -1.000000
+2026/08/13 08:45:27 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 395/420 seconds
+2026/08/13 08:45:28 Sink input rate: -1.000000
+2026/08/13 08:45:29 Sink input rate: -1.000000
+2026/08/13 08:45:29 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:29 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:30 Sink input rate: -1.000000
+2026/08/13 08:45:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:30 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:31 Sink input rate: -1.000000
+2026/08/13 08:45:32 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 400/420 seconds
+2026/08/13 08:45:33 Sink input rate: -1.000000
+2026/08/13 08:45:34 Sink input rate: -1.000000
+2026/08/13 08:45:34 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:34 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:35 Sink input rate: -1.000000
+2026/08/13 08:45:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:35 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:36 Sink input rate: -1.000000
+2026/08/13 08:45:37 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 405/420 seconds
+2026/08/13 08:45:38 Sink input rate: -1.000000
+2026/08/13 08:45:39 Sink input rate: -1.000000
+2026/08/13 08:45:39 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:39 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:40 Sink input rate: -1.000000
+2026/08/13 08:45:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:40 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:41 Sink input rate: -1.000000
+2026/08/13 08:45:42 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 410/420 seconds
+2026/08/13 08:45:43 Sink input rate: -1.000000
+2026/08/13 08:45:44 Sink input rate: -1.000000
+2026/08/13 08:45:44 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:44 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:45 Sink input rate: -1.000000
+2026/08/13 08:45:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:45 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:46 Sink input rate: -1.000000
+2026/08/13 08:45:47 Sink input rate: -1.000000
+[INFO] Experiment running... Elapsed time: 415/420 seconds
+2026/08/13 08:45:48 Sink input rate: -1.000000
+2026/08/13 08:45:49 Sink input rate: -1.000000
+2026/08/13 08:45:49 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:49 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:50 Sink input rate: -1.000000
+2026/08/13 08:45:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:50 Kafka producer (10.10.1.1) output rate: -1
+2026/08/13 08:45:51 Sink input rate: -1.000000
+2026/08/13 08:45:52 Sink input rate: -1.000000
+[INFO] Experiment duration reached, stopping all components...
+
+============================================================
+                       Store results...
+============================================================
+[RESULTS INFO] Moving metricDB from /users/akash01/holostream/data/metricDB to /users/akash01/holostream/scripts/results/nexmark_query6_standard_q6_sponge_matched_memory_225k450k_4to8_20260813T143500Z/metricDB
+mv /users/akash01/holostream/data/metricDB /users/akash01/holostream/scripts/results/nexmark_query6_standard_q6_sponge_matched_memory_225k450k_4to8_20260813T143500Z/metricDB
+[RESULTS INFO] metricDB successfully moved to /users/akash01/holostream/scripts/results/nexmark_query6_standard_q6_sponge_matched_memory_225k450k_4to8_20260813T143500Z/metricDB
+
+============================================================
+      [CLEANUP INFO] Cleaning up all components...
+============================================================
+
+[CLEANUP INFO][Progress 1/5] Stopping all producers...
+[Producer INFO] Total number of Nexmark producers to stop: 4
+[Producer INFO] Stopping Nexmark producers on 10.10.1.1 ...
+ssh 10.10.1.1 'cd /users/akash01/holostream/scripts/producer && python3 stopProducerNode.py'
+2026/08/13 08:45:53 Sink input rate: -1.000000
+[Producer INFO] Terminating process nexmarkKafkaProducer with PID 593022
+[Producer INFO] Terminating process nexmarkKafkaProducer with PID 593023
+[Producer INFO] Terminating process nexmarkKafkaProducer with PID 593024
+[Producer INFO] Terminating process nexmarkKafkaProducer with PID 593025
+[Producer INFO] Total 4 producer processes terminated on this node.
+[Producer INFO] All Nexmark producers stopped successfully.
+
+[CLEANUP INFO][Progress 2/5] Stopping remote pebble instances...
+[CLEANUP INFO] No remote pebble instances to stop.
+
+[CLEANUP INFO][Progress 3/5] Shutting down coordinator and workers...
+[CLEANUP INFO] Terminating process coordinator with PID 592787
+Terminated
+2026/08/13 08:45:53 [Worker 2 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 4 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 16 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 10 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 8 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 19 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 5 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 13 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 17 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 20 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 18 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 1 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 6 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 11 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 0 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 12 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 14 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 15 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 9 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 3 Terminated] Worker shut down by terminated Coordinator
+2026/08/13 08:45:53 [Worker 7 Terminated] Worker shut down by terminated Coordinator
+[CLEANUP INFO] Terminated 1 coordinator process(es).
+
+[CLEANUP INFO][Progress 4/5] Stopping Kafka cluster...
+[Kafka INFO] Stopping the Kafka cluster ...
+[Kafka INFO] Total number of Kafka nodes to stop: 3
+[Kafka INFO] Stopping Kafka node on 10.10.1.2 ...
+ssh 10.10.1.2 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+ssh 10.10.1.2 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+ssh 10.10.1.2 'sudo rm -rf /tmp/kraft-combined-logs'
+[Kafka INFO] Kafka node on 10.10.1.2 stopped and data cleared.
+[Kafka INFO] Stopping Kafka node on 10.10.1.3 ...
+ssh 10.10.1.3 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+ssh 10.10.1.3 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+ssh 10.10.1.3 'sudo rm -rf /tmp/kraft-combined-logs'
+[Kafka INFO] Kafka node on 10.10.1.3 stopped and data cleared.
+[Kafka INFO] Stopping Kafka node on 10.10.1.4 ...
+ssh 10.10.1.4 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+[Kafka INFO] Remote Kafka process on 10.10.1.2 exited with code 143
+ssh 10.10.1.4 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+[Kafka Cluster ERROR] Kafka cluster node count mismatch: 1 alive (expected 3)
+[Kafka Cluster ERROR] Current alive brokers:
+[Kafka Cluster ERROR] Exception when checking cluster health: 'node_id'
+[Kafka INFO] Stopping the Kafka cluster ...
+[Kafka INFO] Total number of Kafka nodes to stop: 3
+[Kafka INFO] Stopping Kafka node on 10.10.1.2 ...
+ssh 10.10.1.2 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+ssh 10.10.1.4 'sudo rm -rf /tmp/kraft-combined-logs'
+No kafka server to stop
+ssh 10.10.1.2 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+[Kafka INFO] Kafka node on 10.10.1.4 stopped and data cleared.
+[Kafka INFO] Kafka cluster stopped and data cleared!
+
+[CLEANUP INFO][Progress 5/5] Cleaning up data folders in all nodes...
+ssh 10.10.1.1 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.2 'sudo rm -rf /tmp/kraft-combined-logs'
+ssh 10.10.1.2 'rm -rf /users/akash01/holostream/data'
+[Kafka INFO] Kafka node on 10.10.1.2 stopped and data cleared.
+[Kafka INFO] Stopping Kafka node on 10.10.1.3 ...
+ssh 10.10.1.3 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+ssh 10.10.1.3 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.3 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+ssh 10.10.1.4 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.3 'sudo rm -rf /tmp/kraft-combined-logs'
+ssh 10.10.1.5 'rm -rf /users/akash01/holostream/data'
+[Kafka INFO] Kafka node on 10.10.1.3 stopped and data cleared.
+[Kafka INFO] Stopping Kafka node on 10.10.1.4 ...
+ssh 10.10.1.4 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0/bin && sudo ./kafka-server-stop.sh'
+ssh 10.10.1.6 'rm -rf /users/akash01/holostream/data'
+No kafka server to stop
+ssh 10.10.1.4 'cd /users/akash01/holostream/scripts/kafka/kafka_2.13-3.9.0 && rm -rf logs'
+ssh 10.10.1.7 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.4 'sudo rm -rf /tmp/kraft-combined-logs'
+ssh 10.10.1.8 'rm -rf /users/akash01/holostream/data'
+[Kafka INFO] Kafka node on 10.10.1.4 stopped and data cleared.
+[Kafka INFO] Kafka cluster stopped and data cleared!
+ssh 10.10.1.9 'rm -rf /users/akash01/holostream/data'
+[Kafka INFO] Remote Kafka process on 10.10.1.3 exited with code 143
+[Kafka INFO] Remote Kafka process on 10.10.1.4 exited with code 143
+[Kafka INFO] All remote Kafka nodes terminated - cluster stopped!
+ssh 10.10.1.10 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.11 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.12 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.13 'rm -rf /users/akash01/holostream/data'
+ssh 10.10.1.14 'rm -rf /users/akash01/holostream/data'
+[CLEANUP INFO] Clean up done!
+
+
+============================================================
+runExperiment() completed - all processes exited and cleaned up
+             Experiment Status: SUCCEEDED
+============================================================

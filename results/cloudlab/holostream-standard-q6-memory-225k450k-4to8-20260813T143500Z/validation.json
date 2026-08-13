@@ -1,0 +1,63 @@
+{
+  "result_id": "holostream-standard-q6-memory-225k450k-4to8-20260813T143500Z",
+  "status": "success",
+  "query": "nexmark_query6",
+  "state_backend": "memory",
+  "workload": {
+    "producer_replicas": 4,
+    "phases": [
+      {"rate_events_per_second": 225000, "duration_seconds": 150},
+      {"rate_events_per_second": 450000, "duration_seconds": 150}
+    ],
+    "auction_records": 6199200,
+    "bid_records": 95050800,
+    "total_records": 101250000,
+    "producer_sha256": "67dd182d4367829ae227dfab8edb61fa64c26fecbe9a30b91c1c94a5f5ea1bf6"
+  },
+  "kafka": {
+    "auction_partitions": 4,
+    "bid_partitions": 4,
+    "auction_terminal_offsets": [1549800, 1549800, 1549800, 1549800],
+    "bid_terminal_offsets": [23762700, 23762700, 23762700, 23762700],
+    "consumer_group": "disaggregated-streaming",
+    "terminal_consumer_lag": 0
+  },
+  "topology": {
+    "auction_source_parallelism": 4,
+    "bid_source_parallelism": 4,
+    "closed_auction_parallelism": 4,
+    "stateful_mapper_parallelism_before": 4,
+    "stateful_mapper_parallelism_after": 8,
+    "sink_parallelism": 1,
+    "target_operator": "statefulMapper"
+  },
+  "scale_out": {
+    "configured_trigger_seconds": 258,
+    "observed_timestamp": "2026-08-13T08:43:12-06:00",
+    "old_worker_ids": [10, 12, 14, 16],
+    "new_worker_ids": [17, 18, 19, 20],
+    "new_worker_hosts": ["node4", "node6", "node7", "node8"],
+    "buckets": 128,
+    "buckets_per_mapper_after": 16,
+    "protocol": "lazy",
+    "protocol_version": "no-migration",
+    "observed_total_reconfiguration_milliseconds": 134.1
+  },
+  "metrics": {
+    "sqlite_integrity": "ok",
+    "total_rows": 204048,
+    "operator_instances": 21,
+    "metric_types": 27,
+    "valid_kafka_queue_rows": 2355,
+    "valid_stateful_mapper_processing_rows": 1332,
+    "first_timestamp": "2026-08-13 08:38:49.770232518-06:00",
+    "last_timestamp": "2026-08-13 08:45:53.047685947-06:00",
+    "portable_database": "metricDB/metricCollector.snapshot.db"
+  },
+  "checksums_sha256": {
+    "config.json": "744ea4a5e69dfe4f8a7e52767359e8b6e69932844ff799b69dc10f21cc45d059",
+    "run.log": "540471593dbba2e0669805343356d6e6a5193e0e7bf7d537d7ad3a4e3a4609d5",
+    "metricDB/metricCollector.db": "e49db66228ec0838696e3ac183c187a7621eb8d63feaae2eb74df1dcfcdea755",
+    "metricDB/metricCollector.snapshot.db": "5650d5051ad857f481ef8d8e043ff6188a34b78eae0b96643c55b2a708fd4f8e"
+  }
+}

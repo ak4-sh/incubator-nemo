@@ -1,0 +1,22 @@
+AUCTION_OFFSETS
+nexmark-auction:0:1549800
+nexmark-auction:1:1549800
+nexmark-auction:2:1549800
+nexmark-auction:3:1549800
+
+BID_OFFSETS
+nexmark-bid:0:23762700
+nexmark-bid:1:23762700
+nexmark-bid:2:23762700
+nexmark-bid:3:23762700
+
+CONSUMER_GROUP
+GROUP                   TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG
+disaggregated-streaming nexmark-auction 0          1549800         1549800         0
+disaggregated-streaming nexmark-auction 1          1549800         1549800         0
+disaggregated-streaming nexmark-auction 2          1549800         1549800         0
+disaggregated-streaming nexmark-auction 3          1549800         1549800         0
+disaggregated-streaming nexmark-bid     0          23762700        23762700        0
+disaggregated-streaming nexmark-bid     1          23762700        23762700        0
+disaggregated-streaming nexmark-bid     2          23762700        23762700        0
+disaggregated-streaming nexmark-bid     3          23762700        23762700        0
