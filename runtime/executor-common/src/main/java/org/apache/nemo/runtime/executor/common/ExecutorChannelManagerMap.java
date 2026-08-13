@@ -91,12 +91,12 @@ public final class ExecutorChannelManagerMap {
       return;
     }
 
-    if (executorId.contains("Lambda") && remoteExecutorId.contains("Lambda")) {
+    if (RuntimeIdManager.isLambdaExecutorId(executorId) && RuntimeIdManager.isLambdaExecutorId(remoteExecutorId)) {
       LOG.warn("Cannot connnect " + executorId + "<->" + remoteExecutorId);
       return;
     }
 
-    if (remoteExecutorId.contains("Lambda")) {
+    if (RuntimeIdManager.isLambdaExecutorId(remoteExecutorId)) {
       LOG.warn("Prevent init connection to lambda executor {} in {}",
         remoteExecutorId, executorId);
       return;

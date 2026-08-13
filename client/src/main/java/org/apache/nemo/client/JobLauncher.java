@@ -35,6 +35,8 @@ import org.apache.nemo.runtime.master.lambda.LambdaAWSResourceRequester;
 import org.apache.nemo.runtime.master.lambda.LambdaContainerRequester;
 import org.apache.nemo.runtime.master.lambda.LambdaYarnResourceRequester;
 import org.apache.nemo.runtime.master.lambda.VMResourceRequester;
+import org.apache.nemo.runtime.master.lambda.CloudLabVMLambdaResourceRequester;
+import org.apache.nemo.runtime.master.offloading.CloudLabVMOffloadingRequester;
 import org.apache.nemo.runtime.master.offloading.LambdaOffloadingRequester;
 import org.apache.nemo.runtime.master.offloading.OffloadingRequester;
 import org.apache.nemo.runtime.master.offloading.YarnExecutorOffloadingRequester;
@@ -55,9 +57,10 @@ import org.apache.reef.tang.annotations.Name;
 import org.apache.reef.tang.exceptions.InjectionException;
 import org.apache.reef.tang.formats.CommandLine;
 import org.apache.reef.util.EnvironmentUtils;
+import org.apache.reef.wake.remote.address.LocalAddressProvider;
 import org.apache.reef.util.Optional;
 import org.apache.reef.wake.IdentifierFactory;
-import org.apache.reef.wake.remote.address.LocalAddressProvider;
+import org.apache.nemo.driver.ShortHostnameLocalAddressProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +110,14 @@ public final class JobLauncher {
   private static String serializedDAG;
   private static final List<?> COLLECTED_DATA = new ArrayList<>();
   private static final String[] EMPTY_USER_ARGS = new String[0];
+
+  private static String getNemoWorkingFile(final String fileName) {
+    final String configuredDir = System.getProperty("nemo.work.dir", System.getenv("NEMO_WORK_DIR"));
+    if (configuredDir != null && !configuredDir.isEmpty()) {
+      return Paths.get(configuredDir, fileName).toString();
+    }
+    return Paths.get(System.getProperty("user.dir"), fileName).toString();
+  }
 
   /**
    * private constructor.
@@ -334,7 +345,10 @@ public final class JobLauncher {
     // launch driver if it hasn't been already
     if (driverReadyLatch == null) {
       try {
-        setup(new String[]{"-job_id", jobId});
+        setup(new String[]{
+            "-job_id", jobId,
+            "-user_main", "org.apache.beam.sdk.nexmark.Main"
+        });
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
@@ -361,11 +375,23 @@ public final class JobLauncher {
             .build())
         .build());
 
-    final String home = System.getenv("HOME");
+    final String scalingFile = getNemoWorkingFile("scaling.txt");
+    final String sourceLogFile = getNemoWorkingFile("source.log");
 
     try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(home + "/incubator-nemo/scaling.txt"));
+      final File scaling = new File(scalingFile);
+      final File sourceLog = new File(sourceLogFile);
+      final File parent = scaling.getParentFile();
+      if (parent != null) {
+        parent.mkdirs();
+      }
+      final File sourceLogParent = sourceLog.getParentFile();
+      if (sourceLogParent != null) {
+        sourceLogParent.mkdirs();
+      }
+      BufferedWriter writer = new BufferedWriter(new FileWriter(scaling));
       writer.close();
+      sourceLog.createNewFile();
     } catch (final Exception e) {
       e.printStackTrace();
       throw new RuntimeException(e);
@@ -375,7 +401,7 @@ public final class JobLauncher {
       LOG.info("Scaling service invoked...");
         try {
           final BufferedReader br =
-            new BufferedReader(new FileReader(home + "/incubator-nemo/scaling.txt"));
+            new BufferedReader(new FileReader(scalingFile));
 
           String s;
           String lastLine = null;
@@ -494,7 +520,7 @@ public final class JobLauncher {
     // input rate 보내기
     try {
       final BufferedReader br =
-        new BufferedReader(new FileReader(home + "/incubator-nemo/source.log"));
+        new BufferedReader(new FileReader(sourceLogFile));
 
       Pattern pattern = Pattern.compile("\\d+ events");
 
@@ -684,7 +710,7 @@ public final class JobLauncher {
     }
 
 
-    return DriverConfiguration.CONF
+    final Configuration driverConf = DriverConfiguration.CONF
         .setMultiple(DriverConfiguration.GLOBAL_LIBRARIES, EnvironmentUtils.getAllClasspathJars()
         .stream().filter(path -> {
           LOG.info("Library path: {}", path);
@@ -705,12 +731,20 @@ public final class JobLauncher {
         .set(DriverConfiguration.DRIVER_IDENTIFIER, jobId)
         .set(DriverConfiguration.DRIVER_MEMORY, driverMemory)
         .build();
+
+    final Configuration localAddrConf = Tang.Factory.getTang().newConfigurationBuilder()
+        .bindImplementation(LocalAddressProvider.class, ShortHostnameLocalAddressProvider.class)
+        .build();
+
+    return Configurations.merge(driverConf, localAddrConf);
   }
 
   private static Class<? extends OffloadingRequester> getRequesterConf(final String offloadingType) {
 
     if (offloadingType.equals("lambda")) {
       return LambdaOffloadingRequester.class;
+    } else if (offloadingType.equals("cloudlab-vm")) {
+      return CloudLabVMOffloadingRequester.class;
     } else {
       return YarnExecutorOffloadingRequester.class;
     }
@@ -720,6 +754,8 @@ public final class JobLauncher {
   getLambdaRequesterConf(final String offloadingType) {
     if (offloadingType.equals("lambda")) {
       return LambdaAWSResourceRequester.class;
+    } else if (offloadingType.equals("cloudlab-vm")) {
+      return CloudLabVMLambdaResourceRequester.class;
     } else if (offloadingType.equals("vm")) {
       return VMResourceRequester.class;
     } else {
@@ -764,6 +800,10 @@ public final class JobLauncher {
     cl.registerShortNameOfClass(JobConf.ExecutorMem.class);
     cl.registerShortNameOfClass(JobConf.ExecutorYarnCore.class);
     cl.registerShortNameOfClass(JobConf.NumExecutor.class);
+    cl.registerShortNameOfClass(JobConf.SourceHosts.class);
+    cl.registerShortNameOfClass(JobConf.ComputeHosts.class);
+    cl.registerShortNameOfClass(JobConf.StrictExecutorPlacement.class);
+    cl.registerShortNameOfClass(JobConf.ExecutorPlacementReportPath.class);
 
     EvalConf.registerCommandLineArgument(cl);
 

@@ -1,5 +1,6 @@
 package org.apache.nemo.runtime.master;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.Channel;
 import org.apache.nemo.offloading.common.EventHandler;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.nemo.offloading.common.OffloadingMasterEvent.Type.DUPLICATE_REQUEST_TERMIATION;
@@ -17,6 +19,7 @@ import static org.apache.nemo.runtime.master.WorkerControlProxy.State.*;
 
 public final class WorkerControlProxy implements EventHandler<OffloadingMasterEvent> {
   private static final Logger LOG = LoggerFactory.getLogger(WorkerControlProxy.class.getName());
+  private static final Set<Integer> ACTIVE_WORKER_IDS = ConcurrentHashMap.newKeySet();
 
   public enum State {
     DEACTIVATING,
@@ -56,6 +59,7 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
     this.pendingActivationWorkers = pendingActivationWorkers;
     this.activator = activator;
     this.state = new AtomicReference<>(State.ACTIVATE);
+    recordActiveWorkerState("REGISTERED_ACTIVE");
   }
 
   public String getExecutorId() {
@@ -111,6 +115,9 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
         synchronized (pendingActivationWorkers) {
           pendingActivationWorkers.add(this);
         }
+        // Send ACTIVATE event to the VM worker so it responds with ACTIVATE
+        final ByteBuf buf = controlChannel.alloc().ioBuffer(Integer.BYTES).writeInt(requestId);
+        controlChannel.writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.ACTIVATE, buf));
         activator.activate();
       } else {
         throw new RuntimeException("Worker " + requestId + "/" + state +
@@ -120,12 +127,12 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
   }
 
   public void deactivate() {
-    synchronized (state) {
-      if (state.get().equals(ACTIVATE)) {
-        state.set(DEACTIVATING);
-        LOG.info("Send end message for deactivating worker {}", requestId);
-        controlChannel
-          .writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.END, null));
+        synchronized (state) {
+          if (state.get().equals(ACTIVATE)) {
+            state.set(DEACTIVATING);
+            LOG.info("Send end message for deactivating worker {}", requestId);
+            controlChannel
+              .writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.END, null));
       } else {
         throw new RuntimeException("Worker " + requestId + "/" + state +
           " is not active but try to deactivate");
@@ -217,6 +224,7 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
 
           LOG.info("Set lambda worker {} to activate", requestId);
           state.set(State.ACTIVATE);
+          recordActiveWorkerState("ACTIVATED");
         }
         break;
       }
@@ -256,6 +264,8 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
           }
 
           state.set(State.DEACTIVATE);
+          ACTIVE_WORKER_IDS.remove(requestId);
+          logActiveWorkerState("DEACTIVATED");
         }
         msg.getByteBuf().release();
         // endQueue.add(msg);
@@ -278,5 +288,15 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
   public int hashCode() {
 
     return Objects.hash(requestId, controlChannel);
+  }
+
+  private void recordActiveWorkerState(final String transition) {
+    ACTIVE_WORKER_IDS.add(requestId);
+    logActiveWorkerState(transition);
+  }
+
+  private void logActiveWorkerState(final String transition) {
+    LOG.info("SPONGE_VM_WORKERS transition={} requestId={} executorId={} activeWorkers={}",
+      transition, requestId, executorId, ACTIVE_WORKER_IDS.size());
   }
 }

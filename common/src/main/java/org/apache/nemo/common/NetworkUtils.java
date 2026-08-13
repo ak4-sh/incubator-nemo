@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.Enumeration;
 
 public class NetworkUtils {
   private static final Logger LOG = LoggerFactory.getLogger(NetworkUtils.class.getName());
@@ -43,7 +44,32 @@ public class NetworkUtils {
   public static InetAddress getLocalHostLANAddress() throws UnknownHostException {
     try {
       InetAddress candidateAddress = null;
-      // Iterate all NICs (network interface cards)...
+
+      final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+      while (interfaces.hasMoreElements()) {
+        final NetworkInterface iface = interfaces.nextElement();
+        if (!iface.isUp() || iface.isLoopback() || iface.isVirtual()) {
+          continue;
+        }
+
+        final Enumeration<InetAddress> addresses = iface.getInetAddresses();
+        while (addresses.hasMoreElements()) {
+          final InetAddress address = addresses.nextElement();
+          if (address.isLoopbackAddress() || !(address instanceof Inet4Address)) {
+            continue;
+          }
+
+          final String hostAddress = address.getHostAddress();
+          if (hostAddress.startsWith("10.10.")) {
+            return address;
+          }
+          if (address.isSiteLocalAddress()) {
+            candidateAddress = address;
+          } else if (candidateAddress == null) {
+            candidateAddress = address;
+          }
+        }
+      }
 
       if (candidateAddress != null) {
         // We did not find a site-local address, but we found some other non-loopback address.

@@ -199,4 +199,15 @@ public final class RuntimeIdManager {
   private static String[] split(final String id) {
     return id.split(SPLITTER);
   }
+
+  /**
+   * Checks if the executor ID belongs to a lambda / VM offloading executor.
+   * Lambda executors use "Lambda" or "VM-" prefixes.
+   *
+   * @param executorId the executor ID to check
+   * @return true if the executor is a lambda/VM executor
+   */
+  public static boolean isLambdaExecutorId(final String executorId) {
+    return executorId != null && (executorId.contains("Lambda") || executorId.contains("VM-"));
+  }
 }

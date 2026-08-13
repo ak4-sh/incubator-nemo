@@ -187,7 +187,7 @@ public final class EvalConf {
   @NamedParameter(short_name = "partial_warmup", default_value = "false")
   public static final class PartialWarmup implements Name<Boolean> {}
 
-  @NamedParameter(short_name = "query_id")
+  @NamedParameter(short_name = "query_id", default_value = "0")
   public final class QueryId implements Name<Integer> {}
 
   public final boolean enableOffloading;
