@@ -1,0 +1,39 @@
+[holostream] validated config=/users/akash01/nemo-original-sponge-holostream/scripts/cloudlab/holostream/config/sponge_hardware_matched_q6_scaleout_225k450k.json sha256=b3effa02a14b66bc047f73d44285bee79033ca99ff779f9f469940ebe63d9fcd replicas=4 auctions=6199200 bids=95050800
+[holostream] verified producer binary sha256=67dd182d4367829ae227dfab8edb61fa64c26fecbe9a30b91c1c94a5f5ea1bf6
+[holostream] launched replica=0 host=node0 ssh_pid=550176 log=/tmp/original-sponge-q6-scaleout-225k450k-20260813T061000Z/holostream-producer-replica-0.log
+[holostream] launched replica=1 host=node0 ssh_pid=550177 log=/tmp/original-sponge-q6-scaleout-225k450k-20260813T061000Z/holostream-producer-replica-1.log
+[holostream] launched replica=2 host=node0 ssh_pid=550178 log=/tmp/original-sponge-q6-scaleout-225k450k-20260813T061000Z/holostream-producer-replica-2.log
+[holostream] launched replica=3 host=node0 ssh_pid=550179 log=/tmp/original-sponge-q6-scaleout-225k450k-20260813T061000Z/holostream-producer-replica-3.log
+[holostream] phase 1 started; targetRate=225000
+[holostream] progress auctions=17220/6199200 bids=897702/95050800
+[holostream] progress auctions=168756/6199200 bids=3151087/95050800
+[holostream] progress auctions=306516/6199200 bids=5333406/95050800
+[holostream] progress auctions=458052/6199200 bids=7656870/95050800
+[holostream] progress auctions=595812/6199200 bids=9769110/95050800
+[holostream] progress auctions=747348/6199200 bids=11903410/95050800
+[holostream] progress auctions=885108/6199200 bids=14204814/95050800
+[holostream] progress auctions=1036644/6199200 bids=16317054/95050800
+[holostream] progress auctions=1174404/6199200 bids=18640518/95050800
+[holostream] progress auctions=1325940/6199200 bids=20763604/95050800
+[holostream] progress auctions=1463700/6199200 bids=23076222/95050800
+[holostream] progress auctions=1615236/6199200 bids=25320603/95050800
+[holostream] progress auctions=1752996/6199200 bids=27511926/95050800
+[holostream] progress auctions=1904532/6199200 bids=29793881/95050800
+[holostream] progress auctions=2042292/6199200 bids=32211660/95050800
+[holostream] phase 2 started; targetRate=450000
+[holostream] progress auctions=2321256/6199200 bids=36445394/95050800
+[holostream] progress auctions=2596776/6199200 bids=41083068/95050800
+[holostream] progress auctions=2899848/6199200 bids=45319819/95050800
+[holostream] progress auctions=3175368/6199200 bids=49954476/95050800
+[holostream] progress auctions=3478440/6199200 bids=54180881/95050800
+[holostream] progress auctions=3753960/6199200 bids=58825884/95050800
+[holostream] progress auctions=4057032/6199200 bids=63052315/95050800
+[holostream] progress auctions=4332552/6199200 bids=67697292/95050800
+[holostream] progress auctions=4635624/6199200 bids=71921772/95050800
+[holostream] progress auctions=4911144/6199200 bids=76568700/95050800
+[holostream] progress auctions=5214216/6199200 bids=80823718/95050800
+[holostream] progress auctions=5489736/6199200 bids=85440108/95050800
+[holostream] progress auctions=5792808/6199200 bids=89778605/95050800
+[holostream] progress auctions=6068328/6199200 bids=94311516/95050800
+[holostream] progress auctions=6199200/6199200 bids=95050800/95050800
+[holostream] all producer partitions reached exact offsets

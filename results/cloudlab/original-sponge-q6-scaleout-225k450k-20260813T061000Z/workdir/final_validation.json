@@ -1,0 +1,18 @@
+{
+  "applicationId": "application_1786601258904_0001",
+  "artifactSha256": {
+    "nemoClient": "6eeaa942b1504780bd54a6a3403a5466d347aa05e4b297cb2e5cd0ec5370306f",
+    "nexmark": "40b37ca4eec83491ea344b0f99ed16bd1f2312fa6d87ce812ef6ad84c1544872"
+  },
+  "consumerLag": 0,
+  "evaluatorErrorCount": 0,
+  "expectedInputEvents": 101250000,
+  "jobId": "original-sponge-q6-scaleout-225k450k-20260813T061000Z",
+  "metricsCollectorStatus": "terminal_validated",
+  "placementPassed": true,
+  "producerStatus": "success",
+  "rawMetricsPreserved": true,
+  "sourceProcessedEvents": 101250000,
+  "terminalInputOffset": 101250000,
+  "validated": true
+}

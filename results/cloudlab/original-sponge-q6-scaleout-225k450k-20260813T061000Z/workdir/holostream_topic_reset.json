@@ -1,0 +1,176 @@
+{
+  "after": {
+    "capturedMs": 1786601419742,
+    "consumerGroup": {
+      "command": "/users/akash01/kafka/bin/kafka-consumer-groups.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --describe --group sponge-original-sponge-q6-scaleout-225k450k-20260813T061000Z",
+      "exitCode": 0,
+      "name": "sponge-original-sponge-q6-scaleout-225k450k-20260813T061000Z",
+      "stderr": "",
+      "stdout": "\nError: Consumer group 'sponge-original-sponge-q6-scaleout-225k450k-20260813T061000Z' does not exist.\n"
+    },
+    "topics": {
+      "nexmark-auction": {
+        "beginningOffsets": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "configuration": {
+          "command": "/users/akash01/kafka/bin/kafka-configs.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --entity-type topics --entity-name nexmark-auction --describe",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Dynamic configs for topic nexmark-auction are:\n  message.timestamp.type=LogAppendTime sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:message.timestamp.type=LogAppendTime, STATIC_BROKER_CONFIG:log.message.timestamp.type=LogAppendTime, DEFAULT_CONFIG:log.message.timestamp.type=CreateTime}\n  min.insync.replicas=1 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:min.insync.replicas=1, DEFAULT_CONFIG:min.insync.replicas=1}\n"
+        },
+        "description": {
+          "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --describe --topic nexmark-auction",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Topic: nexmark-auction\tTopicId: Ff5ttSLRT9WM1kZpMWv4Qw\tPartitionCount: 4\tReplicationFactor: 1\tConfigs: min.insync.replicas=1,segment.bytes=1073741824,message.timestamp.type=LogAppendTime\n\tTopic: nexmark-auction\tPartition: 0\tLeader: 1\tReplicas: 1\tIsr: 1\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-auction\tPartition: 1\tLeader: 2\tReplicas: 2\tIsr: 2\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-auction\tPartition: 2\tLeader: 3\tReplicas: 3\tIsr: 3\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-auction\tPartition: 3\tLeader: 1\tReplicas: 1\tIsr: 1\tElr: N/A\tLastKnownElr: N/A\n"
+        },
+        "endOffsets": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "exists": true
+      },
+      "nexmark-bid": {
+        "beginningOffsets": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "configuration": {
+          "command": "/users/akash01/kafka/bin/kafka-configs.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --entity-type topics --entity-name nexmark-bid --describe",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Dynamic configs for topic nexmark-bid are:\n  message.timestamp.type=LogAppendTime sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:message.timestamp.type=LogAppendTime, STATIC_BROKER_CONFIG:log.message.timestamp.type=LogAppendTime, DEFAULT_CONFIG:log.message.timestamp.type=CreateTime}\n  min.insync.replicas=1 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:min.insync.replicas=1, DEFAULT_CONFIG:min.insync.replicas=1}\n"
+        },
+        "description": {
+          "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --describe --topic nexmark-bid",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Topic: nexmark-bid\tTopicId: P5QVb8pnQtqp6wkYWDPRuQ\tPartitionCount: 4\tReplicationFactor: 1\tConfigs: min.insync.replicas=1,segment.bytes=1073741824,message.timestamp.type=LogAppendTime\n\tTopic: nexmark-bid\tPartition: 0\tLeader: 3\tReplicas: 3\tIsr: 3\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-bid\tPartition: 1\tLeader: 1\tReplicas: 1\tIsr: 1\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-bid\tPartition: 2\tLeader: 2\tReplicas: 2\tIsr: 2\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-bid\tPartition: 3\tLeader: 3\tReplicas: 3\tIsr: 3\tElr: N/A\tLastKnownElr: N/A\n"
+        },
+        "endOffsets": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "exists": true
+      }
+    }
+  },
+  "before": {
+    "capturedMs": 1786601371748,
+    "consumerGroup": {
+      "command": "/users/akash01/kafka/bin/kafka-consumer-groups.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --describe --group sponge-original-sponge-q6-scaleout-225k450k-20260813T061000Z",
+      "exitCode": 0,
+      "name": "sponge-original-sponge-q6-scaleout-225k450k-20260813T061000Z",
+      "stderr": "",
+      "stdout": "\nError: Consumer group 'sponge-original-sponge-q6-scaleout-225k450k-20260813T061000Z' does not exist.\n"
+    },
+    "topics": {
+      "nexmark-auction": {
+        "beginningOffsets": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "configuration": {
+          "command": "/users/akash01/kafka/bin/kafka-configs.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --entity-type topics --entity-name nexmark-auction --describe",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Dynamic configs for topic nexmark-auction are:\n  message.timestamp.type=LogAppendTime sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:message.timestamp.type=LogAppendTime, STATIC_BROKER_CONFIG:log.message.timestamp.type=LogAppendTime, DEFAULT_CONFIG:log.message.timestamp.type=CreateTime}\n  min.insync.replicas=1 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:min.insync.replicas=1, DEFAULT_CONFIG:min.insync.replicas=1}\n"
+        },
+        "description": {
+          "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --describe --topic nexmark-auction",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Topic: nexmark-auction\tTopicId: Tz-CDvl0TbC1mZOMK4a-FA\tPartitionCount: 4\tReplicationFactor: 1\tConfigs: min.insync.replicas=1,segment.bytes=1073741824,message.timestamp.type=LogAppendTime\n\tTopic: nexmark-auction\tPartition: 0\tLeader: 3\tReplicas: 3\tIsr: 3\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-auction\tPartition: 1\tLeader: 1\tReplicas: 1\tIsr: 1\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-auction\tPartition: 2\tLeader: 2\tReplicas: 2\tIsr: 2\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-auction\tPartition: 3\tLeader: 3\tReplicas: 3\tIsr: 3\tElr: N/A\tLastKnownElr: N/A\n"
+        },
+        "endOffsets": {
+          "0": 568260,
+          "1": 568260,
+          "2": 568260,
+          "3": 568260
+        },
+        "exists": true
+      },
+      "nexmark-bid": {
+        "beginningOffsets": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "configuration": {
+          "command": "/users/akash01/kafka/bin/kafka-configs.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --entity-type topics --entity-name nexmark-bid --describe",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Dynamic configs for topic nexmark-bid are:\n  message.timestamp.type=LogAppendTime sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:message.timestamp.type=LogAppendTime, STATIC_BROKER_CONFIG:log.message.timestamp.type=LogAppendTime, DEFAULT_CONFIG:log.message.timestamp.type=CreateTime}\n  min.insync.replicas=1 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:min.insync.replicas=1, DEFAULT_CONFIG:min.insync.replicas=1}\n"
+        },
+        "description": {
+          "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --describe --topic nexmark-bid",
+          "exitCode": 0,
+          "stderr": "",
+          "stdout": "Topic: nexmark-bid\tTopicId: rdMwO3IRQ0aiopBUxqRYTA\tPartitionCount: 4\tReplicationFactor: 1\tConfigs: min.insync.replicas=1,segment.bytes=1073741824,message.timestamp.type=LogAppendTime\n\tTopic: nexmark-bid\tPartition: 0\tLeader: 3\tReplicas: 3\tIsr: 3\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-bid\tPartition: 1\tLeader: 1\tReplicas: 1\tIsr: 1\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-bid\tPartition: 2\tLeader: 2\tReplicas: 2\tIsr: 2\tElr: N/A\tLastKnownElr: N/A\n\tTopic: nexmark-bid\tPartition: 3\tLeader: 3\tReplicas: 3\tIsr: 3\tElr: N/A\tLastKnownElr: N/A\n"
+        },
+        "endOffsets": {
+          "0": 8712990,
+          "1": 8712990,
+          "2": 8712990,
+          "3": 8712990
+        },
+        "exists": true
+      }
+    }
+  },
+  "bootstrapServers": "node1:9092,node2:9092,node3:9092",
+  "consumerGroup": "sponge-original-sponge-q6-scaleout-225k450k-20260813T061000Z",
+  "deletionConfirmedMs": 1786601380041,
+  "endedMs": 1786601419742,
+  "error": "",
+  "kafkaNode": "node1",
+  "operations": [
+    {
+      "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --delete --topic nexmark-auction",
+      "operation": "delete",
+      "timestampMs": 1786601374593,
+      "topic": "nexmark-auction"
+    },
+    {
+      "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --delete --topic nexmark-bid",
+      "operation": "delete",
+      "timestampMs": 1786601377300,
+      "topic": "nexmark-bid"
+    },
+    {
+      "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --create --topic nexmark-auction --partitions 4 --replication-factor 1 --config min.insync.replicas=1 --config message.timestamp.type=LogAppendTime",
+      "operation": "create",
+      "timestampMs": 1786601382810,
+      "topic": "nexmark-auction"
+    },
+    {
+      "command": "/users/akash01/kafka/bin/kafka-topics.sh --bootstrap-server node1:9092,node2:9092,node3:9092 --create --topic nexmark-bid --partitions 4 --replication-factor 1 --config min.insync.replicas=1 --config message.timestamp.type=LogAppendTime",
+      "operation": "create",
+      "timestampMs": 1786601385679,
+      "topic": "nexmark-bid"
+    }
+  ],
+  "partitions": 4,
+  "recreationVerifiedMs": 1786601419742,
+  "replicationFactor": 1,
+  "startedMs": 1786601343265,
+  "status": "success",
+  "topics": [
+    "nexmark-auction",
+    "nexmark-bid"
+  ],
+  "zookeeper": "node1:2181,node2:2181,node3:2181"
+}

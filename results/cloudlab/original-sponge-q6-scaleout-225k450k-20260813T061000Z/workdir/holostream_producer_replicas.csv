@@ -1,0 +1,5 @@
+replica,host,auctionOffset,bidOffset,exitCode,termination,cleanupError
+0,node0,1549800,23762700,255,SIGTERM,
+1,node0,1549800,23762700,255,SIGTERM,
+2,node0,1549800,23762700,255,SIGTERM,
+3,node0,1549800,23762700,255,SIGTERM,
