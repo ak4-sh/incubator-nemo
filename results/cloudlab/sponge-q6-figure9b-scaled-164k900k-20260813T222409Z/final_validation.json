@@ -1,0 +1,18 @@
+{
+  "applicationId": "application_1786659440034_0001",
+  "artifactSha256": {
+    "nemoClient": "50bf7da1afb25eda4aa948489950c23a83a2f7e46be29a9858967ef62820b077",
+    "nexmark": "4f4912ff4da1e77a6a350bc4fd2859deb19bda2777b395bb70f45d3ace9b16b6"
+  },
+  "consumerLag": 0,
+  "evaluatorErrorCount": 0,
+  "expectedInputEvents": 61379940,
+  "jobId": "sponge-q6-figure9b-scaled-164k900k-20260813T222409Z",
+  "metricsCollectorStatus": "terminal_validated",
+  "placementPassed": true,
+  "producerStatus": "success",
+  "rawMetricsPreserved": true,
+  "sourceProcessedEvents": 61379940,
+  "terminalInputOffset": 61379940,
+  "validated": true
+}

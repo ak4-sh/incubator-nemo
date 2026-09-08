@@ -1,0 +1,25 @@
+{
+  "applicationId": "application_1787939630113_0001",
+  "applicationState": "RUNNING",
+  "artifactSha256": {
+    "nemoClient": "dae27117787492e25b5f94f5e104020ed07787437250d7c124f57de5e2bc11b9",
+    "nexmark": "9abb8242ba42098ca1cec6e19b37f055b06ca175e11c61f6ee2a0773761a380e"
+  },
+  "cloudlabWorkerLifecyclePassed": false,
+  "cloudlabWorkerLifecycleRequired": true,
+  "consumerLag": 0,
+  "driverFatalErrorCount": 0,
+  "evaluatorErrorCount": 0,
+  "expectedInputEvents": 150000000,
+  "finalApplicationState": "UNDEFINED",
+  "jobId": "sponge-q6-c6525-repeated-scale-100k375k-20260828T191034Z",
+  "metricsCollectorStatus": "terminal_validated",
+  "placementPassed": true,
+  "producerStatus": "success",
+  "rawMetricsPreserved": true,
+  "safeWorkerReactivation": true,
+  "sourceProcessedEvents": 150000000,
+  "terminalInputOffset": 150000000,
+  "validated": false,
+  "yarnStatusCommandSucceeded": true
+}

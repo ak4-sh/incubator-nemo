@@ -1,0 +1,1244 @@
+{
+  "schemaVersion": 1,
+  "archivedOn": "2026-09-08",
+  "runId": "sponge-q6-c6525-repeated-scale-100k375k-20260828T191034Z",
+  "scope": "Curated historical evidence; not a new run or certification of end-to-end Q6 scaling.",
+  "preservation": "All listed files remain unchanged locally. Only storage=git files are included in this commit. Local-only files are NOT backed up by Git; no remote backup is asserted.",
+  "manifestCoverage": "Original files present before curation; this generated manifest and the shared archive index are not self-hashed.",
+  "selectedBytes": 9621593,
+  "localOnlyBytes": 148437196,
+  "files": [
+    {
+      "path": "application_master.csv",
+      "bytes": 50,
+      "sha256": "738b595509ec68ce64a3a5077e992caefc4fbc52971250c092d96e0b715f1c3b",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "combined_metrics.csv",
+      "bytes": 18810,
+      "sha256": "0f88aae72c5273ff88e978ae46798750848eaa81bfc9dfd97348e4caef58266a",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "driver_fatal_errors.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "evaluator_errors.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "executor_placement_verification.json",
+      "bytes": 2083,
+      "sha256": "f6c581ca4ec588d5e0c8b4e49590227c830e65a0f1b7b55e2c0cb0a738cb8136",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "executor_placement.csv",
+      "bytes": 895,
+      "sha256": "6bf5d37340f551e6010d83327339a3e0b60471c66ee09a33c7d885e1546322e1",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "final_consumer_group.txt",
+      "bytes": 1565,
+      "sha256": "a06eba483ef4004c7f7137401c916433167c7e168835abc6c487a9fe45021297",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "final_kafka_offsets.txt",
+      "bytes": 196,
+      "sha256": "410143911edfba6656c46510860575af1e0c1d31582582a4e97a570f3c997738",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "final_validation.json",
+      "bytes": 901,
+      "sha256": "a36de1739ecdcb48f0ded44d57cf7e2335835de1cabcbd50767482a5e5a501a7",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "hardware_preflight.json",
+      "bytes": 5644,
+      "sha256": "844b59bfad5690be42ad02e694af5fff5f0b1507bccc875bd1029fdd736e8cd2",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_launcher.log",
+      "bytes": 7789,
+      "sha256": "c0451d3c4eb8c0ce0e9d76ae7f9bb6c10ad7f55f676a54a34d13a9d62d76ae1b",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream_producer_completion.json",
+      "bytes": 29543,
+      "sha256": "21885d67ba685a5ef6076f087b47df6d8b2057f8d3ba701c50784aecea4a9268",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_producer_plan.json",
+      "bytes": 1850,
+      "sha256": "18ccb021a4e01504aaa3746ad6d9c7a6a9e2065e69c4d67f6bd3672e8545634f",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_producer_replicas.csv",
+      "bytes": 228,
+      "sha256": "1293d09ca51f1b66826c344909a7faeeec1a3eb3cbd58426ddc80439fd0b938d",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_topic_reset.json",
+      "bytes": 10243,
+      "sha256": "c248ad7c76a515aede62975d2465720ea07de29651d4ea1a4faee52108962381",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream-producer-replica-0.log",
+      "bytes": 20680,
+      "sha256": "136d5ee38d910c2a71f2e9aa10f3dd1d49378914b117655e1bbc9ae82b4875d8",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream-producer-replica-1.log",
+      "bytes": 20680,
+      "sha256": "3dc78f6afe56737cacbece0dd3154eacf909a26f7e3e883435f1d8affbd8fefb",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream-producer-replica-2.log",
+      "bytes": 20680,
+      "sha256": "ef8741cd242b9d17981a491b93b4f05c36e7fb26cc84f66f1cedaff8a667e25f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream-producer-replica-3.log",
+      "bytes": 20684,
+      "sha256": "dafd320084fc6ba5ab79eac1fb336426c6f325859492b382b637b4c648c4d180",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "kafka_input_telemetry.csv",
+      "bytes": 32659,
+      "sha256": "dca6c4382819f9052a34ec53b4a05cd694681d5c861430df6ede7329fbecea1e",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "kafka_input_telemetry.log",
+      "bytes": 2724,
+      "sha256": "aa0e106b2f06d748ca979383e5d1fd1d91dd4a453c905664711aa3e0261cae71",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "kafka_input_topics.json",
+      "bytes": 688,
+      "sha256": "8f249065860cb0ab642eb8e36c59a5b4f093ab152d4fcb630805b72add1256ca",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "kafka_topic_metrics.csv",
+      "bytes": 8247,
+      "sha256": "88493711b788c7a0ffab25f8a584442034fb786f0f8c75a317471dd6d35b4a42",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "metrics_collector.log",
+      "bytes": 27499,
+      "sha256": "53a1321f50190037ad48c5a1d222c41a37def2ea162fc376d19d91d6fd5f74d4",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "optimization_pass_verification.txt",
+      "bytes": 1128,
+      "sha256": "08abf1dd7dd5c0642930cf60132a5c0557d1ce6cd525a45c4cb96c0d2334b921",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plan-logical.json",
+      "bytes": 104843,
+      "sha256": "e23ee6845ee7aed3e8477d285929e54758bbff4808d6f8ac72851cd3cadd9873",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "producer_phases.csv",
+      "bytes": 417,
+      "sha256": "79c2437853976ce4b66060df258b2cbcfd4bbe0734176cc456fb0619ac7d9042",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "remote_tmp_metrics/node5/source_task_metrics.csv",
+      "bytes": 465507,
+      "sha256": "1afff7454e67bf71e1aff4bac2d35a7acbd8983f8e5e3d15c56d81592d77513f",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/start-warm-pool-node4.log",
+      "bytes": 1894,
+      "sha256": "e2e4ff41aef7a65a5383ba774eb4e83f37305b31e07a56d98d67119fd1f21ea8",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25321.log",
+      "bytes": 1335326,
+      "sha256": "43f1d03dc4ece613b5d51847239e3c226d3470ec146ca471d5f9a1127179df47",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25322.log",
+      "bytes": 845299,
+      "sha256": "91ac31c6e411e3e8e5c07562a53ebafc49472990e61d34bcd93fbecac2c47d8d",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25323.log",
+      "bytes": 854582,
+      "sha256": "f3e223f2b4390affc3e68453ff369e9d4f18abecf5f84baef7d1aa92f346e530",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25324.log",
+      "bytes": 574880,
+      "sha256": "417ebf5d89dcb225d8c3dc65122f459d481d3c34ab63797fd4cb2332baa7abc8",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25325.log",
+      "bytes": 865354,
+      "sha256": "82fe129007bd00f47161df86fb984ca9e87eda8f9db5157feca9c8109c0679a1",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25326.log",
+      "bytes": 875649,
+      "sha256": "b56740abf751321adb600f2c15449d9aaa60f4a33b5a02abf4ec8cb7dc754613",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25327.log",
+      "bytes": 885884,
+      "sha256": "38f533d1950532afe7d7f88e2d22d8e918a56e6c507895cdc9ae1633df6569c0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25328.log",
+      "bytes": 895596,
+      "sha256": "d80551ae0eec6b91d14cb14a8ae730f640f67ec55112b5e968791fc3960557a3",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25329.log",
+      "bytes": 905256,
+      "sha256": "370d483555eb4f3b5fc62f36fe4ba3b5c40275f4844027aaef8854b945ac0564",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25330.log",
+      "bytes": 922425,
+      "sha256": "1829661902e50aa5f60b335ecfb674d1afc618d9e9dcf8620edb5b3014c41fb5",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25331.log",
+      "bytes": 932527,
+      "sha256": "655c16aa50ba800667cbe9f8375c59432140b6fc0ccb245ef5a1d82ef8bb43e5",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25332.log",
+      "bytes": 941364,
+      "sha256": "e7ca51cd82d6e456b2e7c12547fc7c6c59771a09e899fc62a11410dbdb697e6a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25333.log",
+      "bytes": 951175,
+      "sha256": "d099a3f44dce94a037c145b03de8065a34cdc5365c673484df5346daaddc9f7f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25334.log",
+      "bytes": 960651,
+      "sha256": "1fa376fa8940d76c6e85f5d9ab4df5ed20b898c350a8c3df4a27a8ba6e465aa7",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25335.log",
+      "bytes": 969979,
+      "sha256": "65c58dda6e07e5d6fb825af6d51bc9b818416fba1e7c7276d001c4e4f6dc8cfd",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25336.log",
+      "bytes": 976218,
+      "sha256": "87190e7eb2a5966891f6d8c02c36172c78fb46809e3ae2801b26ac234c6994e3",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25337.log",
+      "bytes": 988290,
+      "sha256": "87d97ec4f9359fbc2b8252720ec82d95fdfac74b20020594e126a482acfa9ff2",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25338.log",
+      "bytes": 997040,
+      "sha256": "1aa5eebdd6ce943211dcbb2ba982868e6c2961b96556e1f792a3ccca2d14c646",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25339.log",
+      "bytes": 1005885,
+      "sha256": "b97241619c05a66760890354923fe5af5df0614ccb9ecc082f2916142d011577",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25340.log",
+      "bytes": 1014203,
+      "sha256": "18fd42ec686237adcb779c078bfbc709a30a32e2253ec677b26d6faeaef93a99",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25341.log",
+      "bytes": 1023659,
+      "sha256": "156409f10dcc410ee1583a20daabb789a3c717e543c7b358548af08a160d1ba7",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25342.log",
+      "bytes": 1031960,
+      "sha256": "d342b6381ed58eebf13e3a1aefbbd0cb88278b261534a9a9f00995bdc04ef6ad",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25343.log",
+      "bytes": 1039720,
+      "sha256": "9a0768a5650f722665053677314415bd0269aa9944b992ac1b4e1466e3f5985c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25344.log",
+      "bytes": 1048260,
+      "sha256": "f774f2629dac522e3a4213ad5ae12c61528793c150fb4f1772cfc31c6f70e27e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25345.log",
+      "bytes": 1056199,
+      "sha256": "77deda34fd19e726796454ce8ce8fc59c501debb781d0618454bf10f75b8d67a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25346.log",
+      "bytes": 1064301,
+      "sha256": "356d9b06d5c083ef62dc273e5275ff04e61b58ef9720358205488ebbe06787a0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25347.log",
+      "bytes": 1071950,
+      "sha256": "8f2838475b8923df87e39d5110ad1b7721e0a830d96ec0f68846b78268e0ca21",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25348.log",
+      "bytes": 1079957,
+      "sha256": "5d5f514066f4c89dc8100c51b38f8f59e8c33f84b3400b04f0c711912c219d39",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25349.log",
+      "bytes": 1087667,
+      "sha256": "4a9b7e26749d61e043a6e21cac0a4de9ccf50f2ad2a7813940f8c9c7714d81e6",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25350.log",
+      "bytes": 1109196,
+      "sha256": "cd9e787358701c3d7a81fc00c3f332b5383c3874b5dfe8b4776016a0466dd203",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node4/vmworker-25351.log",
+      "bytes": 1102956,
+      "sha256": "fd15eeb7f60eb8e4f3a7fc2f65ff34b728ead20db7c4953cc59691eebfe9ca1a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/start-warm-pool-node6.log",
+      "bytes": 1894,
+      "sha256": "d9a2d0d99d516a4f9bbed0258dc594d401e4e23e664ceeb358dfdda0ae87729d",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25321.log",
+      "bytes": 1110987,
+      "sha256": "6b17fdeb65dda6e3def8f565f3b8f01b80a5c352a50cb0e45ef4ad7070eceb67",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25322.log",
+      "bytes": 1118592,
+      "sha256": "b5c4978d14ccbb9352e602191fd50289394c748841604ac0564f5b4cf127b15e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25323.log",
+      "bytes": 1125524,
+      "sha256": "dbcdd06d628e24a4ac1ab806781d847178c8354621e2f42d5479b36202351ca5",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25324.log",
+      "bytes": 1132386,
+      "sha256": "a82c50d8c23bf3d56f74fe03e9c3fccb8bfae7aa7c6a282a95a17d45d70c942c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25325.log",
+      "bytes": 1139856,
+      "sha256": "107b803b85e5ddef952d72747a7b0d99a3441ad2e62c403c869fc2f9b531bb7d",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25326.log",
+      "bytes": 1145979,
+      "sha256": "edeee4aa496b62032e25f2fdd3d1b24678cbf57f1be348af9a190b97bacd6ae0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25327.log",
+      "bytes": 1153067,
+      "sha256": "5e8a20b242a07187ea1a07a37c7c0652995c168ec7e7a3c3d4f4f64e6239f16e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25328.log",
+      "bytes": 1159281,
+      "sha256": "d46487eb2e920ca3975db13313aa993acccb6da3f1ef5d930ca4f28cb22ae6ed",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25329.log",
+      "bytes": 1166234,
+      "sha256": "c1d14ca0e98873a0ff8e395c303fe5b0263e7cb5b5a04b606ef48843ad73ffaf",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25330.log",
+      "bytes": 1172493,
+      "sha256": "836f86f78d3e1cc27eb5762f9301d81f8921d826ab86ecfa635a0a1d3158e24c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25331.log",
+      "bytes": 1178421,
+      "sha256": "9a6ad8ede5833152f145df48fc1244678bb111e7437a381ed8edd1c779ccbca2",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25332.log",
+      "bytes": 1184816,
+      "sha256": "f9ca7e4211b4b4acc20e3d4308c83b964bd6dd0344bd6524167866e4bff5b31e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25333.log",
+      "bytes": 1190784,
+      "sha256": "5620e805ac00cf8a2abc01fdbb57009b8b04d040ede403d2b22b0ba0dc49315d",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25334.log",
+      "bytes": 1196633,
+      "sha256": "9580100989ad29b54d578aa58af0c31563590fd5ab8ce1b7d343a4761a2038f5",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25335.log",
+      "bytes": 1202426,
+      "sha256": "2fc52784775619f9445b0664cf021e1201dca122beec1ef512ea9dcdaaa614d1",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25336.log",
+      "bytes": 1206457,
+      "sha256": "74a6265c9ee93e114fe842a5398d90ba0f530ca47b97561795a8c05a3282bc05",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25337.log",
+      "bytes": 1213635,
+      "sha256": "5b2bb45d8f94631bf3182a8aa89ec5ccb0c82871e4fccb978c08b63fe5947db3",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25338.log",
+      "bytes": 1219009,
+      "sha256": "a614d7a169084e4276f6dcc11da57b98d22234c30e12e6b159f0e5ea6a259d34",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25339.log",
+      "bytes": 1224460,
+      "sha256": "5c87fd7ccdd542d661da9e5edaba2914ecb83f8747d472297ca60ec483bca855",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25340.log",
+      "bytes": 1229408,
+      "sha256": "13330b6e87d2dacfb040d452629a12057de436a2b2087c6d4b8e95140b944d91",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25341.log",
+      "bytes": 1234673,
+      "sha256": "3c9c422a7f58849b7c5a24397399334d8c29e5e4f5a2febbcf79d70c7edbd62f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25342.log",
+      "bytes": 1239807,
+      "sha256": "49d945579348a5f2f50c130747b3fa94709f4f8622acd2ee220d0cc112978793",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25343.log",
+      "bytes": 1245265,
+      "sha256": "1ec2ba358661b6f491d70693220e3685cadafc76ce3f06baaa7ff6bd5e585e90",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25344.log",
+      "bytes": 1249290,
+      "sha256": "43a25ab31cdff1b009fb6e3b99f741274a93a5d38df37ff13b2a444e1bba63a1",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25345.log",
+      "bytes": 1254292,
+      "sha256": "1f1a8c9a4f739d90ee2c3dfd076c75677c6b28fab707fcef13f2f955e6132f07",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25346.log",
+      "bytes": 1259034,
+      "sha256": "5573587efa53145c1fd8753ea614e3d4ac2e84104cde326058af7c2f4557422a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25347.log",
+      "bytes": 1263265,
+      "sha256": "01d89af93205042fa05af8bb7b7c34a0987593c988266c8060cac1ab57c3ceda",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25348.log",
+      "bytes": 1267360,
+      "sha256": "f9294ef3313b4e46c1976593a1ce3e1eebca810b63934aadb04cd456e12c6a22",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25349.log",
+      "bytes": 1271545,
+      "sha256": "849237fc58c0d59d0adb50fc088943d153e0c88d943a30a531a47c9577bbf54b",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25350.log",
+      "bytes": 1276142,
+      "sha256": "bce06f533c3f7209e4da7b268c22898dc4f8639cb3f29f8fb7d548d2ca0e0e33",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node6/vmworker-25351.log",
+      "bytes": 1280097,
+      "sha256": "ab18573f18f0331f0cc15ac1905ae549b807880f84f7317a1cd0eeaf78fc129a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/start-warm-pool-node7.log",
+      "bytes": 1894,
+      "sha256": "be23d9e15b6619aae7c35c0563369c43625248b5ab2a5288e63b5c0e7b721fc0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25321.log",
+      "bytes": 1285009,
+      "sha256": "0231bbfbc22d55c3b8e3dd4be923902acadf7c83e670c6134d79e04fe3d97e8a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25322.log",
+      "bytes": 1288753,
+      "sha256": "37a27216aa5ab0ce530759e766325ec2f61479a44ac07c3708b3ff77ffc7a7b8",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25323.log",
+      "bytes": 1292582,
+      "sha256": "6667ab2bd71aa11b79478a9bb3e29951e707cc3ee36559fe244d5cd4d2d55c1c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25324.log",
+      "bytes": 1295933,
+      "sha256": "c0e30ddedd4aecef2b505b03062683cceded2bcf6b5dfaa7461044094d629fff",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25325.log",
+      "bytes": 1299017,
+      "sha256": "8ed281af5cd61f63aeae09f4c4a264b85c1527c612377a9cd06f9b1e0e506476",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25326.log",
+      "bytes": 1302599,
+      "sha256": "2579aab6d8f235e171b3160dd54f4fb937423f67c82d1965e651142d0ee9de75",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25327.log",
+      "bytes": 1305998,
+      "sha256": "f6eede86b36309e9985db0c03c04dd0cdcbd5e51c61246ade5ce23ddfae3faf6",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25328.log",
+      "bytes": 1482277,
+      "sha256": "86005b94829a80de127a2aae2d393b650b7cbb3b50d3315b022e579ba84203cc",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25329.log",
+      "bytes": 1477139,
+      "sha256": "b07f23266356f0f6e23b8748711edbdc09a2f4a2d79f2458e64cb8714f90c340",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25330.log",
+      "bytes": 1481821,
+      "sha256": "446641b539a4a78d469bf4990fed31bf09a6866beae64744503906dd0a3c3a4b",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25331.log",
+      "bytes": 1502885,
+      "sha256": "3846ce95aeb0f4024f1b3ca75c5f758e767a8521c7df4f1c915d733de3a8feca",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25332.log",
+      "bytes": 1505586,
+      "sha256": "303dc768299be32e623a205e169ead35564a12368f07cd13cad3ffd2add79eed",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25333.log",
+      "bytes": 1510956,
+      "sha256": "74dfe9b7986f0f7411d2cec4bfe0b8927c72ecb7f877ba9c2b124d0cfb0217bb",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25334.log",
+      "bytes": 1504391,
+      "sha256": "cfdab54755ac0b3a949239498d15e49788b875b1a3c527dabcfad6ad505915b6",
+      "storage": "git",
+      "reason": "Selected worker trace for lifecycle or merger-pipe evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25335.log",
+      "bytes": 1500642,
+      "sha256": "2599f66a91bc7489847a0188a60a4951e951b63e2b6dcfb5d25a84aff084a9ac",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25336.log",
+      "bytes": 1509041,
+      "sha256": "e081c2b8843dee6cc4359fae59d1242e19c9a16c1fb4f4248e00ec3872551ef0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25337.log",
+      "bytes": 1503751,
+      "sha256": "9db31bb9fb47c6c4312a4a2b913b9750ad5723e48405bfee7bd482c8da0331c4",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25338.log",
+      "bytes": 1334052,
+      "sha256": "c85e752f478b4df7c83d9f772ebd5a54c322addd8aea12bb89cb74c305fcaf7a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25339.log",
+      "bytes": 1335850,
+      "sha256": "74db8627da76cadfbde4717f5694097a77196be9df78cc6f878b6e52f6a74d09",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25340.log",
+      "bytes": 1337512,
+      "sha256": "6a698365051d31001fa7815eb00240e2dd89d853c1d403cad6e2aa842ff52f76",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25341.log",
+      "bytes": 1339235,
+      "sha256": "7929af4e859702f40622346e076e5d1bfad5990cd94176b727a60016f536fb66",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25342.log",
+      "bytes": 1340956,
+      "sha256": "c0135a720a9a45c4b8c2819f1b03c5dbbfb0ab58a6ad4a9767ed18469df4fe3b",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25343.log",
+      "bytes": 1342190,
+      "sha256": "98d3714f732e5f8de155b4baf72bbff5a3d016830e1062fa2e85c9f49327bf64",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25344.log",
+      "bytes": 1343782,
+      "sha256": "4f7c95a1d534c404a9f1cb312506f58d372ab681666cbbfefa2bdceefd26bd9a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25345.log",
+      "bytes": 1370597,
+      "sha256": "24b46acfecf1ffb8829f725437653cb9ea84aa1bbe1588a7a00c022806cfdae3",
+      "storage": "git",
+      "reason": "Selected worker trace for lifecycle or merger-pipe evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25346.log",
+      "bytes": 1386141,
+      "sha256": "ff9268953d2d0d9ebc623a83f337922255b1bcd16c987b363da9dd6b5f0c3e9b",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25347.log",
+      "bytes": 1390597,
+      "sha256": "daa43349dcc45692cf466d5c14fd87e7316a2ed92d92467171282d1d5889838f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25348.log",
+      "bytes": 1348392,
+      "sha256": "2b235d8698113cb91e3a3fc0803417731f8fc7e11da50b80fb90b5570d5e6396",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25349.log",
+      "bytes": 416166,
+      "sha256": "24dbe9596070f5f7279f09ae4556e67d3d27b98cd45e9f84bdf2618e4a843a53",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25350.log",
+      "bytes": 430481,
+      "sha256": "685040a68a130474058a4bfad651861de9a1aa2f0fba4a9dcd323f2ebb729fc3",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node7/vmworker-25351.log",
+      "bytes": 444685,
+      "sha256": "fc9a84eac3c02bc7e401d289e94e9f59d59ad2722bbadb80bb91360b27aeee36",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/start-warm-pool-node8.log",
+      "bytes": 1894,
+      "sha256": "a2b22f2a4c254f85e8348cfb36056e6117401d3df4a6d9be399c9c7bbba2aa98",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25321.log",
+      "bytes": 459215,
+      "sha256": "cdbcd7f205a036d3c20956b8b00f0e3215c41bd16d4e5b99e1d5eb8e1e4a554c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25322.log",
+      "bytes": 473200,
+      "sha256": "82c2ac2146cba270e9b2f537e4668d6b42ddb9de841125f71a2ca755a0ad733e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25323.log",
+      "bytes": 487071,
+      "sha256": "dff46632377bd93ba6e5ed0adb42b38ba179f47c49881702bd7614a62e31e567",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25324.log",
+      "bytes": 500832,
+      "sha256": "4ab483630817189bbdb514c38029c6cd92ea89ade9a310d24d96d9ab8e23bdfc",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25325.log",
+      "bytes": 514478,
+      "sha256": "cf4062f7256828ec1b283f6d6c814b5c43c5b1d28aa71e019f2937635b1ec40b",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25326.log",
+      "bytes": 541441,
+      "sha256": "74b979ea0f95a56e73dde6665c0432d4f8b2b304f123deb34cc963693276ed5c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25327.log",
+      "bytes": 531722,
+      "sha256": "c02ece89aa356e1e02fff57e31c39e3cf9291b5e62cb1de841a3f09d44255cd7",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25328.log",
+      "bytes": 558680,
+      "sha256": "0674e246823e1599ea013f7d9d3d2af782c47281d0a679dd534e551afe8774d3",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25329.log",
+      "bytes": 572000,
+      "sha256": "9113c3b42b60cd41bf117de0e4456b6539ae371f4de3f67cce5b59e3b27bc4ff",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25330.log",
+      "bytes": 598277,
+      "sha256": "e252bc3ddd4a527146ea4d214b3d4e97eaa31b7a2a61d86837b289d733a783b2",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25331.log",
+      "bytes": 611755,
+      "sha256": "7d7f856ee894b24ee47220b3318f14e07bf7aa0015def6aa1334ddbdcfb7e687",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25332.log",
+      "bytes": 624236,
+      "sha256": "9c36f92fcbdc17277ebde7277c78f907717bdae273f8bf57eb4df3ee8a9a0af7",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25333.log",
+      "bytes": 700850,
+      "sha256": "35ac1e8d99217990c737c06a24f204e8fbd9b20430483bb021c98b117a0554c4",
+      "storage": "git",
+      "reason": "Selected worker trace for lifecycle or merger-pipe evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25334.log",
+      "bytes": 825605,
+      "sha256": "9cce252e46d8c0932f57f27850d0ae778fd75a44a64f22f3e6c9b3f99e10035c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25335.log",
+      "bytes": 843783,
+      "sha256": "9ea3f993dfd300145d3d479d1774b3b4eb061900d8ea08ff314e71d1184e9aa5",
+      "storage": "git",
+      "reason": "Selected worker trace for lifecycle or merger-pipe evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25336.log",
+      "bytes": 849465,
+      "sha256": "5edf7a5d54c9952a3c19536f87237a93cdbffa20f449f6e284eca0cd28789ebe",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25337.log",
+      "bytes": 861711,
+      "sha256": "9076c00dce699cc7aac310b69ad8081f793ce7394140d346065278ec44bd530c",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25338.log",
+      "bytes": 874713,
+      "sha256": "89479533bd5f85f27b0eb7f4d4b5e02bec023b02fff83f63b74786cbbdb78bff",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25339.log",
+      "bytes": 886685,
+      "sha256": "50a1d960838db91047447928657939702546071012e2e042cd399d1501b52c5e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25340.log",
+      "bytes": 898419,
+      "sha256": "cb2de77f0d8bfc95adc97c0bcb9848726e9d4ecbc44dbc93ab9c41add317d3a6",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25341.log",
+      "bytes": 902433,
+      "sha256": "ea176890c1082bddee501bd4dcc25442c5658e4b17c54e518c5ef2f9bd14f43e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25342.log",
+      "bytes": 934635,
+      "sha256": "18633da282270c59ee76367b316b8b8201822220bee984b1786f4807bb15f7f0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25343.log",
+      "bytes": 933758,
+      "sha256": "0b573a739530f52acb087bf72498407010c9c4dc716b0674e2bd1aa1fd6d57de",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25344.log",
+      "bytes": 770028,
+      "sha256": "1aa2da07985a9c27bbcb2d1f5ad07c779b6866f597d31e518a735c6adc21223f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25345.log",
+      "bytes": 781630,
+      "sha256": "6d42ec4eb95c316acafaa7742cc9df978315e0a0e68d3f0982a76c3e61534232",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25346.log",
+      "bytes": 792752,
+      "sha256": "c48e235467cff68318c3fc6ebb500e1a1837246383d5f2a79e5885b3bb8f5dff",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25347.log",
+      "bytes": 831455,
+      "sha256": "aa7b9c64a61047da1aba57d25cb6749f017f7dcdff28b4bc95e60f8f0c42b12b",
+      "storage": "git",
+      "reason": "Selected worker trace for lifecycle or merger-pipe evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25348.log",
+      "bytes": 856985,
+      "sha256": "5225e216d9c710bd34ba42a9e4bbc72926f7345165a9620cd4210b84b6aadb6e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25349.log",
+      "bytes": 872546,
+      "sha256": "9cec47a2162a45baaaa0d4e4958b51c7f543292eee00b459bb089760470543a3",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25350.log",
+      "bytes": 901043,
+      "sha256": "6fbb77a2eca5b8dc4e3f1d4169f990b16ebe38d2421d97782f0a32d387ffaf93",
+      "storage": "git",
+      "reason": "Selected worker trace for lifecycle or merger-pipe evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/vmworker_logs/node8/vmworker-25351.log",
+      "bytes": 847958,
+      "sha256": "c22b9391f0a10fea5127871b7923551423cea8a6ecc36abdd4c51fe924cb1c73",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/driver.stderr",
+      "bytes": 2646468,
+      "sha256": "29dbb859d25faea5e3663ea92a54a95e7c0354e8db2e0a102628062316ed419f",
+      "storage": "git",
+      "reason": "Driver trace retained for scaler and failure evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node10-Executor2-evaluator.stderr",
+      "bytes": 4333066,
+      "sha256": "57102734f611943d71d267257d82fff3756689dec2456960daaca90ee3bebb6e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node10-Executor2-evaluator.stdout",
+      "bytes": 25670,
+      "sha256": "600d7e41c271b4fbe04fffaaad248ebda209d619d5c9738dd41f7490b4500396",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node11-Executor3-evaluator.stderr",
+      "bytes": 4348207,
+      "sha256": "71e6b6f662c6b1d6c4dd2c8d0b0c67b71cc28d8feca6ccfaa412920b3d7d39c0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node11-Executor3-evaluator.stdout",
+      "bytes": 25503,
+      "sha256": "41c618c89375f7261c23de3e7a77fde2c22c9c1eb21b50b2e18b3f00a9abc891",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node12-Executor4-evaluator.stderr",
+      "bytes": 4342007,
+      "sha256": "3b1527b5d983e9ad8d2a6119071810454967d598cbee7dbe1c7cbc6f3bc3857e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node12-Executor4-evaluator.stdout",
+      "bytes": 27541,
+      "sha256": "5f2f3838bb857be03a43f658ad96d86cc443b18b4301bc0b4d324542db20cd61",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node5-Executor0-evaluator.stderr",
+      "bytes": 6409879,
+      "sha256": "3e7185f4d7af1e9bd55843473e258bade222e066a9def8d541a9ed6c3266977a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node5-Executor0-evaluator.stdout",
+      "bytes": 17079,
+      "sha256": "237a2616eadb616dcdde10b07d0541e4915676c08eb9c912e9996f3d2f407a7f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node9-Executor1-evaluator.stderr",
+      "bytes": 4320509,
+      "sha256": "47841e4f98db1add33c466ab9e10884cffd0a15215108eb81d29c170064220bb",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node9-Executor1-evaluator.stdout",
+      "bytes": 27535,
+      "sha256": "f3632bf9256fbe05900af5346dceafe0f52569cdec721f281a79078123c99051",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "scaler_enable.csv",
+      "bytes": 71,
+      "sha256": "2ee032a5f1492c37b373d3b6c70c091ef60406b539598ba39aa88af4ccbc67a5",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "scaler_metrics.csv",
+      "bytes": 8842,
+      "sha256": "4379bbfa8c0e51ee03ee6315ca9d0169e910297f1ff67af5486731d80577e378",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "scaling.txt",
+      "bytes": 65,
+      "sha256": "274395ea4af5e6c294996c0fd0ce629f1c859441cc4a1d76b278337cdd3ef1d9",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source_aggregate_metrics.csv",
+      "bytes": 82350,
+      "sha256": "d357c2c8bb0110e3ac0fa49961157aefa43cfcd0ff13d853d385e710750eb191",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source_root_execution_verification.txt",
+      "bytes": 925,
+      "sha256": "586a6a1754bdf767af75880aba198ec9ee1e026ffe8820b5ae1f344ece44c233",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source_root_stages.csv",
+      "bytes": 9,
+      "sha256": "120a2dbed1b70f19050666842ea38edc8be6a779d5d02f5efbd0457defd00565",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source.log",
+      "bytes": 11004,
+      "sha256": "fb36d92ad363ff9c3ba3f30df981f7b4e1daf51bccf07b8675ca4c1d8fbd3df6",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "worker_lifecycle_validation.json",
+      "bytes": 44123,
+      "sha256": "c933d1da6b4d0a5d9ffb9d8b4f8a83d895f1da8add9f7901168eaba4deddf3c0",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "yarn_application_status.txt",
+      "bytes": 1124,
+      "sha256": "da72f61c555a62814db051fd6b3368a4a420b2e2dad3c22551cf285f33a866e6",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    }
+  ]
+}

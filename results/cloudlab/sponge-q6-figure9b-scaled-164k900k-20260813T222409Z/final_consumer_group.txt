@@ -1,0 +1,10 @@
+
+GROUP                                                      TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-auction 1          939555          939555          0               -               -               -
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-auction 0          939555          939555          0               -               -               -
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-bid     2          14405430        14405430        0               -               -               -
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-auction 3          939555          939555          0               -               -               -
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-auction 2          939555          939555          0               -               -               -
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-bid     3          14405430        14405430        0               -               -               -
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-bid     0          14405430        14405430        0               -               -               -
+sponge-sponge-q6-figure9b-scaled-164k900k-20260813T222409Z nexmark-bid     1          14405430        14405430        0               -               -               -

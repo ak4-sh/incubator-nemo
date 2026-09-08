@@ -1,0 +1,10 @@
+
+GROUP                                               TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-auction 1          1127250         1127250         0               -               -               -
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-auction 0          1127250         1127250         0               -               -               -
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-bid     2          17285250        17285250        0               -               -               -
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-auction 3          1127250         1127250         0               -               -               -
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-auction 2          1127250         1127250         0               -               -               -
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-bid     3          17285250        17285250        0               -               -               -
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-bid     0          17285250        17285250        0               -               -               -
+sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z nexmark-bid     1          17285250        17285250        0               -               -               -

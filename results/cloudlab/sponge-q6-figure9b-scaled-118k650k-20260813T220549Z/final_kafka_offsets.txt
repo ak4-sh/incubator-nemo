@@ -1,0 +1,8 @@
+nexmark-auction:0:678540
+nexmark-auction:1:678540
+nexmark-auction:2:678540
+nexmark-auction:3:678540
+nexmark-bid:0:10403875
+nexmark-bid:1:10403875
+nexmark-bid:2:10403875
+nexmark-bid:3:10403875

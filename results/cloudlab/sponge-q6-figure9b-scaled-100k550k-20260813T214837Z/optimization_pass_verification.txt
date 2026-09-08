@@ -1,0 +1,14 @@
+26/08/13 21:51:27 INFO policy.PolicyImpl: Apply DefaultParallelismPass to the DAG
+26/08/13 21:51:27 INFO policy.PolicyImpl: Apply R1ReshapingPass to the DAG
+26/08/13 21:51:27 INFO policy.PolicyImpl: Apply R2ReshapingPass to the DAG
+26/08/13 21:51:27 INFO policy.PolicyImpl: Apply R3ReshapingPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply DefaultEdgeEncoderPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply DefaultEdgeDecoderPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply DefaultDataStorePass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply DefaultDataPersistencePass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply DefaultScheduleGroupPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply CompressionPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply ResourceLocalityPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply ResourceSlotPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply PipeTransferForAllEdgesPass to the DAG
+26/08/13 21:51:28 INFO policy.PolicyImpl: Apply StreamingResourceAffinityPass to the DAG

@@ -1,0 +1,22 @@
+26/08/28 19:28:24 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/users/akash01/hadoop/share/hadoop/common/lib/hadoop-auth-2.7.2.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+Application Report : 
+	Application-Id : application_1787939630113_0001
+	Application-Name : sponge-q6-c6525-repeated-scale-100k375k-20260828T191034Z
+	Application-Type : YARN
+	User : akash01
+	Queue : default
+	Start-Time : 1787944342165
+	Finish-Time : 0
+	Progress : 0%
+	State : RUNNING
+	Final-State : UNDEFINED
+	Tracking-URL : N/A
+	RPC Port : -1
+	AM Host : node5
+	Aggregate Resource Allocation : 546639217 MB-seconds, 5717 vcore-seconds
+	Diagnostics : 

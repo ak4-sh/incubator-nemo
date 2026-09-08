@@ -1,0 +1,17 @@
+{
+  "aggregateColumnsRequireAllTopics": true,
+  "collectorIntervalMs": 5000,
+  "consumerGroup": "sponge-sponge-q6-sine-60k450k-peak45-20260813T2057Z",
+  "expectedPartitionsPerTopic": 4,
+  "jobId": "sponge-q6-sine-60k450k-peak45-20260813T2057Z",
+  "kafkaCommandMode": "local",
+  "queueTimeAggregation": "current collector window only; mean one-second intervals per task, then unweighted mean across tasks",
+  "queueTimeRollingHistory": false,
+  "queueTimeSamplingEveryRecords": 1000,
+  "queueTimeScope": "aggregate across source tasks; topic identity unavailable",
+  "sourceQueueReportIntervalMs": 1000,
+  "topics": [
+    "nexmark-auction",
+    "nexmark-bid"
+  ]
+}

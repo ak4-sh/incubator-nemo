@@ -1,0 +1,576 @@
+{
+  "cleanupErrors": [],
+  "configPath": "/users/akash01/casp-builds/nemo-original-sponge-holostream/scripts/cloudlab/holostream/config/sponge_hardware_matched_q6_figure9b_scaled_118k650k.json",
+  "configSha256": "8f5a9b89a18398b388d7c4db342dee9a191872b9536306d137ee4e41e6ad097d",
+  "durationMs": 258191,
+  "emittedPhases": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "endedMs": 1786659257197,
+  "error": "",
+  "expectedAuctionPerPartition": 678540,
+  "expectedAuctionTotal": 2714160,
+  "expectedBidPerPartition": 10403875,
+  "expectedBidTotal": 41615500,
+  "finalAuctionOffsets": {
+    "0": 678540,
+    "1": 678540,
+    "2": 678540,
+    "3": 678540
+  },
+  "finalBidOffsets": {
+    "0": 10403875,
+    "1": 10403875,
+    "2": 10403875,
+    "3": 10403875
+  },
+  "offsetSnapshots": [
+    {
+      "auctionOffsets": {
+        "0": 3618,
+        "1": 1809,
+        "2": 1809,
+        "3": 1809
+      },
+      "bidOffsets": {
+        "0": 138680,
+        "1": 110944,
+        "2": 110944,
+        "3": 110944
+      },
+      "timestampMs": 1786659012557
+    },
+    {
+      "auctionOffsets": {
+        "0": 23517,
+        "1": 21708,
+        "2": 21708,
+        "3": 21708
+      },
+      "bidOffsets": {
+        "0": 443776,
+        "1": 416040,
+        "2": 416040,
+        "3": 416040
+      },
+      "timestampMs": 1786659023150
+    },
+    {
+      "auctionOffsets": {
+        "0": 41607,
+        "1": 39798,
+        "2": 39798,
+        "3": 39798
+      },
+      "bidOffsets": {
+        "0": 721136,
+        "1": 693400,
+        "2": 693400,
+        "3": 693400
+      },
+      "timestampMs": 1786659033621
+    },
+    {
+      "auctionOffsets": {
+        "0": 61506,
+        "1": 59697,
+        "2": 59697,
+        "3": 59697
+      },
+      "bidOffsets": {
+        "0": 1026232,
+        "1": 998496,
+        "2": 998496,
+        "3": 998496
+      },
+      "timestampMs": 1786659044128
+    },
+    {
+      "auctionOffsets": {
+        "0": 79596,
+        "1": 77787,
+        "2": 77787,
+        "3": 77787
+      },
+      "bidOffsets": {
+        "0": 1303592,
+        "1": 1275856,
+        "2": 1275856,
+        "3": 1275856
+      },
+      "timestampMs": 1786659054627
+    },
+    {
+      "auctionOffsets": {
+        "0": 99495,
+        "1": 97686,
+        "2": 97686,
+        "3": 97686
+      },
+      "bidOffsets": {
+        "0": 1608688,
+        "1": 1580952,
+        "2": 1580952,
+        "3": 1580952
+      },
+      "timestampMs": 1786659065193
+    },
+    {
+      "auctionOffsets": {
+        "0": 117585,
+        "1": 115776,
+        "2": 115776,
+        "3": 115776
+      },
+      "bidOffsets": {
+        "0": 1886048,
+        "1": 1858312,
+        "2": 1858312,
+        "3": 1858312
+      },
+      "timestampMs": 1786659075635
+    },
+    {
+      "auctionOffsets": {
+        "0": 137484,
+        "1": 135675,
+        "2": 135675,
+        "3": 135675
+      },
+      "bidOffsets": {
+        "0": 2191144,
+        "1": 2163408,
+        "2": 2163408,
+        "3": 2163408
+      },
+      "timestampMs": 1786659086180
+    },
+    {
+      "auctionOffsets": {
+        "0": 155574,
+        "1": 153765,
+        "2": 153765,
+        "3": 153765
+      },
+      "bidOffsets": {
+        "0": 2468504,
+        "1": 2440768,
+        "2": 2440768,
+        "3": 2440768
+      },
+      "timestampMs": 1786659096559
+    },
+    {
+      "auctionOffsets": {
+        "0": 175473,
+        "1": 173664,
+        "2": 173664,
+        "3": 173664
+      },
+      "bidOffsets": {
+        "0": 2773600,
+        "1": 2737042,
+        "2": 2744661,
+        "3": 2739824
+      },
+      "timestampMs": 1786659107089
+    },
+    {
+      "auctionOffsets": {
+        "0": 193563,
+        "1": 191754,
+        "2": 191754,
+        "3": 191754
+      },
+      "bidOffsets": {
+        "0": 3050960,
+        "1": 3023224,
+        "2": 3023224,
+        "3": 3023224
+      },
+      "timestampMs": 1786659117742
+    },
+    {
+      "auctionOffsets": {
+        "0": 213462,
+        "1": 211653,
+        "2": 211653,
+        "3": 211653
+      },
+      "bidOffsets": {
+        "0": 3356056,
+        "1": 3328320,
+        "2": 3328320,
+        "3": 3328320
+      },
+      "timestampMs": 1786659128372
+    },
+    {
+      "auctionOffsets": {
+        "0": 235533,
+        "1": 230829,
+        "2": 231793,
+        "3": 230829
+      },
+      "bidOffsets": {
+        "0": 3706364,
+        "1": 3647285,
+        "2": 3647285,
+        "3": 3647285
+      },
+      "timestampMs": 1786659138810
+    },
+    {
+      "auctionOffsets": {
+        "0": 280666,
+        "1": 274787,
+        "2": 274787,
+        "3": 274787
+      },
+      "bidOffsets": {
+        "0": 4636372,
+        "1": 4514886,
+        "2": 4511226,
+        "3": 4514886
+      },
+      "timestampMs": 1786659149341
+    },
+    {
+      "auctionOffsets": {
+        "0": 373190,
+        "1": 354378,
+        "2": 355332,
+        "3": 354378
+      },
+      "bidOffsets": {
+        "0": 6027082,
+        "1": 5874531,
+        "2": 5874531,
+        "3": 5874531
+      },
+      "timestampMs": 1786659159865
+    },
+    {
+      "auctionOffsets": {
+        "0": 469965,
+        "1": 460559,
+        "2": 460559,
+        "3": 460559
+      },
+      "bidOffsets": {
+        "0": 7570343,
+        "1": 7448857,
+        "2": 7446334,
+        "3": 7426749
+      },
+      "timestampMs": 1786659170314
+    },
+    {
+      "auctionOffsets": {
+        "0": 542828,
+        "1": 538975,
+        "2": 538975,
+        "3": 536433
+      },
+      "bidOffsets": {
+        "0": 8441272,
+        "1": 8382193,
+        "2": 8382193,
+        "3": 8382193
+      },
+      "timestampMs": 1786659180919
+    },
+    {
+      "auctionOffsets": {
+        "0": 571809,
+        "1": 570000,
+        "2": 570000,
+        "3": 570000
+      },
+      "bidOffsets": {
+        "0": 8850659,
+        "1": 8822923,
+        "2": 8822923,
+        "3": 8822923
+      },
+      "timestampMs": 1786659191553
+    },
+    {
+      "auctionOffsets": {
+        "0": 591708,
+        "1": 589899,
+        "2": 589899,
+        "3": 589899
+      },
+      "bidOffsets": {
+        "0": 9155755,
+        "1": 9107118,
+        "2": 9104557,
+        "3": 9105528
+      },
+      "timestampMs": 1786659202105
+    },
+    {
+      "auctionOffsets": {
+        "0": 609798,
+        "1": 607989,
+        "2": 607989,
+        "3": 607989
+      },
+      "bidOffsets": {
+        "0": 9433115,
+        "1": 9405379,
+        "2": 9405379,
+        "3": 9405379
+      },
+      "timestampMs": 1786659212540
+    },
+    {
+      "auctionOffsets": {
+        "0": 629697,
+        "1": 627888,
+        "2": 627888,
+        "3": 627888
+      },
+      "bidOffsets": {
+        "0": 9721368,
+        "1": 9682739,
+        "2": 9682739,
+        "3": 9682739
+      },
+      "timestampMs": 1786659223059
+    },
+    {
+      "auctionOffsets": {
+        "0": 647787,
+        "1": 645978,
+        "2": 645978,
+        "3": 645978
+      },
+      "bidOffsets": {
+        "0": 10015571,
+        "1": 9987835,
+        "2": 9987835,
+        "3": 9987835
+      },
+      "timestampMs": 1786659233637
+    },
+    {
+      "auctionOffsets": {
+        "0": 667686,
+        "1": 665877,
+        "2": 665877,
+        "3": 665877
+      },
+      "bidOffsets": {
+        "0": 10320667,
+        "1": 10292931,
+        "2": 10292931,
+        "3": 10292931
+      },
+      "timestampMs": 1786659244240
+    },
+    {
+      "auctionOffsets": {
+        "0": 678540,
+        "1": 678540,
+        "2": 678540,
+        "3": 678540
+      },
+      "bidOffsets": {
+        "0": 10403875,
+        "1": 10403875,
+        "2": 10403875,
+        "3": 10403875
+      },
+      "timestampMs": 1786659254779
+    }
+  ],
+  "phases": [
+    {
+      "auctionPerReplica": 217080,
+      "bidPerReplica": 3328320,
+      "cumulativeAuctionPerReplica": 217080,
+      "cumulativeBidPerReplica": 3328320,
+      "durationSec": 120.0,
+      "phase": 1,
+      "targetRate": 118180.0
+    },
+    {
+      "auctionPerReplica": 9045,
+      "bidPerReplica": 138680,
+      "cumulativeAuctionPerReplica": 226125,
+      "cumulativeBidPerReplica": 3467000,
+      "durationSec": 5.0,
+      "phase": 2,
+      "targetRate": 118180.0
+    },
+    {
+      "auctionPerReplica": 11760,
+      "bidPerReplica": 180285,
+      "cumulativeAuctionPerReplica": 237885,
+      "cumulativeBidPerReplica": 3647285,
+      "durationSec": 5.0,
+      "phase": 3,
+      "targetRate": 153636.0
+    },
+    {
+      "auctionPerReplica": 19265,
+      "bidPerReplica": 295395,
+      "cumulativeAuctionPerReplica": 257150,
+      "cumulativeBidPerReplica": 3942680,
+      "durationSec": 5.0,
+      "phase": 4,
+      "targetRate": 251728.0
+    },
+    {
+      "auctionPerReplica": 29395,
+      "bidPerReplica": 450720,
+      "cumulativeAuctionPerReplica": 286545,
+      "cumulativeBidPerReplica": 4393400,
+      "durationSec": 5.0,
+      "phase": 5,
+      "targetRate": 384092.0
+    },
+    {
+      "auctionPerReplica": 39615,
+      "bidPerReplica": 607430,
+      "cumulativeAuctionPerReplica": 326160,
+      "cumulativeBidPerReplica": 5000830,
+      "durationSec": 5.0,
+      "phase": 6,
+      "targetRate": 517636.0
+    },
+    {
+      "auctionPerReplica": 47030,
+      "bidPerReplica": 721150,
+      "cumulativeAuctionPerReplica": 373190,
+      "cumulativeBidPerReplica": 5721980,
+      "durationSec": 5.0,
+      "phase": 7,
+      "targetRate": 614544.0
+    },
+    {
+      "auctionPerReplica": 49745,
+      "bidPerReplica": 762755,
+      "cumulativeAuctionPerReplica": 422935,
+      "cumulativeBidPerReplica": 6484735,
+      "durationSec": 5.0,
+      "phase": 8,
+      "targetRate": 650000.0
+    },
+    {
+      "auctionPerReplica": 47030,
+      "bidPerReplica": 721150,
+      "cumulativeAuctionPerReplica": 469965,
+      "cumulativeBidPerReplica": 7205885,
+      "durationSec": 5.0,
+      "phase": 9,
+      "targetRate": 614544.0
+    },
+    {
+      "auctionPerReplica": 39615,
+      "bidPerReplica": 607430,
+      "cumulativeAuctionPerReplica": 509580,
+      "cumulativeBidPerReplica": 7813315,
+      "durationSec": 5.0,
+      "phase": 10,
+      "targetRate": 517636.0
+    },
+    {
+      "auctionPerReplica": 29395,
+      "bidPerReplica": 450720,
+      "cumulativeAuctionPerReplica": 538975,
+      "cumulativeBidPerReplica": 8264035,
+      "durationSec": 5.0,
+      "phase": 11,
+      "targetRate": 384092.0
+    },
+    {
+      "auctionPerReplica": 19265,
+      "bidPerReplica": 295395,
+      "cumulativeAuctionPerReplica": 558240,
+      "cumulativeBidPerReplica": 8559430,
+      "durationSec": 5.0,
+      "phase": 12,
+      "targetRate": 251728.0
+    },
+    {
+      "auctionPerReplica": 11760,
+      "bidPerReplica": 180285,
+      "cumulativeAuctionPerReplica": 570000,
+      "cumulativeBidPerReplica": 8739715,
+      "durationSec": 5.0,
+      "phase": 13,
+      "targetRate": 153636.0
+    },
+    {
+      "auctionPerReplica": 108540,
+      "bidPerReplica": 1664160,
+      "cumulativeAuctionPerReplica": 678540,
+      "cumulativeBidPerReplica": 10403875,
+      "durationSec": 60.0,
+      "phase": 14,
+      "targetRate": 118180.0
+    }
+  ],
+  "producerSha256ByHost": {
+    "node0": "67dd182d4367829ae227dfab8edb61fa64c26fecbe9a30b91c1c94a5f5ea1bf6"
+  },
+  "replicaResults": [
+    {
+      "auctionOffset": 678540,
+      "bidOffset": 10403875,
+      "cleanupError": "",
+      "exitCode": 255,
+      "host": "node0",
+      "replica": 0,
+      "termination": "SIGTERM"
+    },
+    {
+      "auctionOffset": 678540,
+      "bidOffset": 10403875,
+      "cleanupError": "",
+      "exitCode": 255,
+      "host": "node0",
+      "replica": 1,
+      "termination": "SIGTERM"
+    },
+    {
+      "auctionOffset": 678540,
+      "bidOffset": 10403875,
+      "cleanupError": "",
+      "exitCode": 255,
+      "host": "node0",
+      "replica": 2,
+      "termination": "SIGTERM"
+    },
+    {
+      "auctionOffset": 678540,
+      "bidOffset": 10403875,
+      "cleanupError": "",
+      "exitCode": 255,
+      "host": "node0",
+      "replica": 3,
+      "termination": "SIGTERM"
+    }
+  ],
+  "replicas": 4,
+  "runId": "sponge-q6-figure9b-scaled-118k650k-20260813T220549Z",
+  "startedMs": 1786658999006,
+  "status": "success",
+  "workDir": "/users/akash01/holostream-producer-ref-2217278"
+}

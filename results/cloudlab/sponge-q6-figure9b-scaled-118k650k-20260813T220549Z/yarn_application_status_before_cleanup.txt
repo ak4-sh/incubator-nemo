@@ -1,0 +1,17 @@
+26/08/13 22:15:36 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Application Report : 
+	Application-Id : application_1786658675876_0001
+	Application-Name : sponge-q6-figure9b-scaled-118k650k-20260813T220549Z
+	Application-Type : YARN
+	User : akash01
+	Queue : default
+	Start-Time : 1786658890136
+	Finish-Time : 0
+	Progress : 0%
+	State : RUNNING
+	Final-State : UNDEFINED
+	Tracking-URL : N/A
+	RPC Port : -1
+	AM Host : node10
+	Aggregate Resource Allocation : 249629561 MB-seconds, 2616 vcore-seconds
+	Diagnostics : 

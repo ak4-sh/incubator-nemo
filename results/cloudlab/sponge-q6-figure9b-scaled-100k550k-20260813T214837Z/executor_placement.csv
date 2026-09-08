@@ -1,0 +1,6 @@
+timestamp,jobId,executorId,executorType,containerId,requestedHost,physicalHost,placementPassed
+1786657885550,sponge-q6-figure9b-scaled-100k550k-20260813T214837Z,Executor3,Compute,container_1786657206356_0001_01_000005,node11-link-1,node11-link-1,true
+1786657886643,sponge-q6-figure9b-scaled-100k550k-20260813T214837Z,Executor2,Compute,container_1786657206356_0001_01_000004,node10-link-1,node10-link-1,true
+1786657886731,sponge-q6-figure9b-scaled-100k550k-20260813T214837Z,Executor4,Compute,container_1786657206356_0001_01_000006,node12-link-1,node12-link-1,true
+1786657886732,sponge-q6-figure9b-scaled-100k550k-20260813T214837Z,Executor1,Compute,container_1786657206356_0001_01_000003,node9-link-1,node9-link-1,true
+1786657886749,sponge-q6-figure9b-scaled-100k550k-20260813T214837Z,Executor0,Source,container_1786657206356_0001_01_000002,node5-link-1,node5-link-1,true

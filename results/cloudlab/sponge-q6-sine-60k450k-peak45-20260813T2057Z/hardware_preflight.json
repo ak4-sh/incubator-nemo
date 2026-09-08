@@ -1,0 +1,175 @@
+{
+  "activeApplications": [],
+  "computeHosts": [
+    "node9-link-1",
+    "node10-link-1",
+    "node11-link-1",
+    "node12-link-1"
+  ],
+  "executorConfig": "/users/akash01/casp-builds/nemo-original-sponge-holostream/configs/cloudlab/nemo-yarn-kafka-holostream-matched-r1r2r3-node55.json",
+  "failures": [],
+  "hostProbes": [
+    {
+      "cpus": 56,
+      "host": "node5",
+      "memory_kb": 131393512,
+      "nm_count": 1,
+      "nm_java": "/usr/lib/jvm/java-11-openjdk-amd64/bin/java",
+      "raw": "cpus=56\nmemory_kb=131393512\nnm_count=1\nvmworker_count=0\nreef_count=0\nnm_java=/usr/lib/jvm/java-11-openjdk-amd64/bin/java\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node9",
+      "memory_kb": 131393488,
+      "nm_count": 1,
+      "nm_java": "/usr/lib/jvm/java-11-openjdk-amd64/bin/java",
+      "raw": "cpus=56\nmemory_kb=131393488\nnm_count=1\nvmworker_count=0\nreef_count=0\nnm_java=/usr/lib/jvm/java-11-openjdk-amd64/bin/java\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node10",
+      "memory_kb": 131393496,
+      "nm_count": 1,
+      "nm_java": "/usr/lib/jvm/java-11-openjdk-amd64/bin/java",
+      "raw": "cpus=56\nmemory_kb=131393496\nnm_count=1\nvmworker_count=0\nreef_count=0\nnm_java=/usr/lib/jvm/java-11-openjdk-amd64/bin/java\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node11",
+      "memory_kb": 131393500,
+      "nm_count": 1,
+      "nm_java": "/usr/lib/jvm/java-11-openjdk-amd64/bin/java",
+      "raw": "cpus=56\nmemory_kb=131393500\nnm_count=1\nvmworker_count=0\nreef_count=0\nnm_java=/usr/lib/jvm/java-11-openjdk-amd64/bin/java\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node12",
+      "memory_kb": 131393488,
+      "nm_count": 1,
+      "nm_java": "/usr/lib/jvm/java-11-openjdk-amd64/bin/java",
+      "raw": "cpus=56\nmemory_kb=131393488\nnm_count=1\nvmworker_count=0\nreef_count=0\nnm_java=/usr/lib/jvm/java-11-openjdk-amd64/bin/java\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node4",
+      "memory_kb": 131393484,
+      "nm_count": 0,
+      "nm_java": "",
+      "raw": "cpus=56\nmemory_kb=131393484\nnm_count=0\nvmworker_count=0\nreef_count=0\nnm_java=\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node6",
+      "memory_kb": 131393476,
+      "nm_count": 0,
+      "nm_java": "",
+      "raw": "cpus=56\nmemory_kb=131393476\nnm_count=0\nvmworker_count=0\nreef_count=0\nnm_java=\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node7",
+      "memory_kb": 131393500,
+      "nm_count": 0,
+      "nm_java": "",
+      "raw": "cpus=56\nmemory_kb=131393500\nnm_count=0\nvmworker_count=0\nreef_count=0\nnm_java=\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    },
+    {
+      "cpus": 56,
+      "host": "node8",
+      "memory_kb": 131393492,
+      "nm_count": 0,
+      "nm_java": "",
+      "raw": "cpus=56\nmemory_kb=131393492\nnm_count=0\nvmworker_count=0\nreef_count=0\nnm_java=\n",
+      "reef_count": 0,
+      "vmworker_count": 0
+    }
+  ],
+  "jobLauncherCount": 0,
+  "offloadHosts": [
+    "node4",
+    "node6",
+    "node7",
+    "node8"
+  ],
+  "passed": true,
+  "resourceManagerJava": "/users/akash01/deps/jdk8u472-b08/bin/java",
+  "resources": [
+    {
+      "capacity": 1,
+      "memory_mb": 1769,
+      "num": 0,
+      "slot": 1,
+      "type": "Transient"
+    },
+    {
+      "capacity": 1,
+      "memory_mb": 1769,
+      "num": 0,
+      "slot": 1,
+      "type": "Reserved"
+    },
+    {
+      "capacity": 55,
+      "memory_mb": 114688,
+      "num": 1,
+      "slot": 16,
+      "type": "Source"
+    },
+    {
+      "capacity": 55,
+      "memory_mb": 114688,
+      "num": 4,
+      "slot": 12,
+      "type": "Compute"
+    }
+  ],
+  "runningYarnNodes": [
+    "node10",
+    "node11",
+    "node12",
+    "node5",
+    "node9"
+  ],
+  "sourceHosts": [
+    "node5-link-1"
+  ],
+  "yarnSite": {
+    "yarn.application.classpath": "/users/akash01/hadoop/etc/hadoop,/users/akash01/hadoop/share/hadoop/common/*,/users/akash01/hadoop/share/hadoop/common/lib/*,/users/akash01/hadoop/share/hadoop/hdfs/*,/users/akash01/hadoop/share/hadoop/hdfs/lib/*,/users/akash01/hadoop/share/hadoop/yarn/*,/users/akash01/hadoop/share/hadoop/yarn/lib/*,/users/akash01/hadoop/share/hadoop/mapreduce/*,/users/akash01/hadoop/share/hadoop/mapreduce/lib/*",
+    "yarn.log-aggregation-enable": "false",
+    "yarn.nodemanager.aux-services": "mapreduce_shuffle",
+    "yarn.nodemanager.aux-services.mapreduce.shuffle.class": "org.apache.hadoop.mapred.ShuffleHandler",
+    "yarn.nodemanager.hostname": "${NM_HOST}",
+    "yarn.nodemanager.local-dirs": "/data/hadoop/yarn/local",
+    "yarn.nodemanager.log-dirs": "/data/hadoop/yarn/logs",
+    "yarn.nodemanager.pmem-check-enabled": "false",
+    "yarn.nodemanager.resource.cpu-vcores": "56",
+    "yarn.nodemanager.resource.memory-mb": "122880",
+    "yarn.nodemanager.vmem-check-enabled": "false",
+    "yarn.resourcemanager.address": "node0:8032",
+    "yarn.resourcemanager.admin.address": "node0:8033",
+    "yarn.resourcemanager.hostname": "node0",
+    "yarn.resourcemanager.resource-tracker.address": "node0:8031",
+    "yarn.resourcemanager.scheduler.address": "node0:8030",
+    "yarn.resourcemanager.webapp.address": "node0:8088",
+    "yarn.scheduler.maximum-allocation-mb": "122880",
+    "yarn.scheduler.maximum-allocation-vcores": "56",
+    "yarn.scheduler.minimum-allocation-mb": "512",
+    "yarn.scheduler.minimum-allocation-vcores": "1"
+  }
+}

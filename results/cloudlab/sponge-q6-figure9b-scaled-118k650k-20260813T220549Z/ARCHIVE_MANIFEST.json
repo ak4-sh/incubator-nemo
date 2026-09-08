@@ -1,0 +1,404 @@
+{
+  "schemaVersion": 1,
+  "archivedOn": "2026-09-08",
+  "runId": "sponge-q6-figure9b-scaled-118k650k-20260813T220549Z",
+  "scope": "Curated historical evidence; not a new run or certification of end-to-end Q6 scaling.",
+  "preservation": "All listed files remain unchanged locally. Only storage=git files are included in this commit. Local-only files are NOT backed up by Git; no remote backup is asserted.",
+  "manifestCoverage": "Original files present before curation; this generated manifest and the shared archive index are not self-hashed.",
+  "selectedBytes": 3093878,
+  "localOnlyBytes": 12691600,
+  "files": [
+    {
+      "path": "application_master.csv",
+      "bytes": 51,
+      "sha256": "12768ad8c5abc22c21ee408f9589673d47b72671b7e6873e13561fb2df204e2d",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "combined_metrics.csv",
+      "bytes": 4643,
+      "sha256": "7e6762a2dd0dabbeba69569fb91f2661087cc76b3f36380114f34cb7e1969a1c",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "evaluator_errors.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "executor_placement_verification.json",
+      "bytes": 2058,
+      "sha256": "7b4919be4d04c33bb4ab06eae03cea007e2998ae6ad1596a9c0c7264cca31ee4",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "executor_placement.csv",
+      "bytes": 870,
+      "sha256": "5a7719122fc00c58f778d7d30826888aedaf8bb9057e16bb79864edb1c2772d1",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "final_consumer_group.txt",
+      "bytes": 1520,
+      "sha256": "bcff4f3963e9b55ab8a7759d9b47efd137274ceb8a61f97b635230c92ebaed6b",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "final_kafka_offsets.txt",
+      "bytes": 192,
+      "sha256": "98442304cb7f8d31cc52f7fddd43bdb099b64e380858412bce662c0f8d7cbad5",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "final_validation.json",
+      "bytes": 632,
+      "sha256": "a0c1af02dc7142feeb8690de0503436419cbcaaefe10e0a9a00ca21c00e5e406",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "hardware_preflight.json",
+      "bytes": 5656,
+      "sha256": "d6b7fd1867c790b20a47c2022d2a1c7690b2769d4ec901167318b1090f1e12aa",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_launcher.log",
+      "bytes": 3407,
+      "sha256": "e5709fbf94bfe8e22c685c4afcc5e9a0d66ba03fba1a35d928c79a639e2ea57f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream_producer_completion.json",
+      "bytes": 12119,
+      "sha256": "b67afbff5e662997ff3c4cc267f1a1d68d48d700490b2ff335d67e3cd7e04c37",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_producer_plan.json",
+      "bytes": 3151,
+      "sha256": "c7bf3b782ba440cf8ef740672f257496bcb9015f4cd08a4cdcdb19a760b0a51b",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_producer_replicas.csv",
+      "bytes": 224,
+      "sha256": "fc5635a398a65dafd1243ec394aa22dbe3dc8e67573056b469ed9569dfa337cd",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream_topic_reset.json",
+      "bytes": 10200,
+      "sha256": "a024409ae4d28472e478245ef3964080041faeea1a51f642e7ca47810c2c0ddf",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "holostream-producer-replica-0.log",
+      "bytes": 6537,
+      "sha256": "29f668a750d54ba912d934bcf35bd9e6bd3d0a1ef12d7b572a75c57751815aa0",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream-producer-replica-1.log",
+      "bytes": 6537,
+      "sha256": "8ec8b203565dc44513bedbd86fcd3c3750955d0d0a69268ba13a3fcd19df558b",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream-producer-replica-2.log",
+      "bytes": 6537,
+      "sha256": "7fa342a2d319cc69bab195242dbf97c72adcd6e29808ce9ea044833460d96f33",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "holostream-producer-replica-3.log",
+      "bytes": 6537,
+      "sha256": "a670f5120bb212ef15c80a296c7f65f2ac3eb87125044d4d0ac5975bc1b71e68",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "kafka_input_telemetry.csv",
+      "bytes": 10056,
+      "sha256": "991305f2a32a1930bbf02cf4ad0d91175b44a165234a118cb62c865fcba75efb",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "kafka_input_telemetry.log",
+      "bytes": 2723,
+      "sha256": "f342f3e33a6f77f3abe2b59637e1df8f4829cc536a767e891723e9d0244032d1",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "kafka_input_topics.json",
+      "bytes": 678,
+      "sha256": "acb2edf8a74cb31fed4e5640edb9911b55b1880fea94b981b866fd53ef68cec7",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "kafka_topic_metrics.csv",
+      "bytes": 2388,
+      "sha256": "3574202f84f1a68fc3c98bb778f02c26638c7d42e324dc973cff1f9dfb5404a6",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "metrics_collector.log",
+      "bytes": 3027,
+      "sha256": "af5ce01cd891b2047b79b85214efaa40f1dc866383ad41cb23396c878aa63ce4",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "optimization_pass_verification.txt",
+      "bytes": 1128,
+      "sha256": "997b7d2072a4d8d3eb20b8a66ca9daf9b87801c1ea51f8fbc4627e3010758069",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plan-logical.json",
+      "bytes": 104838,
+      "sha256": "fc7e407a00030a9e820740c00d96ca234ab0cd52f5d9ade14d5148c495e4fbf7",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plots/cpu.png",
+      "bytes": 111707,
+      "sha256": "d0a8e5ef8ba935542a43ec50841f5e901ae1e24a51841f34f2b77a5cca9ba794",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plots/input_rate.png",
+      "bytes": 126304,
+      "sha256": "eb970d638791ce0313e54c969e2c26b21eeaf20df2daec3d3783a63a20937bdb",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plots/kafka_source_lag.png",
+      "bytes": 111713,
+      "sha256": "22eab87e60610d962916aa9d75a377e5ba6ac033d4a610cb4d1b8f892fb5e37a",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plots/kafka_topic_lag.png",
+      "bytes": 148592,
+      "sha256": "fd163cc445ad9901c4d226a496e76ac1f38f3ab7d56bc284611ae74466a8e26d",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plots/kafka_topic_rates.png",
+      "bytes": 131561,
+      "sha256": "a3a36d368a0d663cbd41bcbfa677dce1633589cdda8deca91934564267b1f784",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plots/source_kafka_queue_time_by_task.png",
+      "bytes": 202520,
+      "sha256": "151abaa2e8f3fffdc527fe1281023548b52f4f31cb733191dd7992656a962bb0",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "plots/source_kafka_queue_time.png",
+      "bytes": 180634,
+      "sha256": "0fdb20463236e27fafe7bb35b79fb07740f4c71022a123607aa1e4189b087139",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "producer_phases.csv",
+      "bytes": 762,
+      "sha256": "5a148c09c3398c79a9073edce6dcf17ede27f44e963cd11df51534c86dfe5c7d",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "remote_tmp_metrics/node5/source_task_metrics.csv",
+      "bytes": 143760,
+      "sha256": "51d49f008b6b7a07f6ec91c7e8237b6163b49e763e893fc172ce19006ffc0c07",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/driver.stderr",
+      "bytes": 1740655,
+      "sha256": "96caf2ce3c5621d364b71511411ad6d7f9051e96e1eb8b26f871ad02309fca01",
+      "storage": "git",
+      "reason": "Driver trace retained for scaler and failure evidence"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node10-Executor2-evaluator.stderr",
+      "bytes": 2291749,
+      "sha256": "21a99f9e681aaba5fc75193fa2adec27a6aeaa8b78d6d10127973b63059f8f03",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node10-Executor2-evaluator.stdout",
+      "bytes": 13175,
+      "sha256": "26c0822cac2e7142c1381ded2b824105f96a16622544875ccf5f67dcb93b6a8d",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node11-Executor3-evaluator.stderr",
+      "bytes": 2302993,
+      "sha256": "b831efd44616c134832019348dbb9b80d5641a2cd217880b2143795b7ecf2b86",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node11-Executor3-evaluator.stdout",
+      "bytes": 13174,
+      "sha256": "c46d9fb6d35125693bc5c0ab984cf4c44ed5a579dd665fcb8626b10d67145377",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node12-Executor4-evaluator.stderr",
+      "bytes": 2308709,
+      "sha256": "90bab9be9961922225110179a5f6f4fb1dd8c8012196dd31e7c1b768cb198777",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node12-Executor4-evaluator.stdout",
+      "bytes": 13177,
+      "sha256": "d335301c102a118476315414c7632abad23b95c74ce1de93faee64608515ac0a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node5-Executor0-evaluator.stderr",
+      "bytes": 3210277,
+      "sha256": "275180d2b7f089760878d58cae5f80d45f33c06d795baa137cde7215ef4bb84a",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node5-Executor0-evaluator.stdout",
+      "bytes": 8783,
+      "sha256": "4deea1cc8942708c349f01974b2ffb812dfe3b17590ff4e60efb29b02cd342c2",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node9-Executor1-evaluator.stderr",
+      "bytes": 2304336,
+      "sha256": "5ea229c4085cfa341949c387b7ee831ed684a4ea4446789a63babb359e535909",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "remote_tmp_metrics/yarn_logs/node9-Executor1-evaluator.stdout",
+      "bytes": 13081,
+      "sha256": "6fdb4ea01273116b177f60c38148b17c5a0b4f1c0b3f6ca57df6687fdf1ed839",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "RUN_SUMMARY.md",
+      "bytes": 2806,
+      "sha256": "07ace0f3e3d23f56a9de5e4ae230b61ea465ccf1e02b40dff4fc130510511a15",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "scaler_enable.csv",
+      "bytes": 71,
+      "sha256": "4b315215fb078493dd0912d20f4fcb95866a3fb0006a509c5ed8aac686d8d00a",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "scaler_metrics.csv",
+      "bytes": 2552,
+      "sha256": "ef7c3cac1c77dff1f516d022b0fea4d5c89fe44024c27586c3462dd343946178",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "scaling.txt",
+      "bytes": 65,
+      "sha256": "62d11df079a35d920b9ffa5e2d937928541ac37c6e56474d8610bb8dc75d6848",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source_aggregate_metrics.csv",
+      "bytes": 27696,
+      "sha256": "c6c3520596fd66f2de7f25f5b4cfdaec235f903d06c158ba78a5ba2952e021e8",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source_root_execution_verification.txt",
+      "bytes": 925,
+      "sha256": "4816dfa9aa6fa89ea870804b1a4a5012ad1cc9e6afe1b5f0ea35b6f5541cabad",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source_root_stages.csv",
+      "bytes": 9,
+      "sha256": "120a2dbed1b70f19050666842ea38edc8be6a779d5d02f5efbd0457defd00565",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "source.log",
+      "bytes": 3462,
+      "sha256": "d21033c83b568b2c4a1f1fdc27faccea06ecbefa79fa08523c89236ab894fd3e",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "subscriber.log",
+      "bytes": 173379,
+      "sha256": "5139bbc534e7509b907d4b9ae22fa37f0cb6ba79aff3d08283f90bd0604cdf7f",
+      "storage": "local-only",
+      "reason": "Bulk raw log or log bundle, retained only on local filesystem"
+    },
+    {
+      "path": "yarn_application_status_before_cleanup.txt",
+      "bytes": 539,
+      "sha256": "4ca989c24e5ba8e71ab7f409d19d94779373b6bde84efec7e2ae7539d7a25142",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    },
+    {
+      "path": "yarn_nodes_before_cleanup.txt",
+      "bytes": 603,
+      "sha256": "89516fecb34b377d030a2399997de56fb90ffa1cabf768fa3ed2a4dedc641ab3",
+      "storage": "git",
+      "reason": "Metrics, validation, plan, plot, summary, or runtime command"
+    }
+  ]
+}

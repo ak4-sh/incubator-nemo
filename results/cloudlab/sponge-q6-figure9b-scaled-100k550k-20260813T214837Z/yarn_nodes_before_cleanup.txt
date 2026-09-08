@@ -1,0 +1,8 @@
+26/08/13 21:58:35 INFO client.RMProxy: Connecting to ResourceManager at node0/10.10.1.1:8032
+Total Nodes:5
+         Node-Id	     Node-State	Node-Http-Address	Number-of-Running-Containers
+node11-link-1:45701	        RUNNING	node11-link-1:8042	                           2
+node12-link-1:37779	        RUNNING	node12-link-1:8042	                           1
+node10-link-1:45637	        RUNNING	node10-link-1:8042	                           1
+node9-link-1:43135	        RUNNING	node9-link-1:8042	                           1
+node5-link-1:44537	        RUNNING	node5-link-1:8042	                           1
