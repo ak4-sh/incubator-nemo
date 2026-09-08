@@ -141,6 +141,11 @@ public final class DefaultExecutorRepresenterImpl implements ExecutorRepresenter
     }
   }
 
+  static boolean shouldWaitForWorkerActivation(final WorkerControlProxy workerControlProxy) {
+    return !workerControlProxy.isActive()
+      && (workerControlProxy.requiresActivationAcknowledgement() || !workerControlProxy.isActivating());
+  }
+
   private void sendRoutingSignal(final String taskId, final String pairVmTaskId, ExecutorRepresenter vmExecutor) {
     // waiting
     waitForActivation();
@@ -496,10 +501,12 @@ public final class DefaultExecutorRepresenterImpl implements ExecutorRepresenter
       serializedTaskMap.setSerializedTask(task.getTaskId(), bos.toByteArray());
 
       if (lambdaControlProxy != null && RuntimeIdManager.isLambdaExecutorId(executorId)) {
-        if (lambdaControlProxy.isActive() || lambdaControlProxy.isActivating()) {
-          // just send task
-        } else {
+        if (shouldWaitForWorkerActivation(lambdaControlProxy)) {
+          LOG.info("SPONGE_WORKER_REACTIVATION transition=TASK_WAIT executorId={} taskId={}",
+            executorId, task.getTaskId());
           waitForActivation();
+          LOG.info("SPONGE_WORKER_REACTIVATION transition=TASK_RELEASE executorId={} taskId={}",
+            executorId, task.getTaskId());
         }
       }
 

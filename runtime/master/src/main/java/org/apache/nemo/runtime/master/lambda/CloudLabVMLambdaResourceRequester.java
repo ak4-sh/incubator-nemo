@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -113,25 +114,77 @@ public final class CloudLabVMLambdaResourceRequester implements LambdaContainerR
     final Channel openChannel = channelFuture.channel();
     LOG.info("Open channel for CloudLab VM worker {}: {}", vmAddress, openChannel);
 
-    final byte[] bytes = String.format("{\"address\":\"%s\", \"port\": %d, \"requestId\": %d}",
-      controlAddr, controlPort, requestId).getBytes();
-    openChannel.writeAndFlush(new OffloadingMasterEvent(
-      OffloadingMasterEvent.Type.SEND_ADDRESS, bytes, bytes.length));
+    final CloudLabVMActivator activator = new CloudLabVMActivator(
+      openChannel, controlAddr, controlPort, requestId, executorId);
+    activator.startInitialInvocation();
+    return activator;
+  }
 
-    return new LambdaActivator() {
-      @Override
-      public void activate() {
+  /**
+   * Starts one Lambda-equivalent invocation in a persistent CloudLab VMWorker.
+   *
+   * <p>A VMWorker process is the warm execution environment, not the invocation itself. Each
+   * SEND_ADDRESS request makes VMWorker submit {@code OffloadingHandler.handleRequest()}, whose
+   * lifetime is bounded by one matching END. Re-sending SEND_ADDRESS on activation therefore
+   * preserves the invocation boundary used by the AWS backend.</p>
+   */
+  static final class CloudLabVMActivator implements LambdaActivator {
+    private final Channel requestChannel;
+    private final String controlAddr;
+    private final int controlPort;
+    private final int requestId;
+    private final String executorId;
+    private final AtomicInteger invocationSequence = new AtomicInteger(0);
+
+    CloudLabVMActivator(final Channel requestChannel,
+                        final String controlAddr,
+                        final int controlPort,
+                        final int requestId,
+                        final String executorId) {
+      this.requestChannel = requestChannel;
+      this.controlAddr = controlAddr;
+      this.controlPort = controlPort;
+      this.requestId = requestId;
+      this.executorId = executorId;
+    }
+
+    void startInitialInvocation() {
+      startInvocation("INITIAL");
+    }
+
+    @Override
+    public void activate() {
+      startInvocation("REACTIVATION");
+    }
+
+    private synchronized void startInvocation(final String reason) {
+      if (!requestChannel.isOpen() || !requestChannel.isActive()) {
+        throw new RuntimeException("CloudLab VM worker channel is unavailable for requestId "
+          + requestId + "/" + executorId);
       }
 
-      @Override
-      public int getRequestId() {
-        return requestId;
-      }
+      final int invocation = invocationSequence.incrementAndGet();
+      final byte[] bytes = String.format(
+        "{\"address\":\"%s\", \"port\": %d, \"requestId\": %d, "
+          + "\"invocationSequence\": %d, \"activationReason\": \"%s\"}",
+        controlAddr, controlPort, requestId, invocation, reason)
+        .getBytes(StandardCharsets.UTF_8);
 
-      @Override
-      public String getExecutorId() {
-        return executorId;
-      }
-    };
+      LOG.info("SPONGE_WORKER_INVOCATION backend=cloudlab-vm "
+          + "transition=INVOCATION_REQUESTED requestId={} executorId={} invocation={} reason={}",
+        requestId, executorId, invocation, reason);
+      requestChannel.writeAndFlush(new OffloadingMasterEvent(
+        OffloadingMasterEvent.Type.SEND_ADDRESS, bytes, bytes.length));
+    }
+
+    @Override
+    public int getRequestId() {
+      return requestId;
+    }
+
+    @Override
+    public String getExecutorId() {
+      return executorId;
+    }
   }
 }

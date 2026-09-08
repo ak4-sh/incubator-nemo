@@ -166,7 +166,8 @@ public final class LambdaContainerManager {
             final WorkerControlProxy proxy = new WorkerControlProxy(
               requestId, requestIdExecutorMap.get(requestId), pair.left(),
               clientRPC,
-              requestIdActivatorMap.get(requestId), pendingActivationWorkers);
+              requestIdActivatorMap.get(requestId), pendingActivationWorkers,
+              evalConf.safeWorkerReactivation);
 
             requestIdHandlerMap.put(requestId, proxy);
             requestIdControlChannelMap.put(requestId, proxy);

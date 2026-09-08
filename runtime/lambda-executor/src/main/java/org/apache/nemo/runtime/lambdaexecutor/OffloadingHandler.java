@@ -658,15 +658,6 @@ public final class OffloadingHandler {
 
           break;
         }
-        case ACTIVATE: {
-          // Driver sent ACTIVATE; echo ACTIVATE back so the driver sets proxy state to ACTIVE
-          final ByteBuf buf = controlChannel.alloc().ioBuffer(Integer.BYTES).writeInt(requestId);
-          controlChannel.writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.ACTIVATE, buf));
-          if (nemoEvent.getByteBuf() != null) {
-            nemoEvent.getByteBuf().release();
-          }
-          break;
-        }
         case TASK_SEND: {
           final long st = System.currentTimeMillis();
           Thread.currentThread().setContextClassLoader(classLoader);

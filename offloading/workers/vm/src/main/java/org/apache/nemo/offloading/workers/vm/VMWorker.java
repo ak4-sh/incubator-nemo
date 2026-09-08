@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -94,13 +95,25 @@ public class VMWorker {
             final byte[] bytes = new byte[event.getByteBuf().readableBytes()];
             event.getByteBuf().readBytes(bytes);
 
-            final String str = new String(bytes);
+            final String str = new String(bytes, StandardCharsets.UTF_8);
             System.out.println("Receive request " + str);
             final JSONObject jsonObj = new JSONObject(str);
             final Map<String, Object> map = VMWorkerUtils.jsonToMap(jsonObj);
-            final Future future = singleThread.submit(() -> {
-              handler.handleRequest(map, null);
-              handlerQueue.add(handler);
+            final int requestId = jsonObj.optInt("requestId", -1);
+            final int invocationSequence = jsonObj.optInt("invocationSequence", 0);
+            final String activationReason = jsonObj.optString("activationReason", "LEGACY");
+            final Future<?> future = singleThread.submit(() -> {
+              LOG.info("SPONGE_WORKER_INVOCATION backend=cloudlab-vm "
+                  + "transition=INVOCATION_STARTED requestId={} invocation={} reason={}",
+                requestId, invocationSequence, activationReason);
+              try {
+                handler.handleRequest(map, null);
+              } finally {
+                handlerQueue.add(handler);
+                LOG.info("SPONGE_WORKER_INVOCATION backend=cloudlab-vm "
+                    + "transition=INVOCATION_FINISHED requestId={} invocation={} reason={}",
+                  requestId, invocationSequence, activationReason);
+              }
             });
 
             try {

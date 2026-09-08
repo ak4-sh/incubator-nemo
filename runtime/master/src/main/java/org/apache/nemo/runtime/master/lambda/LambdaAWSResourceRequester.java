@@ -39,11 +39,7 @@ public final class LambdaAWSResourceRequester implements LambdaContainerRequeste
   private LambdaAWSResourceRequester(final EvalConf evalConf) {
     final ProfileCredentialsProvider provider = new ProfileCredentialsProvider(evalConf.awsProfileName);
     this.maxLambda = evalConf.numMaxLambda;
-    this.lambdaCreated = new Boolean[maxLambda];
-
-    for (int i = 0; i < maxLambda; i++) {
-      lambdaCreated[i] = false;
-    }
+    this.lambdaCreated = newLambdaSlots(maxLambda);
 
     this.awsLambda = AWSLambdaAsyncClientBuilder.standard()
       .withRegion(evalConf.awsRegion)
@@ -52,6 +48,21 @@ public final class LambdaAWSResourceRequester implements LambdaContainerRequeste
         new ClientConfiguration().withMaxConnections(500)).build();
 
     // Registration
+  }
+
+  /** Test-only constructor which avoids creating a real AWS client. */
+  LambdaAWSResourceRequester(final AWSLambdaAsync awsLambda, final int maxLambda) {
+    this.awsLambda = awsLambda;
+    this.maxLambda = maxLambda;
+    this.lambdaCreated = newLambdaSlots(maxLambda);
+  }
+
+  private static Boolean[] newLambdaSlots(final int maxLambda) {
+    final Boolean[] slots = new Boolean[maxLambda];
+    for (int i = 0; i < maxLambda; i++) {
+      slots[i] = false;
+    }
+    return slots;
   }
 
   private int findNextFreeLambda() {

@@ -1,6 +1,5 @@
 package org.apache.nemo.runtime.master;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.Channel;
 import org.apache.nemo.offloading.common.EventHandler;
@@ -45,19 +44,26 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
   private final Set<WorkerControlProxy> pendingActivationWorkers;
   private final LambdaContainerRequester.LambdaActivator activator;
   private final ClientRPC clientRPC;
+  private final boolean safeWorkerReactivation;
+
+  // Guarded by state. Multiple scheduling requests may arrive before END is acknowledged,
+  // but they must result in exactly one subsequent activation attempt.
+  private boolean reactivationPending;
 
   public WorkerControlProxy(final int requestId,
                             final String executorId,
                             final Channel controlChannel,
                             final ClientRPC clientRPC,
                             final LambdaContainerRequester.LambdaActivator activator,
-                            final Set<WorkerControlProxy> pendingActivationWorkers) {
+                            final Set<WorkerControlProxy> pendingActivationWorkers,
+                            final boolean safeWorkerReactivation) {
     this.requestId = requestId;
     this.executorId = executorId;
     this.clientRPC = clientRPC;
     this.controlChannel = controlChannel;
     this.pendingActivationWorkers = pendingActivationWorkers;
     this.activator = activator;
+    this.safeWorkerReactivation = safeWorkerReactivation;
     this.state = new AtomicReference<>(State.ACTIVATE);
     recordActiveWorkerState("REGISTERED_ACTIVE");
   }
@@ -77,7 +83,10 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
   public void setDataChannel(ExecutorRepresenter er,
                              final String fullAddr) {
 
-    state.set(State.ACTIVATE);
+    synchronized (state) {
+      state.set(State.ACTIVATE);
+      state.notifyAll();
+    }
 
     this.er = er;
     this.dataFullAddr = fullAddr;
@@ -108,22 +117,59 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
   }
 
   public void activate() {
+    boolean startActivation = false;
     synchronized (state) {
       if (state.get().equals(DEACTIVATE)) {
-        LOG.info("Send activate message for worker {}", requestId);
         state.set(ACTIVATING);
-        synchronized (pendingActivationWorkers) {
-          pendingActivationWorkers.add(this);
+        startActivation = true;
+      } else if (safeWorkerReactivation && state.get().equals(DEACTIVATING)) {
+        if (reactivationPending) {
+          logReactivationTransition("DEFERRED_DUPLICATE", state.get());
+        } else {
+          reactivationPending = true;
+          logReactivationTransition("DEFERRED", state.get());
         }
-        // Send ACTIVATE event to the VM worker so it responds with ACTIVATE
-        final ByteBuf buf = controlChannel.alloc().ioBuffer(Integer.BYTES).writeInt(requestId);
-        controlChannel.writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.ACTIVATE, buf));
-        activator.activate();
+        return;
       } else {
-        throw new RuntimeException("Worker " + requestId + "/" + state +
+        throw new RuntimeException("Worker " + requestId + "/" + state.get() +
           " is not deactive but try to activate");
       }
     }
+
+    if (startActivation) {
+      beginActivation("DIRECT");
+    }
+  }
+
+  /**
+   * Registers and starts one backend activation attempt. This method deliberately runs outside
+   * the state monitor because the backend activator may perform I/O.
+   *
+   * <p>The proxy must remain backend-neutral: an AWS activator starts a new Lambda invocation,
+   * while the CloudLab VM activator submits a new handler invocation to a pre-warmed VMWorker.
+   * Sending a direct ACTIVATE message here would acknowledge the worker state without creating
+   * the invocation that must later consume and acknowledge END.</p>
+   */
+  private void beginActivation(final String reason) {
+    final boolean added;
+    final int pendingCount;
+    synchronized (pendingActivationWorkers) {
+      added = pendingActivationWorkers.add(this);
+      pendingCount = pendingActivationWorkers.size();
+    }
+
+    if (!added) {
+      LOG.info("SPONGE_WORKER_REACTIVATION transition=ACTIVATION_COALESCED reason={} "
+          + "requestId={} executorId={} pendingActivationWorkers={}",
+        reason, requestId, executorId, pendingCount);
+      return;
+    }
+
+    LOG.info("SPONGE_WORKER_REACTIVATION transition=ACTIVATION_REQUESTED reason={} "
+        + "requestId={} executorId={} pendingActivationWorkers={}",
+      reason, requestId, executorId, pendingCount);
+
+    activator.activate();
   }
 
   public void deactivate() {
@@ -131,17 +177,25 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
           if (state.get().equals(ACTIVATE)) {
             state.set(DEACTIVATING);
             LOG.info("Send end message for deactivating worker {}", requestId);
+            LOG.info("SPONGE_WORKER_REACTIVATION transition=END_SENT "
+                + "requestId={} executorId={}", requestId, executorId);
             controlChannel
               .writeAndFlush(new OffloadingMasterEvent(OffloadingMasterEvent.Type.END, null));
       } else {
-        throw new RuntimeException("Worker " + requestId + "/" + state +
+        throw new RuntimeException("Worker " + requestId + "/" + state.get() +
           " is not active but try to deactivate");
       }
     }
   }
 
   public boolean isDeactivated() {
-    return state.get().equals(DEACTIVATE);
+    synchronized (state) {
+      return state.get().equals(DEACTIVATE);
+    }
+  }
+
+  boolean requiresActivationAcknowledgement() {
+    return safeWorkerReactivation;
   }
 
   public boolean allPendingTasksReady() {
@@ -223,8 +277,14 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
           duplicateRequestChannels.clear();
 
           LOG.info("Set lambda worker {} to activate", requestId);
-          state.set(State.ACTIVATE);
+          synchronized (state) {
+            state.set(State.ACTIVATE);
+            state.notifyAll();
+          }
           recordActiveWorkerState("ACTIVATED");
+          LOG.info("SPONGE_WORKER_REACTIVATION transition=ACTIVATION_ACKNOWLEDGED "
+              + "requestId={} executorId={} pendingActivationWorkers={}",
+            requestId, executorId, pendingActivationWorkers.size());
         }
         break;
       }
@@ -255,8 +315,12 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
       }
       case END:
         LOG.info("Deactivating worker {}", requestId);
+        LOG.info("SPONGE_WORKER_REACTIVATION transition=END_ACKNOWLEDGED "
+            + "requestId={} executorId={}", requestId, executorId);
 
         lastActivationTime = System.currentTimeMillis();
+
+        boolean startDeferredActivation = false;
 
         synchronized (state) {
           if (!state.get().equals(DEACTIVATING)) {
@@ -266,8 +330,18 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
           state.set(State.DEACTIVATE);
           ACTIVE_WORKER_IDS.remove(requestId);
           logActiveWorkerState("DEACTIVATED");
+
+          if (safeWorkerReactivation && reactivationPending) {
+            reactivationPending = false;
+            state.set(State.ACTIVATING);
+            startDeferredActivation = true;
+            logReactivationTransition("DEFERRED_RELEASED", state.get());
+          }
         }
         msg.getByteBuf().release();
+        if (startDeferredActivation) {
+          beginActivation("DEFERRED");
+        }
         // endQueue.add(msg);
         break;
       default:
@@ -298,5 +372,10 @@ public final class WorkerControlProxy implements EventHandler<OffloadingMasterEv
   private void logActiveWorkerState(final String transition) {
     LOG.info("SPONGE_VM_WORKERS transition={} requestId={} executorId={} activeWorkers={}",
       transition, requestId, executorId, ACTIVE_WORKER_IDS.size());
+  }
+
+  private void logReactivationTransition(final String transition, final State currentState) {
+    LOG.info("SPONGE_WORKER_REACTIVATION transition={} requestId={} executorId={} state={} pending={}",
+      transition, requestId, executorId, currentState, reactivationPending);
   }
 }
