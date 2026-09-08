@@ -1,0 +1,68 @@
+{
+  "QueryName": "nexmark_query6",
+  "WorkDir": "/users/akash01/holostream-producer-ref-2217278",
+  "KafkaClusterIPs": ["10.10.1.2", "10.10.1.3", "10.10.1.4"],
+  "ProducerIPs": ["node0", "node0", "node0", "node0"],
+  "NexmarkLogicalSourceConfigs": [
+    {
+      "EventType": "Auction",
+      "NexmarkSourceConfig": {
+        "NumEvents": 574195,
+        "OutputEventNumber": 0,
+        "InterEventDelay": "1ms",
+        "PersonProportion": 1,
+        "AuctionProportion": 3,
+        "BidProportion": 46,
+        "NumCategories": 10,
+        "NumInFlightEvents": 500000,
+        "NumActiveAuctions": 30000,
+        "NumActivePeople": 1000,
+        "RateLimiterConfig": {
+          "UseRateLimit": true,
+          "RateLimit": [
+            1531,
+            1531, 1990, 3260, 4974, 6704, 7959, 8418,
+            7959, 6704, 4974, 3260, 1990,
+            1531
+          ],
+          "RateChangeInterval": [
+            120,
+            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+            60
+          ],
+          "GeneratorInterval": "1s"
+        }
+      }
+    },
+    {
+      "EventType": "Bid",
+      "NexmarkSourceConfig": {
+        "NumEvents": 8803305,
+        "OutputEventNumber": 0,
+        "InterEventDelay": "1ms",
+        "PersonProportion": 1,
+        "AuctionProportion": 3,
+        "BidProportion": 46,
+        "NumCategories": 10,
+        "NumInFlightEvents": 500000,
+        "NumActiveAuctions": 30000,
+        "NumActivePeople": 1000,
+        "RateLimiterConfig": {
+          "UseRateLimit": true,
+          "RateLimit": [
+            23469,
+            23469, 30510, 49990, 76276, 102796, 122041, 129082,
+            122041, 102796, 76276, 49990, 30510,
+            23469
+          ],
+          "RateChangeInterval": [
+            120,
+            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+            60
+          ],
+          "GeneratorInterval": "1s"
+        }
+      }
+    }
+  ]
+}
