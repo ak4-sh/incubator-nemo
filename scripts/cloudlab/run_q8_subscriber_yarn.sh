@@ -21,6 +21,7 @@ CPU_DELAY_MS=${CPU_DELAY_MS:-0}
 EC2=${EC2:-false}
 OFFLOADING=${OFFLOADING:-0}
 AUTOSCALING=${AUTOSCALING:-false}
+SAFE_WORKER_REACTIVATION=${SAFE_WORKER_REACTIVATION:-false}
 OPTIMIZATION_POLICY=${OPTIMIZATION_POLICY:-org.apache.nemo.compiler.optimizer.policy.StreamingPolicy}
 LATENCY_LIMIT=${LATENCY_LIMIT:-300000}
 NUM_MAX_LAMBDA=${NUM_MAX_LAMBDA:-4}
@@ -37,6 +38,7 @@ if [[ "$OFFLOADING" == "1" ]]; then
     -offloading_type cloudlab-vm
     -num_max_lambda "$NUM_MAX_LAMBDA"
     -autoscaling "$AUTOSCALING"
+    -safe_worker_reactivation "$SAFE_WORKER_REACTIVATION"
     -latency_limit "$LATENCY_LIMIT"
   )
 fi
@@ -51,6 +53,7 @@ echo "  executor_json=$EXECUTOR_JSON"
 echo "  ec2_cpu_normalization=$EC2"
 echo "  offloading=$OFFLOADING"
 echo "  autoscaling=$AUTOSCALING"
+echo "  safe_worker_reactivation=$SAFE_WORKER_REACTIVATION"
 echo "  optimization_policy=$OPTIMIZATION_POLICY"
 echo "  source_hosts=${SOURCE_HOSTS:-<unset>}"
 echo "  compute_hosts=${COMPUTE_HOSTS:-<unset>}"

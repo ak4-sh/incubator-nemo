@@ -36,6 +36,10 @@ export STRICT_EXECUTOR_PLACEMENT=true
 export EXPECTED_EXECUTOR_PLACEMENT_ROWS=5
 export EXPECTED_SOURCE_SLOTS=${EXPECTED_SOURCE_SLOTS:-16}
 export EXPECTED_COMPUTE_SLOTS=${EXPECTED_COMPUTE_SLOTS:-12}
+export EXPECTED_EXECUTOR_MEMORY_MB=${EXPECTED_EXECUTOR_MEMORY_MB:-114688}
+export EXPECTED_EXECUTOR_CAPACITY=${EXPECTED_EXECUTOR_CAPACITY:-55}
+export EXPECTED_NODE_MEMORY_MB=${EXPECTED_NODE_MEMORY_MB:-122880}
+export EXPECTED_NODE_VCORES=${EXPECTED_NODE_VCORES:-56}
 export OFFLOAD_NODES=${OFFLOAD_NODES:-node4,node6,node7,node8}
 
 # Smoke-test defaults keep the scaler inactive while validating the original rewritten graph.
@@ -63,8 +67,12 @@ python3 "$SCRIPT_DIR/validate_hardware_matched_sponge.py" \
   --source-host "$SOURCE_HOSTS" \
   --compute-hosts "$COMPUTE_HOSTS" \
   --offload-hosts "$OFFLOAD_NODES" \
+  --executor-memory-mb "$EXPECTED_EXECUTOR_MEMORY_MB" \
+  --executor-capacity "$EXPECTED_EXECUTOR_CAPACITY" \
   --source-slots "$EXPECTED_SOURCE_SLOTS" \
   --compute-slots "$EXPECTED_COMPUTE_SLOTS" \
+  --node-memory-mb "$EXPECTED_NODE_MEMORY_MB" \
+  --node-vcores "$EXPECTED_NODE_VCORES" \
   --output-json "$WORK_DIR/hardware_preflight.json"
 
 exec "$SCRIPT_DIR/run_autoscaler_smoke.sh"

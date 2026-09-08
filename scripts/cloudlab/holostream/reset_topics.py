@@ -18,6 +18,7 @@ AUCTION_TOPIC = "nexmark-auction"
 BID_TOPIC = "nexmark-bid"
 TOPICS = (AUCTION_TOPIC, BID_TOPIC)
 SSH_OPTIONS = ("-o", "BatchMode=yes", "-o", "ConnectTimeout=10")
+KAFKA_CLI_HEAP_OPTS = "KAFKA_HEAP_OPTS=-Xmx256m"
 OFFSET_LINE = re.compile(r"^([^:]+):(\d+):(\d+)\s*$")
 PARTITION_REPLICAS = re.compile(
     r"Partition:\s*(\d+).*?Replicas:\s*([0-9]+(?:,[0-9]+)*)"
@@ -28,7 +29,7 @@ class ResetError(RuntimeError):
     """A failure which prevents a verified empty-topic reset."""
 
 
-def run_command(command: list[str], label: str, timeout: int = 30) -> subprocess.CompletedProcess[str]:
+def run_command(command: list[str], label: str, timeout: int = 120) -> subprocess.CompletedProcess[str]:
     try:
         return subprocess.run(
             command,
@@ -46,10 +47,14 @@ def ssh(
     remote_args: list[str],
     label: str,
     *,
-    timeout: int = 30,
+    timeout: int = 120,
     allow_failure: bool = False,
 ) -> subprocess.CompletedProcess[str]:
-    command = ["ssh", *SSH_OPTIONS, host, shlex.join(remote_args)]
+    # Kafka's CLI defaults to a much larger heap than these short-lived admin
+    # commands require.  On smaller CloudLab nodes that can make JVM startup
+    # exceed the per-command timeout even though the brokers are healthy.
+    remote_command = ["env", KAFKA_CLI_HEAP_OPTS, *remote_args]
+    command = ["ssh", *SSH_OPTIONS, host, shlex.join(remote_command)]
     result = run_command(command, label, timeout)
     if result.returncode != 0 and not allow_failure:
         detail = result.stderr.strip() or result.stdout.strip() or "no output"
@@ -344,11 +349,33 @@ def reset_topics(args: argparse.Namespace, manifest: dict[str, Any]) -> None:
             "--config",
             "message.timestamp.type=LogAppendTime",
         ]
-        ssh(
-            args.kafka_node,
-            create_args,
-            f"create fixed HoloStream topic {topic}",
-        )
+        create_deadline = time.monotonic() + args.timeout_seconds
+        while True:
+            create_result = ssh(
+                args.kafka_node,
+                create_args,
+                f"create fixed HoloStream topic {topic}",
+                allow_failure=True,
+            )
+            if create_result.returncode == 0:
+                break
+            create_detail = (
+                create_result.stderr.strip()
+                or create_result.stdout.strip()
+                or "no output"
+            )
+            if (
+                "TopicExistsException" not in create_detail
+                or time.monotonic() >= create_deadline
+            ):
+                raise ResetError(
+                    f"create fixed HoloStream topic {topic} exited "
+                    f"{create_result.returncode}: {create_detail}"
+                )
+            # Kafka can omit a topic from --list while it is still marked for
+            # deletion.  Wait for the deletion to become final before retrying
+            # the exact same create operation.
+            time.sleep(1)
         manifest["operations"].append(
             {
                 "timestampMs": int(time.time() * 1000),

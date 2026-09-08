@@ -65,6 +65,9 @@ STREAM_TIMEOUT=${STREAM_TIMEOUT:-900}
 NUM_EVENTS=${NUM_EVENTS:-$TOTAL_EVENTS}
 CPU_DELAY_MS=${CPU_DELAY_MS:-0}
 AUTOSCALING=${AUTOSCALING:-false}
+SAFE_WORKER_REACTIVATION=${SAFE_WORKER_REACTIVATION:-false}
+REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION=${REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION:-false}
+MIN_CLOUDLAB_REACTIVATIONS_PER_WORKER=${MIN_CLOUDLAB_REACTIVATIONS_PER_WORKER:-0}
 OFFLOADING=${OFFLOADING:-1}
 SCALER_START_MODE=${SCALER_START_MODE:-immediate}
 SCALER_START_PHASE=${SCALER_START_PHASE:-2}
@@ -432,6 +435,23 @@ if [[ "$OFFLOADING" != "0" && "$OFFLOADING" != "1" ]]; then
 fi
 if [[ "$AUTOSCALING" == "true" && "$OFFLOADING" != "1" ]]; then
   echo "ERROR: AUTOSCALING=true requires OFFLOADING=1" >&2
+  exit 1
+fi
+if [[ "$SAFE_WORKER_REACTIVATION" != "true" && "$SAFE_WORKER_REACTIVATION" != "false" ]]; then
+  echo "ERROR: SAFE_WORKER_REACTIVATION must be true or false" >&2
+  exit 1
+fi
+if [[ "$REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION" != "true" &&
+      "$REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION" != "false" ]]; then
+  echo "ERROR: REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION must be true or false" >&2
+  exit 1
+fi
+if ! [[ "$MIN_CLOUDLAB_REACTIVATIONS_PER_WORKER" =~ ^[0-9]+$ ]]; then
+  echo "ERROR: MIN_CLOUDLAB_REACTIVATIONS_PER_WORKER must be a non-negative integer" >&2
+  exit 1
+fi
+if [[ "$REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION" == "true" && "$OFFLOADING" != "1" ]]; then
+  echo "ERROR: CloudLab lifecycle validation requires OFFLOADING=1" >&2
   exit 1
 fi
 
@@ -1099,6 +1119,21 @@ PY
     done < "$WORK_DIR/executor_placement.csv"
   fi
 
+  if [[ "$OFFLOADING" == "1" ]]; then
+    local -a lifecycle_offload_nodes
+    mkdir -p "$metrics_dir/vmworker_logs"
+    IFS=',' read -ra lifecycle_offload_nodes <<< "$OFFLOAD_NODES"
+    for node in "${lifecycle_offload_nodes[@]}"; do
+      mkdir -p "$metrics_dir/vmworker_logs/$node"
+      scp "$node:/tmp/vmworker-*.log" "$metrics_dir/vmworker_logs/$node/" \
+        >/dev/null 2>&1 || true
+      if ssh "$node" "test -f /tmp/start-warm-pool-$node.log"; then
+        scp "$node:/tmp/start-warm-pool-$node.log" \
+          "$metrics_dir/vmworker_logs/$node/" >/dev/null 2>&1 || true
+      fi
+    done
+  fi
+
   "$KAFKA_HOME/bin/kafka-consumer-groups.sh" \
     --bootstrap-server "$KAFKA_BOOTSTRAP" \
     --describe \
@@ -1112,6 +1147,22 @@ PY
       --topic "$topic" \
       --time -1 >> "$WORK_DIR/final_kafka_offsets.txt"
   done
+}
+
+validate_cloudlab_worker_lifecycle() {
+  local metrics_dir="$WORK_DIR/remote_tmp_metrics"
+  local output="$WORK_DIR/worker_lifecycle_validation.json"
+
+  if [[ "$REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION" != "true" ]]; then
+    return 0
+  fi
+
+  echo "Validating repeated CloudLab VM worker invocation lifecycles"
+  python3 "$SCRIPT_DIR/validate_worker_lifecycle.py" \
+    --master-log-dir "$metrics_dir/yarn_logs" \
+    --worker-log-dir "$metrics_dir/vmworker_logs" \
+    --minimum-reactivations-per-worker "$MIN_CLOUDLAB_REACTIVATIONS_PER_WORKER" \
+    --output-json "$output"
 }
 
 stop_metrics_collector() {
@@ -1148,6 +1199,12 @@ write_final_validation() {
   local requested_host
   local physical_host
   local row_passed
+  local application_state="UNKNOWN"
+  local final_application_state="UNKNOWN"
+  local yarn_status_ok=false
+  local driver_fatal_error_count=0
+  local cloudlab_lifecycle_required="$REQUIRE_CLOUDLAB_LIFECYCLE_VALIDATION"
+  local cloudlab_lifecycle_passed=true
 
   row=$(awk -F, 'NR > 1 {line=$0} END {print line}' "$WORK_DIR/combined_metrics.csv")
   input_offset=$(printf '%s\n' "$row" | awk -F, '{print $2}')
@@ -1183,6 +1240,35 @@ write_final_validation() {
     done < "$WORK_DIR/executor_placement.csv"
   fi
   evaluator_error_count=$(wc -l < "$WORK_DIR/evaluator_errors.txt" | tr -d ' ')
+
+  if "$HADOOP_HOME/bin/yarn" application -status "$APP_ID" \
+      > "$WORK_DIR/yarn_application_status.txt" 2>&1; then
+    yarn_status_ok=true
+    application_state=$(awk -F: '
+      $1 ~ /^[[:space:]]*State[[:space:]]*$/ {
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2; exit
+      }' "$WORK_DIR/yarn_application_status.txt")
+    final_application_state=$(awk -F: '
+      $1 ~ /^[[:space:]]*Final-State[[:space:]]*$/ {
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2; exit
+      }' "$WORK_DIR/yarn_application_status.txt")
+    application_state=${application_state:-UNKNOWN}
+    final_application_state=${final_application_state:-UNKNOWN}
+  fi
+
+  grep -E \
+    'REEFUncaughtExceptionHandler uncaughtException|Thread TaskDispatcher thread threw an uncaught exception|Received a resource manager error|SEVERE: Uncaught exception|OutOfMemoryError:|InvalidClassException|Failed to deserialize|Failed to decode' \
+    "$SUB_LOG" > "$WORK_DIR/driver_fatal_errors.txt" || true
+  driver_fatal_error_count=$(wc -l < "$WORK_DIR/driver_fatal_errors.txt" | tr -d ' ')
+
+  if [[ "$cloudlab_lifecycle_required" == "true" ]]; then
+    cloudlab_lifecycle_passed=false
+    if [[ -f "$WORK_DIR/worker_lifecycle_validation.json" ]] &&
+       grep -q '"passed":[[:space:]]*true' "$WORK_DIR/worker_lifecycle_validation.json"; then
+      cloudlab_lifecycle_passed=true
+    fi
+  fi
+
   python3 -c '
 import json
 import sys
@@ -1191,23 +1277,33 @@ from pathlib import Path
 (
     output, job_id, app_id, expected, produced, source, lag, producer_status,
     nemo_sha256, nexmark_sha256, placement_passed, evaluator_error_count,
+    safe_worker_reactivation, yarn_status_ok, application_state,
+    final_application_state, driver_fatal_error_count,
+    cloudlab_lifecycle_required, cloudlab_lifecycle_passed,
 ) = sys.argv[1:]
 payload = {
     "applicationId": app_id,
+    "applicationState": application_state,
     "artifactSha256": {
         "nemoClient": nemo_sha256,
         "nexmark": nexmark_sha256,
     },
     "consumerLag": int(lag),
+    "cloudlabWorkerLifecyclePassed": cloudlab_lifecycle_passed == "true",
+    "cloudlabWorkerLifecycleRequired": cloudlab_lifecycle_required == "true",
+    "driverFatalErrorCount": int(driver_fatal_error_count),
     "evaluatorErrorCount": int(evaluator_error_count),
     "expectedInputEvents": int(expected),
+    "finalApplicationState": final_application_state,
     "jobId": job_id,
     "metricsCollectorStatus": "terminal_validated",
     "placementPassed": placement_passed == "true",
     "producerStatus": producer_status,
     "rawMetricsPreserved": True,
+    "safeWorkerReactivation": safe_worker_reactivation == "true",
     "sourceProcessedEvents": int(source),
     "terminalInputOffset": int(produced),
+    "yarnStatusCommandSucceeded": yarn_status_ok == "true",
     "validated": (
         producer_status in ("success", "not_applicable")
         and int(produced) == int(expected)
@@ -1215,13 +1311,22 @@ payload = {
         and int(lag) == 0
         and placement_passed == "true"
         and int(evaluator_error_count) == 0
+        and int(driver_fatal_error_count) == 0
+        and yarn_status_ok == "true"
+        and application_state == "RUNNING"
+        and (
+            cloudlab_lifecycle_required != "true"
+            or cloudlab_lifecycle_passed == "true"
+        )
     ),
 }
 Path(output).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 ' "$WORK_DIR/final_validation.json" "$JOB_ID" "$APP_ID" "$TOTAL_EVENTS" \
     "$input_offset" "$source_count" "$consumer_lag" "$producer_status" \
     "$nemo_sha256" "$nexmark_sha256" "$placement_passed" \
-    "$evaluator_error_count"
+    "$evaluator_error_count" "$SAFE_WORKER_REACTIVATION" "$yarn_status_ok" \
+    "$application_state" "$final_application_state" "$driver_fatal_error_count" \
+    "$cloudlab_lifecycle_required" "$cloudlab_lifecycle_passed"
   grep -q '"validated": true' "$WORK_DIR/final_validation.json"
 }
 
@@ -1444,6 +1549,7 @@ export LOG_FILE="$SUB_LOG"
 export OFFLOADING
 export NUM_MAX_LAMBDA
 export AUTOSCALING
+export SAFE_WORKER_REACTIVATION
 export JOB_ID
 export NEMO_WORK_DIR="$WORK_DIR"
 export NEMO_JOB_ID="$JOB_ID"
@@ -1595,6 +1701,9 @@ fi
 if [[ "$PRODUCER_IMPL" == "holostream" ]]; then
   wait_for_terminal_metrics
   preserve_run_metrics
+  if ! validate_cloudlab_worker_lifecycle; then
+    echo "ERROR: CloudLab VM worker lifecycle validation failed" >&2
+  fi
   write_final_validation
   stop_metrics_collector
 fi
